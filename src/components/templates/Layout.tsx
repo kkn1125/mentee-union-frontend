@@ -1,15 +1,17 @@
-import { Box } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import Header from "@components/moleculars/Header";
-import Footer from "@components/moleculars/Footer";
+import Header from "@/components/organisms/Header";
+import Footer from "@/components/organisms/Footer";
 
 function Layout() {
   return (
-    <Box>
+    <Stack sx={{ height: "inherit" }}>
       <Header />
-      <Outlet />
+      <Box sx={{ flex: 1, px: 1, overflowY: "auto" }}>
+        <Outlet />
+      </Box>
       <Footer />
-    </Box>
+    </Stack>
   );
 }
 
