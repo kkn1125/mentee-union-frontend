@@ -1,16 +1,20 @@
 import ReactDOM from "react-dom/client";
 import App from "./App.tsx";
 import { BrowserRouter } from "react-router-dom";
-import TokenProvider from "./context/TokenContext.tsx";
+import "./assets/main.scss";
+import TokenProvider from "./context/TokenProvider.tsx";
+import ThemeProvider from "./context/ThemeProvider.tsx";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <>
     {/* <React.StrictMode> */}
-    <BrowserRouter>
-      <TokenProvider>
-        <App />
-      </TokenProvider>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <TokenProvider>
+          <App />
+        </TokenProvider>
+      </BrowserRouter>
+    </ThemeProvider>
     {/* </React.StrictMode> */}
   </>
 );

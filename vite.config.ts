@@ -1,7 +1,51 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react-swc'
+import react from "@vitejs/plugin-react-swc";
+import { defineConfig, loadEnv } from "vite";
+import dotenv from "dotenv";
+import path from "path";
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-})
+export default defineConfig(({ command, mode }) => {
+  // Load env file based on `mode` in the current working directory.
+  // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
+  const env = loadEnv(mode, process.cwd(), "");
+
+  dotenv.config({
+    path: path.join(path.resolve(), ".env"),
+  });
+
+  const host = process.env.HOST;
+  const port = +process.env.PORT || 5000;
+
+  return {
+    // vite config
+    define: {
+      __APP_ENV__: JSON.stringify(env.APP_ENV),
+      custom_env: { BRAND_NAME: process.env.BRAND_NAME },
+    },
+    server: {
+      host: host,
+      port: port,
+    },
+    base: "./",
+    resolve: {
+      alias: [
+        {
+          find: "@",
+          replacement: path.join(path.resolve(), "src"),
+        },
+        {
+          find: "@components",
+          replacement: path.join(path.resolve(), "src/components"),
+        },
+      ],
+    },
+    build: {
+      outDir: "dist",
+      minify: "terser",
+      cssMinify: true,
+      terserOptions: {
+        keep_classnames: true,
+      },
+    },
+    plugins: [react()],
+  };
+});
