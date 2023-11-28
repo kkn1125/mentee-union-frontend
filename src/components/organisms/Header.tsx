@@ -1,3 +1,8 @@
+import {
+  TOKEN_ACTION,
+  TokenContext,
+  TokenDispatchContext,
+} from "@/context/TokenProvider";
 import { BRAND_NAME } from "@/util/global.constants";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -7,23 +12,79 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import * as React from "react";
+import {
+  useState,
+  useEffect,
+  ChangeEvent,
+  useContext,
+  MouseEvent,
+  Fragment,
+  useCallback,
+} from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Header() {
-  const [auth, setAuth] = React.useState(true);
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [auth, setAuth] = useState(true);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const tokenDispatch = useContext(TokenDispatchContext);
+  const token = useContext(TokenContext);
+  const navigate = useNavigate();
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    tokenDispatch({
+      type: TOKEN_ACTION.LOAD,
+    });
+  }, []);
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     setAuth(event.target.checked);
   };
 
-  const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
+  const handleMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  const handleSignout = () => {
+    tokenDispatch({
+      type: TOKEN_ACTION.SIGNOUT,
+    });
+  };
+
+  const handleRedirectHome = () => {
+    navigate("/");
+  };
+
+  const handleRedirectSignin = () => {
+    navigate("auth/signin");
+  };
+
+  const menuListInfo = [
+    { name: "Profile", onClick: handleClose, isShow: !!token.token },
+    { name: "My Account", onClick: handleClose, isShow: !!token.token },
+    {
+      name: "Sign in",
+      onClick: () => {
+        handleClose();
+        handleRedirectSignin();
+      },
+      isShow: !token.token,
+    },
+    {
+      name: "Sign out",
+      onClick: () => {
+        handleClose();
+        setTimeout(() => {
+          handleRedirectHome();
+          handleSignout();
+        }, 100);
+      },
+      isShow: !!token.token,
+    },
+  ];
 
   return (
     <AppBar position='static' color='transparent'>
@@ -36,7 +97,12 @@ export default function Header() {
           sx={{ mr: 2 }}>
           <MenuIcon />
         </IconButton>
-        <Typography variant='h6' component='div' sx={{ flexGrow: 1 }}>
+        <Typography
+          variant='h6'
+          component={Link}
+          fontWeight={700}
+          sx={{ flexGrow: 1, textDecoration: "none", color: "inherit" }}
+          to='/'>
           {BRAND_NAME}
         </Typography>
         {auth && (
@@ -64,8 +130,14 @@ export default function Header() {
               }}
               open={Boolean(anchorEl)}
               onClose={handleClose}>
-              <MenuItem onClick={handleClose}>Profile</MenuItem>
-              <MenuItem onClick={handleClose}>My account</MenuItem>
+              {menuListInfo.map(
+                (info) =>
+                  info.isShow && (
+                    <MenuItem key={info.name} onClick={info.onClick}>
+                      {info.name}
+                    </MenuItem>
+                  )
+              )}
             </Menu>
           </div>
         )}

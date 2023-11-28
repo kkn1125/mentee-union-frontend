@@ -32,13 +32,22 @@ function Placeholder({
     return canvas.toDataURL("image/png");
   }
 
-  return (
+  return placeholder ? (
     <Box
       component='img'
       src={placeholder}
       alt={alt}
       width={maxWidth ? "100%" : width}
       height={height}
+    />
+  ) : (
+    <Box
+      component='div'
+      sx={{
+        width: maxWidth ? "100%" : width,
+        height: height,
+        backgroundColor: "#56565656",
+      }}
     />
   );
 }

@@ -1,6 +1,7 @@
 import Placeholder from "@/components/moleculars/Placeholder";
 import Section from "@/components/moleculars/Section";
 import { ColorModeContext } from "@/context/ThemeProvider";
+import { TokenContext } from "@/context/TokenProvider";
 import {
   Box,
   Button,
@@ -10,9 +11,12 @@ import {
   Typography,
 } from "@mui/material";
 import { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+  const navigate = useNavigate();
   const theme = useContext(ColorModeContext);
+  const token = useContext(TokenContext);
 
   useEffect(() => {}, []);
 
@@ -33,12 +37,20 @@ function Home() {
             제공하는 것입니다.
           </Typography>
           <Box>
-            <Button variant='contained'>커뮤니티 가입하기</Button>
+            <Button
+              variant='contained'
+              onClick={() =>
+                token.token
+                  ? navigate("community")
+                  : alert("로그인 후 사용 가능합니다.")
+              }>
+              커뮤니티 참여하기
+            </Button>
           </Box>
         </Stack>
-        <Box sx={{ width: 300 }}>
+        <Stack sx={{ width: 300 }}>
           <Placeholder width={600} height={450} maxWidth />
-        </Box>
+        </Stack>
       </Section>
 
       <Section>
@@ -59,9 +71,9 @@ function Home() {
             </Typography>
           </Paper>
         </Stack>
-        <Box sx={{ width: 300 }}>
+        <Stack sx={{ width: 300 }}>
           <Placeholder width={600} height={450} maxWidth />
-        </Box>
+        </Stack>
       </Section>
 
       <Stack flex={1} gap={5} sx={{ my: 2 }}>
@@ -171,9 +183,9 @@ function Home() {
             </Typography>
           </Paper>
         </Stack>
-        <Box sx={{ width: 300 }}>
+        <Stack sx={{ width: 300 }}>
           <Placeholder width={600} height={450} maxWidth />
-        </Box>
+        </Stack>
       </Section>
 
       <Stack flex={1} gap={5} sx={{ my: 2 }}>

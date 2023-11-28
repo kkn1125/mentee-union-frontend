@@ -7,9 +7,9 @@ function Layout() {
   return (
     <Stack sx={{ height: "inherit" }}>
       <Header />
-      <Box sx={{ flex: 1, px: 1, overflowY: "auto" }}>
+      <Stack sx={{ flex: 1, px: 1, overflowY: "auto" }}>
         <Outlet />
-      </Box>
+      </Stack>
       <Footer />
     </Stack>
   );
