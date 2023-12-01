@@ -2,7 +2,7 @@ import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
 import { axiosInstance } from "@/util/instances";
 import { Box, Button, Container, Paper, Stack, TextField } from "@mui/material";
 import { useFormik } from "formik";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 
@@ -23,7 +23,6 @@ const validationSchema = yup.object({
 function Signin() {
   const tokenDispatch = useContext(TokenDispatchContext);
   const navigate = useNavigate();
-  const [isAccountLock, setIsAccountLock] = useState(false);
   const locate = useLocation();
 
   const formik = useFormik({
@@ -89,7 +88,6 @@ function Signin() {
                 email: formik.values.email,
                 password: "",
               });
-              setIsAccountLock(true);
               break;
             default:
               alert("서버에 문제가 발생 했습니다.");

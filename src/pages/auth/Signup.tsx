@@ -1,5 +1,4 @@
 import Loading from "@/components/atoms/Loading";
-import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
 import { axiosInstance } from "@/util/instances";
 import {
   Box,
@@ -15,7 +14,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 
@@ -53,7 +52,6 @@ const validationSchema = yup.object({
 const options = ["male", "female", "none"];
 
 function Signup() {
-  const tokenDispatch = useContext(TokenDispatchContext);
   const navigate = useNavigate();
   const [availableUsername, setAvailableUsername] = useState<
     boolean | undefined

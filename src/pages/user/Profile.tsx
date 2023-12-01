@@ -1,15 +1,14 @@
 import Loading from "@/components/atoms/Loading";
 import { TokenContext } from "@/context/TokenProvider";
 import { axiosInstance } from "@/util/instances";
-import { Stack, Typography, Box, Button, TextField } from "@mui/material";
-import React, { useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Stack, TextField, Typography } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
 
 function Profile() {
   const token = useContext(TokenContext);
   const [profileData, setProfileData] = useState<Partial<User>>({});
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     if (token.token) {
@@ -21,7 +20,7 @@ function Profile() {
         })
         .then(({ data }) => {
           setLoading(false);
-          console.log(data.data)
+          console.log(data.data);
           setProfileData(data.data);
         });
     }

@@ -1,11 +1,10 @@
-import { TokenDispatchContext, TOKEN_ACTION } from "@/context/TokenProvider";
+import Loading from "@/components/atoms/Loading";
 import { axiosInstance } from "@/util/instances";
-import { Box, Button, Container, Paper, Stack, TextField } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
+import { Button, Container, Paper, Stack, TextField } from "@mui/material";
+import { useFormik } from "formik";
+import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as yup from "yup";
-import { useFormik } from "formik";
-import Loading from "@/components/atoms/Loading";
 
 const validationSchema = yup.object({
   email: yup
@@ -43,7 +42,6 @@ function RequestResetPassword() {
           email: values.email,
         })
         .then(({ data }) => {
-          const { _ } = data;
           console.log(data);
           // navigate("/");
           alert("비밀번호 재설정 메일을 전송했습니다. 메일을 확인 해 주세요.");

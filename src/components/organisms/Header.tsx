@@ -6,23 +6,17 @@ import {
 import { BRAND_NAME } from "@/util/global.constants";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
+import { Box } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import {
-  ChangeEvent,
-  MouseEvent,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { MouseEvent, useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Header() {
-  const [auth, setAuth] = useState(true);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const tokenDispatch = useContext(TokenDispatchContext);
   const token = useContext(TokenContext);
@@ -33,10 +27,6 @@ export default function Header() {
       type: TOKEN_ACTION.LOAD,
     });
   }, []);
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setAuth(event.target.checked);
-  };
 
   const handleMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -106,42 +96,40 @@ export default function Header() {
           to='/'>
           {BRAND_NAME}
         </Typography>
-        {auth && (
-          <div>
-            <IconButton
-              size='large'
-              aria-label='account of current user'
-              aria-controls='menu-appbar'
-              aria-haspopup='true'
-              onClick={handleMenu}
-              color='inherit'>
-              <AccountCircle />
-            </IconButton>
-            <Menu
-              id='menu-appbar'
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}>
-              {menuListInfo.map(
-                (info) =>
-                  info.isShow && (
-                    <MenuItem key={info.name} onClick={info.onClick}>
-                      {info.name}
-                    </MenuItem>
-                  )
-              )}
-            </Menu>
-          </div>
-        )}
+        <Box>
+          <IconButton
+            size='large'
+            aria-label='account of current user'
+            aria-controls='menu-appbar'
+            aria-haspopup='true'
+            onClick={handleMenu}
+            color='inherit'>
+            <AccountCircle />
+          </IconButton>
+          <Menu
+            id='menu-appbar'
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            open={Boolean(anchorEl)}
+            onClose={handleClose}>
+            {menuListInfo.map(
+              (info) =>
+                info.isShow && (
+                  <MenuItem key={info.name} onClick={info.onClick}>
+                    {info.name}
+                  </MenuItem>
+                )
+            )}
+          </Menu>
+        </Box>
       </Toolbar>
     </AppBar>
   );
