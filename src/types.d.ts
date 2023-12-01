@@ -40,7 +40,7 @@ export declare global {
     phone_number: string;
     birth: Date;
     gender: string;
-    password: string;
+    auth_email: boolean;
     level: number;
     points: number;
     fail_login_count: number;
@@ -58,5 +58,17 @@ export declare global {
     deleted_at: Date;
     created_at: Date;
     updated_at: Date;
+  }
+  export declare interface CustomAxiosError extends Error {
+    response: {
+      data: {
+        ok: boolean;
+        code: number;
+        data: object;
+        message: string;
+        detail: string;
+      };
+      status: number;
+    };
   }
 }

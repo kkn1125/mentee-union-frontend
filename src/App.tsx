@@ -7,6 +7,11 @@ import Community from "./pages/community/Index";
 import SeminarDetail from "./pages/community/seminars/SeminarDetail";
 import CommunityLayout from "./components/templates/CommunityLayout";
 import AuthLayout from "./components/templates/AuthLayout";
+import Signup from "./pages/auth/Signup";
+import RequestResetPassword from "./pages/auth/RequestResetPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+import Profile from "./pages/user/Profile";
+import UserLayout from "./components/templates/UserLayout";
 
 function App() {
   return (
@@ -16,6 +21,12 @@ function App() {
         <Route path='*' element={<Notfound />} />
         <Route path='auth' element={<AuthLayout />}>
           <Route path='signin' element={<Signin />} />
+          <Route path='signup' element={<Signup />} />
+          <Route path='request-pass' element={<RequestResetPassword />} />
+          <Route path='reset-password' element={<ResetPassword />} />
+        </Route>
+        <Route path='user' element={<UserLayout />}>
+          <Route path='profile' element={<Profile />} />
         </Route>
         <Route path='community' element={<CommunityLayout />}>
           <Route path='' element={<Community />} />

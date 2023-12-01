@@ -13,13 +13,11 @@ import MenuItem from "@mui/material/MenuItem";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import {
-  useState,
-  useEffect,
   ChangeEvent,
-  useContext,
   MouseEvent,
-  Fragment,
-  useCallback,
+  useContext,
+  useEffect,
+  useState,
 } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -54,22 +52,25 @@ export default function Header() {
     });
   };
 
-  const handleRedirectHome = () => {
-    navigate("/");
-  };
-
-  const handleRedirectSignin = () => {
-    navigate("auth/signin");
+  const handleRedirect = (path: string) => {
+    navigate(path);
   };
 
   const menuListInfo = [
-    { name: "Profile", onClick: handleClose, isShow: !!token.token },
+    {
+      name: "Profile",
+      onClick: () => {
+        handleClose();
+        handleRedirect("/user/profile");
+      },
+      isShow: !!token.token,
+    },
     { name: "My Account", onClick: handleClose, isShow: !!token.token },
     {
       name: "Sign in",
       onClick: () => {
         handleClose();
-        handleRedirectSignin();
+        handleRedirect("/auth/signin");
       },
       isShow: !token.token,
     },
@@ -78,7 +79,7 @@ export default function Header() {
       onClick: () => {
         handleClose();
         setTimeout(() => {
-          handleRedirectHome();
+          handleRedirect("/");
           handleSignout();
         }, 100);
       },
@@ -87,7 +88,7 @@ export default function Header() {
   ];
 
   return (
-    <AppBar position='static' color='transparent'>
+    <AppBar position='static' color='transparent' sx={{ zIndex: 100 }}>
       <Toolbar>
         <IconButton
           size='large'

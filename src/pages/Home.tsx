@@ -246,9 +246,15 @@ function Home() {
           목표는 상호적인 지식 공유와 성장을 위한 환경을 제공하는 것입니다. 아래
           버튼을 클릭하여 가입하세요.
         </Typography>
-        <Box>
-          <Button variant='contained'>지금 가입하기</Button>
-        </Box>
+        {!token.token && (
+          <Box>
+            <Button
+              variant='contained'
+              onClick={() => navigate("/auth/signup")}>
+              지금 가입하기
+            </Button>
+          </Box>
+        )}
       </Stack>
     </Stack>
   );

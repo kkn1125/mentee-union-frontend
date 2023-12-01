@@ -9,9 +9,10 @@ function Loading() {
         position: "fixed",
         top: 0,
         left: 0,
-        // backgroundColor: "#56565656",
+        backgroundColor: "#56565656",
         width: "100%",
         height: "100%",
+        zIndex: 999,
       }}>
       <CircularProgress />
     </Stack>
