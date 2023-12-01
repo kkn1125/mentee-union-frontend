@@ -1,18 +1,18 @@
-import { Container } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { Outlet } from "react-router-dom";
 
 function AuthLayout() {
   return (
-    <Container
-      maxWidth='sm'
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        flex: 1,
-      }}>
-      <Outlet />
-    </Container>
+    <Stack
+      gap={10}
+      justifyContent={"center"}
+      alignItems={"center"}
+      flex={1}
+      sx={{ width: "100%", mx: "auto", my: 5 }}>
+      <Box sx={{ width: "60%" }}>
+        <Outlet />
+      </Box>
+    </Stack>
   );
 }
 
