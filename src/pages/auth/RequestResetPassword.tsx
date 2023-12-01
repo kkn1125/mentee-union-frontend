@@ -1,6 +1,12 @@
-import Loading from "@/components/atoms/Loading";
 import { axiosInstance } from "@/util/instances";
-import { Button, Container, Paper, Stack, TextField } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  Container,
+  Paper,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -89,7 +95,6 @@ function RequestResetPassword() {
       sx={{
         flex: 1,
       }}>
-      {loading && <Loading />}
       <Paper
         component={Stack}
         sx={{
@@ -114,7 +119,11 @@ function RequestResetPassword() {
             helperText={formik.touched.email && formik.errors.email}
           />
           <Button type='submit' variant='contained' color='info'>
-            메일 전송
+            {loading ? (
+              <CircularProgress size={24.5} color='inherit' sx={{ mx: 2 }} />
+            ) : (
+              "메일 전송"
+            )}
           </Button>
           <Button
             type='button'

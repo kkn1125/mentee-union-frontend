@@ -1,3 +1,5 @@
+import { PaletteColor } from "@mui/material";
+
 export declare global {
   declare interface Window {}
 
@@ -71,4 +73,22 @@ export declare global {
       status: number;
     };
   }
+
+  // type MappedType<T, U> = {
+  //   [Property in T]: U;
+  // };
+
+  // type CustomPaletteColors = "whiteT" /*  | "nature" */;
+
+  // type CustomPalette = {
+  //   [_ in CustomPaletteColors]: PaletteColor;
+  // };
+  // type CustomPaletteOptions = {
+  //   [_ in keyof CustomPalette]?: PaletteColorOptions;
+  // };
+
+  // export declare module "@mui/material/styles" {
+  //   interface Palette extends CustomPalette {}
+  //   interface PaletteOptions extends CustomPaletteOptions {}
+  // }
 }

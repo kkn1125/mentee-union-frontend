@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 type PlaceholderType = {
   width: number;
   height: number;
+  src?: string;
   alt?: string;
   color?: string;
   maxWidth?: boolean;
@@ -12,6 +13,7 @@ type PlaceholderType = {
 function Placeholder({
   width,
   height,
+  src,
   alt = "placeholder",
   color = "#565656",
   maxWidth = false,
@@ -20,7 +22,7 @@ function Placeholder({
 
   useEffect(() => {
     setPlaceholder(createPlaceholderUrl(width, height, color));
-  }, [width, height]);
+  }, [src, width, height]);
 
   function createPlaceholderUrl(width: number, height: number, color: string) {
     const canvas = document.createElement("canvas");
@@ -32,10 +34,10 @@ function Placeholder({
     return canvas.toDataURL("image/png");
   }
 
-  return placeholder ? (
+  return src || placeholder ? (
     <Box
       component='img'
-      src={placeholder}
+      src={src || placeholder}
       alt={alt}
       width={maxWidth ? "100%" : width}
       height={height}
