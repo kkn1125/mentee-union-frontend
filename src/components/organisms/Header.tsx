@@ -78,7 +78,13 @@ export default function Header() {
   ];
 
   return (
-    <AppBar position='static' color='transparent' sx={{ zIndex: 100 }}>
+    <AppBar
+      position='static'
+      color='transparent'
+      sx={{
+        zIndex: 100,
+        backgroundColor: (theme) => theme.palette.background.paper,
+      }}>
       <Toolbar>
         <IconButton
           size='large'

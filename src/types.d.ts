@@ -51,6 +51,15 @@ export declare global {
     deleted_at: Date;
     created_at: Date;
     updated_at: Date;
+
+    profiles: Profile[];
+  }
+  export declare interface Profile {
+    id: number;
+    user_id: number;
+    origin_name: string;
+    new_name: string;
+    user: User;
   }
   export declare interface SeminarParticipants {
     id: number;
@@ -74,21 +83,21 @@ export declare global {
     };
   }
 
-  // type MappedType<T, U> = {
+  // declare type MappedType<T, U> = {
   //   [Property in T]: U;
   // };
 
-  // type CustomPaletteColors = "whiteT" /*  | "nature" */;
+  // declare type CustomPaletteColors = "white" /*  | "nature" */;
 
-  // type CustomPalette = {
+  // declare type CustomPalette = {
   //   [_ in CustomPaletteColors]: PaletteColor;
   // };
-  // type CustomPaletteOptions = {
+  // declare type CustomPaletteOptions = {
   //   [_ in keyof CustomPalette]?: PaletteColorOptions;
   // };
 
   // export declare module "@mui/material/styles" {
-  //   interface Palette extends CustomPalette {}
-  //   interface PaletteOptions extends CustomPaletteOptions {}
+  //   export declare interface Palette extends CustomPalette {}
+  //   export declare interface PaletteOptions extends CustomPaletteOptions {}
   // }
 }

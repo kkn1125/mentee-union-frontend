@@ -5,7 +5,7 @@ function Footer() {
     <Box
       sx={{
         p: 3,
-        background: (theme) => theme.palette.background.default,
+        background: (theme) => theme.palette.background.paper,
         color: (theme) => theme.palette.text.primary,
       }}>
       <Typography align='center'>

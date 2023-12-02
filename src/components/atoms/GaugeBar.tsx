@@ -1,6 +1,6 @@
 import { Box, SxProps, Theme, Typography } from "@mui/material";
 
-interface GuageBarType {
+interface GaugeBarType {
   width?: number;
   height?: number;
   value?: number;
@@ -8,23 +8,24 @@ interface GuageBarType {
   sx?: SxProps<Theme>;
 }
 
-function GuageBar({
+function GaugeBar({
   width = 0,
   height = 25,
   value = 50,
   maxValue = 50,
   sx,
-}: GuageBarType) {
+}: GaugeBarType) {
   const barValue = ((value / maxValue) * 100).toFixed(1);
   return (
     <Box
       sx={{
         position: "relative",
         height: height,
-        overflowX: "hidden",
+        overflow: "hidden",
         ...(width && { width }),
         ...sx,
         borderRadius: 1,
+        display: "flex",
       }}>
       <Box
         sx={{
@@ -50,6 +51,7 @@ function GuageBar({
           component='div'
           variant='body2'
           sx={{
+            lineHeight: 1,
             userSelect: "none",
             position: "absolute",
             top: "50%",
@@ -59,6 +61,7 @@ function GuageBar({
             px: (theme) => theme.typography.pxToRem(12),
             transform: "translateY(-50%)",
             color: (theme) => theme.palette.background.default,
+            fontSize: "inherit",
           }}>
           {value}/{maxValue} ({barValue}%){/* {barValue}% */}
         </Typography>
@@ -67,4 +70,4 @@ function GuageBar({
   );
 }
 
-export default GuageBar;
+export default GaugeBar;

@@ -15,7 +15,7 @@ function Placeholder({
   height,
   src,
   alt = "placeholder",
-  color = "#565656",
+  color = "#afafaf",
   maxWidth = false,
 }: PlaceholderType) {
   const [placeholder, setPlaceholder] = useState("");

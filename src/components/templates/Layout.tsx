@@ -1,7 +1,7 @@
-import { Box, Stack } from "@mui/material";
-import { Outlet } from "react-router-dom";
-import Header from "@/components/organisms/Header";
 import Footer from "@/components/organisms/Footer";
+import Header from "@/components/organisms/Header";
+import { Stack } from "@mui/material";
+import { Outlet } from "react-router-dom";
 
 function Layout() {
   return (

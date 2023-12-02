@@ -2,6 +2,7 @@ import { CssBaseline, PaletteMode } from "@mui/material";
 import { amber, deepOrange, grey } from "@mui/material/colors";
 import {
   createTheme,
+  ThemeOptions,
   ThemeProvider as ThemeProviders,
 } from "@mui/material/styles";
 import { ReactElement, createContext, useMemo, useState } from "react";
@@ -14,7 +15,9 @@ const theme = createTheme({
   },
 });
 
-const getDesignTokens = (mode: PaletteMode) => ({
+const getDesignTokens: (mode: PaletteMode) => ThemeOptions = (
+  mode: PaletteMode
+) => ({
   palette: {
     mode,
     ...(mode === "light"
@@ -28,7 +31,7 @@ const getDesignTokens = (mode: PaletteMode) => ({
           },
           divider: "#D4FADE",
           background: {
-            default: "#ffffff",
+            default: "#f1f1f1",
             paper: "#ffffff",
           },
           text: {
