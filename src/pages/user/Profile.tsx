@@ -1,7 +1,12 @@
 import GuageBar from "@/components/atoms/GaugeBar";
 import Loading from "@/components/atoms/Loading";
 import Placeholder from "@/components/moleculars/Placeholder";
-import { TokenContext } from "@/context/TokenProvider";
+import {
+  TOKEN_ACTION,
+  TokenContext,
+  TokenDispatchContext,
+} from "@/context/TokenProvider";
+import { ERROR_MESSAGE, FAIL_MESSAGE, REGEX } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import { convertDateStringPropertyToDate, timeFormat } from "@/util/tool";
 import {
@@ -18,6 +23,7 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 
 type UpdateData = {
@@ -42,26 +48,28 @@ const VisuallyHiddenInput = styled("input")({
 const validationSchema = yup.object({
   username: yup
     .string()
-    .min(1, "최소 1자 이상 입력해야합니다.")
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .min(1, ERROR_MESSAGE.MIN(1))
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
   email: yup
     .string()
     .email("이메일 형식이 아닙니다.")
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
   phone_number: yup
     .string()
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
   birth: yup
     .string()
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
 });
 
 function Profile() {
+  const navigate = useNavigate();
   const token = useContext(TokenContext);
+  const tokenDispatch = useContext(TokenDispatchContext);
   const [profileData, setProfileData] = useState<Partial<User>>({});
   const [loading, setLoading] = useState(true);
   const [profilePreview, setProfilePreview] = useState("");
@@ -91,42 +99,32 @@ function Profile() {
         phone_number?: string;
       } = {};
       /* property match condition */
-      const userMatched = values.username.match(
-        /\b(?![\s_\-0-9])(?=.*[A-Za-z])(?=.*([0-9_-]?|[^\s]))[A-Za-z0-9_-]+/g
-      );
-      const emailMatched = values.email.match(
-        /\b(?=.*[A-Za-z])(?=.*[0-9_\-.])[A-Za-z0-9_\-.]+@(?=.*[A-Za-z]?)(?=.*[0-9_-]*)[A-Za-z0-9_-]+\.(?=.*[A-Za-z]\b)(?!.*[.])[A-Za-z]+/g
-      );
-      const phoneNumberMatched = values.phone_number.match(
-        /\d{2,3}-\d{3,4}-\d{4}/g
-      );
+      const userMatched = values.username.match(REGEX.USERNAME);
+      const emailMatched = values.email.match(REGEX.EMAIL);
+      const phoneNumberMatched = values.phone_number.match(REGEX.PHONE_NUMBER);
       /* match confirm */
       if (values.username.length < 5 || values.username.length > 20) {
-        errors.username =
-          "유저네임은 영문자로 시작하는 5~20자의 영문, 숫자, 밑줄(_), 대시(-)로 구성해야 합니다.";
+        errors.username = ERROR_MESSAGE.USERNAME.DEFAULT(5, 20);
       }
       if (!userMatched || userMatched[0] !== values.username) {
         if (userMatched) {
           if (userMatched[0] !== values.username) {
-            errors.username = "숫자나 특수 문자로 시작할 수 없습니다.";
+            errors.username = ERROR_MESSAGE.USERNAME.NOT_ALLOWED_START_WITH;
           } else {
-            errors.username =
-              "유저네임은 영문자로 시작하는 5~20자의 영문, 숫자, 밑줄(_), 대시(-)로 구성해야 합니다. 숫자나 특수 문자로 시작할 수 없습니다.";
+            errors.username = ERROR_MESSAGE.USERNAME.DEFAULT(5, 20);
           }
         } else {
-          errors.username =
-            "유저네임은 영문자로 시작하는 5~20자의 영문, 숫자, 밑줄(_), 대시(-)로 구성해야 합니다. 숫자나 특수 문자로 시작할 수 없습니다.";
+          errors.username = ERROR_MESSAGE.USERNAME.DEFAULT(5, 20);
         }
       }
       if (!emailMatched || emailMatched[0] !== values.email) {
-        errors.email = "이메일 형식이 아닙니다.";
+        errors.email = ERROR_MESSAGE.EMAIL_FORMAT;
       }
       if (
         !phoneNumberMatched ||
         phoneNumberMatched[0] !== values.phone_number
       ) {
-        errors.phone_number =
-          "폰 번호 형식이 아닙니다. 010-0000-1111 로 작성해야 합니다.";
+        errors.phone_number = ERROR_MESSAGE.PHONE_NUMBER;
       }
       return errors;
     },
@@ -145,16 +143,19 @@ function Profile() {
         (updated.username = values.username);
 
       handleSubmitProfile(updated);
-
-      // alert("test");
     },
   });
 
   useEffect(() => {
-    if (token.token) {
-      initProfileData();
+    if (token.status !== "init") {
+      if (token.token) {
+        initProfileData();
+      } else if (!token.token && token.status === "fail") {
+        alert(FAIL_MESSAGE.ACCESS_DENIED);
+        navigate("/");
+      }
     }
-  }, [token]);
+  }, [token.token]);
 
   function initProfileData() {
     axiosInstance
@@ -182,6 +183,18 @@ function Profile() {
           birth: originData.birth as unknown as string,
           phone_number: convertedProfileData.phone_number,
         });
+      })
+      .catch((err) => {
+        console.log(err.response);
+        if (err.response.data.code === 401) {
+          if (err.response.data.detail === "jwt expired") {
+            alert(FAIL_MESSAGE.EXPIRED_TOKEN);
+            tokenDispatch({
+              type: TOKEN_ACTION.SIGNOUT,
+            });
+            navigate("/");
+          }
+        }
       });
   }
 

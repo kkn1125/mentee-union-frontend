@@ -1,22 +1,16 @@
 import { Stack } from "@mui/material";
-import { ReactNode } from "react";
+import { ReactElement } from "react";
 
-function Section({
+function VerticalSection({
   children,
-  type = "vertical",
 }: {
-  children: ReactNode | ReactNode[];
-  type?: "horizon" | "vertical";
+  children: ReactElement | ReactElement[];
 }) {
   return (
     <Stack
       component='section'
-      {...(type === "vertical" && {
-        direction: "row",
-        justifyContent: "center",
-        alignItems: "center",
-      })}
       gap={5}
+      flex={1}
       sx={{
         my: 2,
         p: 5,
@@ -28,4 +22,4 @@ function Section({
   );
 }
 
-export default Section;
+export default VerticalSection;

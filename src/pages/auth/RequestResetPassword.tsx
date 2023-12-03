@@ -1,3 +1,8 @@
+import {
+  ERROR_MESSAGE,
+  FAIL_MESSAGE,
+  SUCCESS_MESSAGE,
+} from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import {
   Button,
@@ -15,9 +20,9 @@ import * as yup from "yup";
 const validationSchema = yup.object({
   email: yup
     .string()
-    .email("이메일 형식이 아닙니다.")
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .email(ERROR_MESSAGE.EMAIL_FORMAT)
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
 });
 
 function RequestResetPassword() {
@@ -37,7 +42,7 @@ function RequestResetPassword() {
         /\b(?=.*[A-Za-z])(?=.*[0-9_\-.])[A-Za-z0-9_\-.]+@(?=.*[A-Za-z]?)(?=.*[0-9_-]*)[A-Za-z0-9_-]+\.(?=.*[A-Za-z]\b)(?!.*[.])[A-Za-z]+/g
       );
       if (!emailMatched || emailMatched[0] !== values.email) {
-        errors.email = "이메일 형식이 아닙니다.";
+        errors.email = ERROR_MESSAGE.EMAIL_FORMAT;
       }
       return errors;
     },
@@ -50,7 +55,7 @@ function RequestResetPassword() {
         .then(({ data }) => {
           console.log(data);
           // navigate("/");
-          alert("비밀번호 재설정 메일을 전송했습니다. 메일을 확인 해 주세요.");
+          alert(SUCCESS_MESSAGE.SEND_RESET_PASSWORD_MAIL_CHECK);
         })
         .catch((err) => {
           const message = err.response.data.message;
@@ -58,9 +63,9 @@ function RequestResetPassword() {
             message ===
             "This email is not registered. You must use the email that was used for registration."
           ) {
-            alert("등록되지 않은 메일 입니다.");
+            alert(FAIL_MESSAGE.UNREGISTERD_EMAIL);
           } else {
-            alert("서버에 문제가 발생했습니다.");
+            alert(FAIL_MESSAGE.PROBLEM_WITH_SERVER);
           }
         })
         .finally(() => {

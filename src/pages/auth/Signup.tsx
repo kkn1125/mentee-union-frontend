@@ -1,4 +1,10 @@
 import Loading from "@/components/atoms/Loading";
+import {
+  ERROR_MESSAGE,
+  FAIL_MESSAGE,
+  REGEX,
+  SUCCESS_MESSAGE,
+} from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import {
   Box,
@@ -21,32 +27,32 @@ import * as yup from "yup";
 const validationSchema = yup.object({
   username: yup
     .string()
-    .min(1, "최소 1자 이상 입력해야합니다.")
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .min(1, ERROR_MESSAGE.MIN(1))
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
   email: yup
     .string()
-    .email("이메일 형식이 아닙니다.")
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .email(ERROR_MESSAGE.EMAIL_FORMAT)
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
   password: yup
     .string()
-    .min(5, "비밀번호는 최소 5자 이상 입력 해야합니다.")
-    .max(20, "비밀번호는 최대 20자 이하 입력 해야합니다.")
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .min(5, ERROR_MESSAGE.PASSWORD.MIN(5))
+    .max(20, ERROR_MESSAGE.PASSWORD.MAX(20))
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
   phone_number: yup
     .string()
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
   birth: yup
     .string()
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
   gender: yup
     .string()
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
 });
 
 const options = ["male", "female", "none"];
@@ -85,65 +91,51 @@ function Signup() {
       } = {};
 
       /* property match condition */
-      const userMatched = values.username.match(
-        /\b(?![\s_\-0-9])(?=.*[A-Za-z])(?=.*([0-9_-]?|[^\s]))[A-Za-z0-9_-]+/g
-      );
-      const emailMatched = values.email.match(
-        /\b(?=.*[A-Za-z])(?=.*[0-9_\-.])[A-Za-z0-9_\-.]+@(?=.*[A-Za-z]?)(?=.*[0-9_-]*)[A-Za-z0-9_-]+\.(?=.*[A-Za-z]\b)(?!.*[.])[A-Za-z]+/g
-      );
-      const passwordMatched = values.password.match(
-        /(?=.*[A-Z])(?=.*[a-z])[A-Za-z]{1,}(?=.*[A-Za-z])(?=.*[0-9])[A-Za-z0-9]{0,}(?=.*[0-9])(?=.*[!@#$%^&*()])[A-Za-z0-9!@#$%^&*()]{4,20}/g
-      );
-      const phoneNumberMatched = values.phone_number.match(
-        /\d{2,3}-\d{3,4}-\d{4}/g
-      );
+      const userMatched = values.username.match(REGEX.USERNAME);
+      const emailMatched = values.email.match(REGEX.EMAIL);
+      const passwordMatched = values.password.match(REGEX.PASSWORD);
+      const phoneNumberMatched = values.phone_number.match(REGEX.PHONE_NUMBER);
 
       /* match confirm */
       if (values.username.length < 5 || values.username.length > 20) {
-        errors.username =
-          "유저네임은 영문자로 시작하는 5~20자의 영문, 숫자, 밑줄(_), 대시(-)로 구성해야 합니다.";
+        errors.username = ERROR_MESSAGE.USERNAME.DEFAULT(5, 20);
       }
       if (!userMatched || userMatched[0] !== values.username) {
         if (userMatched) {
           if (userMatched[0] !== values.username) {
-            errors.username = "숫자나 특수 문자로 시작할 수 없습니다.";
+            errors.username = ERROR_MESSAGE.USERNAME.NOT_ALLOWED_START_WITH;
           } else {
-            errors.username =
-              "유저네임은 영문자로 시작하는 5~20자의 영문, 숫자, 밑줄(_), 대시(-)로 구성해야 합니다. 숫자나 특수 문자로 시작할 수 없습니다.";
+            errors.username = ERROR_MESSAGE.USERNAME.DEFAULT(5, 20);
           }
         } else {
-          errors.username =
-            "유저네임은 영문자로 시작하는 5~20자의 영문, 숫자, 밑줄(_), 대시(-)로 구성해야 합니다. 숫자나 특수 문자로 시작할 수 없습니다.";
+          errors.username = ERROR_MESSAGE.USERNAME.DEFAULT(5, 20);
         }
       }
       if (!emailMatched || emailMatched[0] !== values.email) {
-        errors.email = "이메일 형식이 아닙니다.";
+        errors.email = ERROR_MESSAGE.EMAIL_FORMAT;
       }
       if (!passwordMatched || passwordMatched[0] !== values.password) {
-        errors.password =
-          "비밀번호는 숫자, 영문 대소문자, 특수문자가 최소 1개 씩 포함되어야 하며, 5 ~ 20자 이내로 작성해야 합니다.";
+        errors.password = ERROR_MESSAGE.PASSWORD.DEFAULT(5, 20);
       }
       if (
         !phoneNumberMatched ||
         phoneNumberMatched[0] !== values.phone_number
       ) {
-        errors.phone_number =
-          "폰 번호 형식이 아닙니다. 010-0000-1111 로 작성해야 합니다.";
+        errors.phone_number = ERROR_MESSAGE.PHONE_NUMBER;
       }
       return errors;
     },
     onSubmit: (values) => {
       if (checkUsername === false) {
         document.querySelector('[name="username"]')?.scrollIntoView(true);
-        alert("유저네임 중복확인은 필수 입니다.");
+        alert(FAIL_MESSAGE.CHECK_DUPLICATE_USERNAME);
         return;
       }
       if (checkEmail === false) {
         document.querySelector('[name="email"]')?.scrollIntoView(true);
-        alert("이메일 본인인증은 필수 입니다.");
+        alert(FAIL_MESSAGE.REQUIRE_EMAIL_AUTH);
         return;
       }
-      // alert(JSON.stringify(values, null, 2));
       axiosInstance
         .post("/users", {
           grade_id: 1,
@@ -156,25 +148,15 @@ function Signup() {
           auth_email: checkEmail,
         })
         .then(({ data }) => {
-          // const { access_token, refresh_token } = data;
-          // tokenDispatch({
-          //   type: TOKEN_ACTION.SAVE,
-          //   token: access_token,
-          //   refresh: refresh_token,
-          // });
-          // console.log(data);
-          // console.log(data.ok, data.code === 201);
           if (data.ok && data.code === 201) {
             window.removeEventListener("beforeunload", leaveCurrentPageMessage);
             navigate("/");
           } else {
-            alert("입력 값 중 잘못된 값이 있습니다. 확인해주세요.");
-            // formik.resetForm();
+            alert(FAIL_MESSAGE.CHECK_WRONG_VALUE);
           }
         })
         .catch(() => {
-          alert("회원가입에 문제가 발생했습니다.");
-          // formik.resetForm();
+          alert(FAIL_MESSAGE.PROBLEM_WITH_SERVER_CAUSE("회원가입"));
         });
     },
   });
@@ -214,8 +196,8 @@ function Signup() {
         `/mailer/confirm?email=${formik.values.email}`
       );
       if (data.code === 200) {
-        alert("본인인증이 완료 되었습니다.");
-        setAuthEmailMessage("본인인증이 완료 되었습니다.");
+        alert(SUCCESS_MESSAGE.PASS_EMAIL_AUTH);
+        setAuthEmailMessage(SUCCESS_MESSAGE.PASS_EMAIL_AUTH);
         setCheckEmail(true);
         setAvailableEmail(true);
       }
@@ -225,30 +207,30 @@ function Signup() {
       const message = (error as CustomAxiosError).response.data.message;
       switch (message) {
         case "already used email":
-          alert("이미 사용 중인 이메일 입니다.");
-          setAuthEmailMessage("이미 사용 중인 이메일 입니다.");
+          alert(FAIL_MESSAGE.ALREADY_USED_EMAIL);
+          setAuthEmailMessage(FAIL_MESSAGE.ALREADY_USED_EMAIL);
           break;
         case "token no exists":
-          alert("유효하지 않은 접근입니다.");
-          setAuthEmailMessage("유효하지 않은 접근입니다.");
+          alert(FAIL_MESSAGE.ACCESS_DENIED);
+          setAuthEmailMessage(FAIL_MESSAGE.ACCESS_DENIED);
           break;
         case "expired":
-          alert("인증 시간이 만료 되었습니다.");
-          setAuthEmailMessage("인증 시간이 만료 되었습니다.");
+          alert(FAIL_MESSAGE.EXPIRED_AUTH_TIME);
+          setAuthEmailMessage(FAIL_MESSAGE.EXPIRED_AUTH_TIME);
           break;
         case "invalid token format":
-          alert("유효하지 않은 접근입니다.");
-          setAuthEmailMessage("유효하지 않은 접근입니다.");
+          alert(FAIL_MESSAGE.ACCESS_DENIED);
+          setAuthEmailMessage(FAIL_MESSAGE.ACCESS_DENIED);
           break;
         case "already used":
-          alert("이미 인증이 완료 되었습니다.");
-          setAuthEmailMessage("이미 인증이 완료 되었습니다.");
+          alert(SUCCESS_MESSAGE.ALREADY_PASS_AUTH);
+          setAuthEmailMessage(SUCCESS_MESSAGE.ALREADY_PASS_AUTH);
           setCheckEmail(true);
           setAvailableEmail(true);
           break;
         default:
-          alert("본인인증에 실패 했습니다.");
-          setAuthEmailMessage("본인인증에 실패 했습니다.");
+          alert(FAIL_MESSAGE.FAILED_AUTH);
+          setAuthEmailMessage(FAIL_MESSAGE.FAILED_AUTH);
           break;
       }
     } finally {
@@ -348,9 +330,7 @@ function Signup() {
               type='button'
               disabled={checkEmail}
               onClick={() => {
-                alert(
-                  "해당 이메일로 본인인증 메일이 발송되었습니다. 본인 인증 유효 시간은 1분 입니다. 메일을 확인 후 작업을 완료해주세요."
-                );
+                alert(SUCCESS_MESSAGE.SEND_SIGNUP_AUTH_MAIL_CHECK);
                 handleAuthenticationEmail();
               }}>
               본인 인증

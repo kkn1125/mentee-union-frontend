@@ -1,7 +1,6 @@
 import Loading from "@/components/atoms/Loading";
-import Section from "@/components/moleculars/Section";
 import { axiosInstance } from "@/util/instances";
-import { Box, Paper, Stack, Typography } from "@mui/material";
+import { Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 

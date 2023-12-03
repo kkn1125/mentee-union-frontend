@@ -4,6 +4,7 @@ export type IntialState = {
   token?: string;
   refresh?: string;
   // expired?: number;
+  status: "loaded" | "init" | "fail";
 };
 
 export enum TOKEN_ACTION {
@@ -19,7 +20,9 @@ type ActionType = {
   // expired?: number;
 };
 
-export const initialState: IntialState = {};
+export const initialState: IntialState = {
+  status: "init",
+};
 
 export const TokenContext = createContext(initialState);
 export const TokenDispatchContext = createContext(new Function());
@@ -27,13 +30,28 @@ export const TokenDispatchContext = createContext(new Function());
 const reducer = (state: IntialState, action: ActionType) => {
   switch (action.type) {
     case TOKEN_ACTION.LOAD:
-      return { ...state, ...JSON.parse(localStorage.getItem("user") || "{}") };
+      return {
+        ...state,
+        status: JSON.parse(localStorage.getItem("user") || "{}").token
+          ? "loaded"
+          : "fail",
+        ...JSON.parse(localStorage.getItem("user") || "{}"),
+      };
     case TOKEN_ACTION.SAVE:
       localStorage.setItem(
         "user",
-        JSON.stringify({ token: action.token, refresh: action.refresh })
+        JSON.stringify({
+          token: action.token,
+          status: "loaded",
+          refresh: action.refresh,
+        })
       );
-      return { ...state, token: action.token, refresh: action.refresh };
+      return {
+        ...state,
+        status: "loaded",
+        token: action.token,
+        refresh: action.refresh,
+      };
     case TOKEN_ACTION.SIGNOUT:
       localStorage.setItem("user", JSON.stringify({}));
       return {};

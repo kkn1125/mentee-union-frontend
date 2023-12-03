@@ -2,14 +2,7 @@ import Placeholder from "@/components/moleculars/Placeholder";
 import Section from "@/components/moleculars/Section";
 import { ColorModeContext } from "@/context/ThemeProvider";
 import { TokenContext } from "@/context/TokenProvider";
-import {
-  Box,
-  Button,
-  Container,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Paper, Stack, Typography } from "@mui/material";
 import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -76,7 +69,7 @@ function Home() {
         </Stack>
       </Section>
 
-      <Stack flex={1} gap={5} sx={{ my: 2 }}>
+      <Section type='horizon'>
         <Typography variant='h3'>커뮤니티 가입 방법</Typography>
         <Stack direction='row' gap={3}>
           <Stack flex={1}>
@@ -98,9 +91,9 @@ function Home() {
             </Typography>
           </Stack>
         </Stack>
-      </Stack>
+      </Section>
 
-      <Stack flex={1} gap={5} sx={{ my: 2 }}>
+      <Section type='horizon'>
         <Typography variant='h3'>멘토링 프로그램 소개</Typography>
         <Typography variant='body1'>
           우리의 멘토링 프로그램은 멘토와 멘티 간의 상호작용과 지식 공유를 위해
@@ -131,9 +124,9 @@ function Home() {
             </Typography>
           </Stack>
         </Stack>
-      </Stack>
+      </Section>
 
-      <Stack flex={1} gap={5} sx={{ my: 2 }}>
+      <Section type='horizon'>
         <Typography variant='h3'>멘토링 진행 방식</Typography>
         <Stack direction={"row"} gap={5}>
           <Typography variant='h5'>1</Typography>
@@ -165,7 +158,7 @@ function Home() {
             </Typography>
           </Stack>
         </Stack>
-      </Stack>
+      </Section>
 
       <Section>
         <Stack flex={1} gap={3}>
@@ -188,7 +181,7 @@ function Home() {
         </Stack>
       </Section>
 
-      <Stack flex={1} gap={5} sx={{ my: 2 }}>
+      <Section type='horizon'>
         <Typography variant='h3'>커뮤니티 이벤트 정보</Typography>
         <Typography variant='body1'>
           커뮤니티에서 주최하는 다양한 이벤트에 참여하여 지식을 공유하고 새로운
@@ -198,9 +191,9 @@ function Home() {
         <Box>
           <Button variant='contained'>이벤트 정보 확인하기</Button>
         </Box>
-      </Stack>
+      </Section>
 
-      <Stack flex={1} gap={5} sx={{ my: 2 }}>
+      <Section type='horizon'>
         <Typography variant='h3'>자주 묻는 질문 (FAQ)</Typography>
         <Stack direction={"row"} gap={5}>
           <Typography variant='h5'>1</Typography>
@@ -237,9 +230,9 @@ function Home() {
             </Typography>
           </Stack>
         </Stack>
-      </Stack>
+      </Section>
 
-      <Stack flex={1} gap={5} sx={{ my: 2 }}>
+      <Section type='horizon'>
         <Typography variant='h3'>함께 성장해요!</Typography>
         <Typography variant='body1'>
           멘토와 멘티가 함께 만들어나가는 멘토링 커뮤니티에 가입하세요. 우리의
@@ -255,7 +248,7 @@ function Home() {
             </Button>
           </Box>
         )}
-      </Stack>
+      </Section>
     </Stack>
   );
 }

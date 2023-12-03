@@ -1,4 +1,5 @@
 import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
+import { FAIL_MESSAGE, ERROR_MESSAGE, REGEX } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import { Box, Button, Container, Paper, Stack, TextField } from "@mui/material";
 import { useFormik } from "formik";
@@ -9,15 +10,15 @@ import * as yup from "yup";
 const validationSchema = yup.object({
   email: yup
     .string()
-    .email("이메일 형식이 아닙니다.")
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .email(ERROR_MESSAGE.EMAIL_FORMAT)
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
   password: yup
     .string()
-    .min(5, "비밀번호는 최소 5자 이상 입력 해야합니다.")
-    .max(20, "비밀번호는 최대 20자 이하 입력 해야합니다.")
-    .required("필수 항목입니다.")
-    .typeError("문자만 입력 가능합니다."),
+    .min(5, ERROR_MESSAGE.PASSWORD.MIN(5))
+    .max(20, ERROR_MESSAGE.PASSWORD.MAX(20))
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
 });
 
 function Signin() {
@@ -33,11 +34,11 @@ function Signin() {
     validationSchema: validationSchema,
     validate(values) {
       const errors: { email?: string } = {};
-      const matched = values.email.match(
-        /\b(?=.*[A-Za-z])(?=.*[0-9_\-.])[A-Za-z0-9_\-.]+@(?=.*[A-Za-z]?)(?=.*[0-9_-]*)[A-Za-z0-9_-]+\.(?=.*[A-Za-z]\b)(?!.*[.])[A-Za-z]+/g
-      );
-      if (!matched || matched[0] !== values.email) {
-        errors.email = "email must be a valid email";
+      const matched = values.email.match(REGEX.EMAIL);
+      if (!values.email) {
+        errors.email = ERROR_MESSAGE.REQUIRED;
+      } else if (!matched || matched[0] !== values.email) {
+        errors.email = ERROR_MESSAGE.EMAIL_FORMAT;
       }
       return errors;
     },
@@ -60,37 +61,27 @@ function Signin() {
           const data = (err as CustomAxiosError).response.data;
           switch (data.message) {
             case "email authentication required":
-              alert("이메일 본인인증이 필요합니다.");
+              alert(FAIL_MESSAGE.REQUIRE_EMAIL_AUTH);
               break;
             case "user not found":
-              alert("회원정보가 없습니다.");
+              alert(FAIL_MESSAGE.NO_ACCOUNT);
               break;
             case "Incorrect email or password. You have n attempts left. Please try again.":
-              alert(
-                `이메일 또는 비밀번호가 올바르지 않습니다. 다시 확인해주세요.\n남은 로그인 시도 횟수: ${
-                  data.detail || 0
-                }${
-                  (+data.detail || 0) < 3
-                    ? "\n알림: 모든 횟수를 소진하면 계정이 잠깁니다."
-                    : ""
-                }`
-              );
+              alert(FAIL_MESSAGE.INCORRECT_ACCOUNT_INFO(+data.detail, 3));
               formik.setValues({
                 email: formik.values.email,
                 password: "",
               });
               break;
             case "You have exceeded the maximum number of login attempts. Please try again later.":
-              alert(
-                `잠긴 계정입니다. 이메일을 통해 비밀번호를 재설정 해주세요.`
-              );
+              alert(FAIL_MESSAGE.LOCKED_ACCOUNT_REQUIRED_RESET);
               formik.setValues({
                 email: formik.values.email,
                 password: "",
               });
               break;
             default:
-              alert("서버에 문제가 발생 했습니다.");
+              alert(FAIL_MESSAGE.PROBLEM_WITH_SERVER);
               break;
           }
         });
