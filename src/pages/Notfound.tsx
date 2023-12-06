@@ -1,5 +1,4 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
-import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Notfound() {

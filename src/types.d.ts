@@ -3,11 +3,32 @@ import { PaletteColor } from "@mui/material";
 export declare global {
   declare interface Window {}
 
+  export declare interface Token {
+    sub: number;
+    username: string;
+    email: string;
+    phone_number: string;
+    last_sign_in: string;
+    exp: number;
+    iat: number;
+  }
+
   export declare interface Forum {
     id: number;
     user_id: number;
     title: string;
     content: string;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
+
+    category: Category;
+    user: User;
+  }
+  export declare interface Category {
+    id: number;
+    name: string;
+    description: string;
     deleted_at: Date;
     created_at: Date;
     updated_at: Date;
@@ -32,8 +53,15 @@ export declare global {
 
     user: User;
     seminarParticipants: SeminarParticipants;
+    category: Category;
   }
-
+  export declare interface Channel {
+    id: number;
+    name: string;
+    url: string;
+    created_at: Date;
+    updated_at: Date;
+  }
   export declare interface User {
     id: number;
     grade_id: number;
@@ -83,11 +111,54 @@ export declare global {
     };
   }
 
+  export declare type Issue = {
+    id: number;
+    title: string;
+    content: string;
+  };
+
+  export declare interface FlowIssuesProps {
+    issues: Issue[];
+    width: number;
+    height: number;
+  }
+
+  export declare interface UserModel {
+    id: number;
+    user_id: number;
+    token: string;
+    email: string;
+    url: string;
+    profile: string;
+    status: string;
+    joined: number;
+  }
+  export declare interface ChannelModel {
+    id: number;
+    name: string;
+    category: string;
+    content: string;
+    limit: number;
+    users: UserModel[];
+    whiteList: number[];
+    blackList: number[];
+    admin: UserModel;
+  }
+  export declare interface Message {
+    id: number;
+    user_id: number;
+    username: string;
+    profile: string;
+    message: string;
+    removed: boolean;
+    created_at: number;
+  }
+
   // declare type MappedType<T, U> = {
   //   [Property in T]: U;
   // };
 
-  // declare type CustomPaletteColors = "white" /*  | "nature" */;
+  // declare type CustomPaletteColors = "white" | "bg" /*  | "nature" */;
 
   // declare type CustomPalette = {
   //   [_ in CustomPaletteColors]: PaletteColor;
@@ -100,4 +171,35 @@ export declare global {
   //   export declare interface Palette extends CustomPalette {}
   //   export declare interface PaletteOptions extends CustomPaletteOptions {}
   // }
+
+  export declare interface DefaultMessageType {
+    event: string;
+    message?: string;
+  }
+
+  export declare interface DataUserType extends DefaultMessageType {
+    type: "user";
+    data?: Partial<User>;
+  }
+  export declare interface DataChannelType extends DefaultMessageType {
+    type: "channel";
+    data?: Partial<Channel>;
+  }
+  export declare interface DataMessageType extends DefaultMessageType {
+    type: "message";
+    data: {
+      message: string;
+      scope: string;
+    };
+  }
+
+  export declare interface DataStringType extends DefaultMessageType {
+    type: "string";
+    data: string;
+  }
+  export declare type MessageType =
+    | DataUserType
+    | DataChannelType
+    | DataMessageType
+    | DataStringType;
 }

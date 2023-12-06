@@ -1,12 +1,19 @@
 import GuageBar from "@/components/atoms/GaugeBar";
 import Loading from "@/components/atoms/Loading";
+import ModalWithButton from "@/components/atoms/ModalWithButton";
 import Placeholder from "@/components/moleculars/Placeholder";
 import {
   TOKEN_ACTION,
   TokenContext,
   TokenDispatchContext,
 } from "@/context/TokenProvider";
-import { ERROR_MESSAGE, FAIL_MESSAGE, REGEX } from "@/util/global.constants";
+import {
+  CHECK_MESSAGE,
+  ERROR_MESSAGE,
+  FAIL_MESSAGE,
+  REGEX,
+  SUCCESS_MESSAGE,
+} from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import { convertDateStringPropertyToDate, timeFormat } from "@/util/tool";
 import {
@@ -129,8 +136,6 @@ function Profile() {
       return errors;
     },
     onSubmit: (values) => {
-      console.log(values);
-
       const updated: UpdateData = {};
 
       timeFormat(values.birth as string, "YYYY-MM-dd") !==
@@ -147,15 +152,12 @@ function Profile() {
   });
 
   useEffect(() => {
-    if (token.status !== "init") {
+    if (token.status === "exists") {
       if (token.token) {
         initProfileData();
-      } else if (!token.token && token.status === "fail") {
-        alert(FAIL_MESSAGE.ACCESS_DENIED);
-        navigate("/");
       }
     }
-  }, [token.token]);
+  }, [token.status]);
 
   function initProfileData() {
     axiosInstance
@@ -193,7 +195,27 @@ function Profile() {
               type: TOKEN_ACTION.SIGNOUT,
             });
             navigate("/");
+          } else if (err.response.data.detail === "jwt malformed") {
+            alert(FAIL_MESSAGE.MALFORMED_TOKEN);
+            tokenDispatch({
+              type: TOKEN_ACTION.SIGNOUT,
+            });
+            navigate("/");
           }
+        } else if (err.response.data.code === 404) {
+          if (err.response.data.message === "not found user") {
+            alert(FAIL_MESSAGE.NO_ACCOUNT);
+            tokenDispatch({
+              type: TOKEN_ACTION.SIGNOUT,
+            });
+            navigate("/");
+          }
+        } else {
+          alert(FAIL_MESSAGE.PROBLEM_WITH_SERVER);
+          tokenDispatch({
+            type: TOKEN_ACTION.SIGNOUT,
+          });
+          navigate("/");
         }
       });
   }
@@ -228,14 +250,16 @@ function Profile() {
   }
 
   function handleSubmitProfile(updatedData: UpdateData) {
-    axiosInstance
-      .put(`/users/${profileData.id}`, updatedData)
-      .then(({ data }) => {
-        if (data.ok) {
-          setProfile((profile) => ({ ...profile, file: null, error: "" }));
-          initProfileData();
-        }
-      });
+    if (Object.keys(updatedData).length > 0) {
+      axiosInstance
+        .put(`/users/${profileData.id}`, updatedData)
+        .then(({ data }) => {
+          if (data.ok) {
+            setProfile((profile) => ({ ...profile, file: null, error: "" }));
+            initProfileData();
+          }
+        });
+    }
   }
 
   function handleUpdateUserInfo() {
@@ -282,6 +306,30 @@ function Profile() {
           handleResetFile();
         }
       });
+  }
+
+  function hadleRemoveAccount() {
+    if (confirm(CHECK_MESSAGE.REMOVE_ACCOUNT)) {
+      axiosInstance
+        .delete("/users", {
+          headers: {
+            Authorization: "Bearer " + token.token,
+          },
+        })
+        .then(({ data }) => {
+          console.log(data);
+          alert(SUCCESS_MESSAGE.REMOVE_ACCOUNT);
+          tokenDispatch({
+            type: TOKEN_ACTION.SIGNOUT,
+          });
+          navigate("/");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      alert("탈퇴를 취소합니다.");
+    }
   }
 
   return loading ? (
@@ -490,7 +538,15 @@ function Profile() {
         </Alert>
 
         <Box sx={{ my: 3 }}>
-          <Button color='error' variant='contained'>
+          <ModalWithButton
+            label='회원 탈퇴'
+            title='탈퇴 안내'
+            content={CHECK_MESSAGE.REMOVE_ACCOUNT}
+          />
+          <Button
+            color='error'
+            variant='contained'
+            onClick={hadleRemoveAccount}>
             회원 탈퇴
           </Button>
         </Box>

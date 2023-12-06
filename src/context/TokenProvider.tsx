@@ -3,8 +3,8 @@ import { ReactElement, createContext, useReducer } from "react";
 export type IntialState = {
   token?: string;
   refresh?: string;
-  // expired?: number;
-  status: "loaded" | "init" | "fail";
+  expired?: number;
+  status?: "exists" | "no-exists";
 };
 
 export enum TOKEN_ACTION {
@@ -21,42 +21,38 @@ type ActionType = {
 };
 
 export const initialState: IntialState = {
-  status: "init",
+  status: undefined,
 };
 
 export const TokenContext = createContext(initialState);
 export const TokenDispatchContext = createContext(new Function());
 
 const reducer = (state: IntialState, action: ActionType) => {
-  switch (action.type) {
-    case TOKEN_ACTION.LOAD:
-      return {
-        ...state,
-        status: JSON.parse(localStorage.getItem("user") || "{}").token
-          ? "loaded"
-          : "fail",
-        ...JSON.parse(localStorage.getItem("user") || "{}"),
-      };
-    case TOKEN_ACTION.SAVE:
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          token: action.token,
-          status: "loaded",
-          refresh: action.refresh,
-        })
-      );
-      return {
-        ...state,
-        status: "loaded",
-        token: action.token,
-        refresh: action.refresh,
-      };
-    case TOKEN_ACTION.SIGNOUT:
-      localStorage.setItem("user", JSON.stringify({}));
-      return {};
-    default:
-      return state;
+  if (action.type === TOKEN_ACTION.LOAD) {
+    const userItem = localStorage.getItem("user");
+    const user = JSON.parse(userItem || "{}");
+    return {
+      ...state,
+      status: user.token ? "exists" : "no-exists",
+      ...user,
+    };
+  } else if (action.type === TOKEN_ACTION.SAVE) {
+    const data = {
+      ...state,
+      token: action.token,
+      status: "exists",
+      refresh: action.refresh,
+    };
+    localStorage.setItem("user", JSON.stringify(data));
+    return data;
+  } else if (action.type === TOKEN_ACTION.SIGNOUT) {
+    const data = {
+      status: undefined,
+    };
+    localStorage.setItem("user", JSON.stringify(data));
+    return data;
+  } else {
+    return state;
   }
 };
 

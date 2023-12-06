@@ -418,6 +418,7 @@ function Signup() {
             to={`/auth/request-pass?r=${encodeURIComponent(locate.pathname)}`}
             color='success'
             sx={{
+              color: "inherit",
               textDecoration: "none",
               fontSize: (theme) => theme.typography.pxToRem(12),
             }}>

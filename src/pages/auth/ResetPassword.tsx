@@ -174,14 +174,14 @@ function ResetPassword() {
     e.returnValue = "페이지를 벗어나시겠습니까?";
   }
 
-  function handleRedirect() {
-    const r = params.get("r");
-    if (r) {
-      navigate(decodeURIComponent(r));
-    } else {
-      navigate("/");
-    }
-  }
+  // function handleRedirect() {
+  //   const r = params.get("r");
+  //   if (r) {
+  //     navigate(decodeURIComponent(r));
+  //   } else {
+  //     navigate("/");
+  //   }
+  // }
 
   return (
     <Container

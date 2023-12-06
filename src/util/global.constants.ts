@@ -6,6 +6,8 @@ declare global {
   }
 }
 
+export const PRIVKEY = import.meta.env.VITE_PRIVKEY;
+
 export const BRAND_NAME = window.custom_env.BRAND_NAME;
 
 export const SUCCESS_MESSAGE = {
@@ -17,6 +19,15 @@ export const SUCCESS_MESSAGE = {
     "비밀번호 재설정 메일을 전송했습니다. 메일을 확인 해 주세요.",
   SEND_SIGNUP_AUTH_MAIL_CHECK:
     "해당 이메일로 본인인증 메일이 발송되었습니다. 본인 인증 유효 시간은 1분 입니다. 메일을 확인 후 작업을 완료해주세요.",
+  REMOVE_ACCOUNT:
+    "회원탈퇴가 정상처리 되었습니다. 그동안 멘티 유니온을 사용해주셔서 감사합니다.",
+};
+
+export const CHECK_MESSAGE = {
+  REMOVE_ACCOUNT:
+    "서비스 정책에 따라 회원 가입 기간 동안 발생한 결제에 대한 환불은 제공되지 않습니다. 탈퇴 시 모든 서비스 이용이 종료되며, 이에 대한 추가적인 정보는 [이용 약관 링크]에서 확인하실 수 있습니다. 탈퇴를 진행하시겠습니까?",
+  REQUIRED_SIGN_IN:
+    "개인회원 로그인 후 이용해 주세요.\n로그인 페이지로 이동하시겠습니까?",
 };
 
 export const ERROR_MESSAGE = {
@@ -54,14 +65,20 @@ export const REGEX = {
 
 export const FAIL_MESSAGE = {
   EXPIRED_TOKEN: "토큰이 만료되었습니다.",
+  MALFORMED_TOKEN: "유효하지 않은 토큰입니다.",
+  REQUIRE_SIGN_IN: "개인회원 로그인 후 이용해주세요.",
   REQUIRE_EMAIL_AUTH: "이메일 본인인증이 필요합니다.",
   NO_ACCOUNT: "회원정보가 없습니다.",
   INCORRECT_ACCOUNT_INFO: (triedValue: number = 0, maxTriedValue: number = 3) =>
-    `이메일 또는 비밀번호가 올바르지 않습니다. 다시 확인해주세요.\n남은 로그인 시도 횟수: ${triedValue}${
-      triedValue < maxTriedValue
-        ? "\n알림: 모든 횟수를 소진하면 계정이 잠깁니다."
-        : ""
-    }`,
+    triedValue === -1
+      ? "이메일 또는 비밀번호가 올바르지 않습니다. 다시 확인해주세요."
+      : `이메일 또는 비밀번호가 올바르지 않습니다. 다시 확인해주세요.\n남은 로그인 시도 횟수: ${
+          triedValue || 0
+        }${
+          triedValue < maxTriedValue
+            ? "\n알림: 모든 횟수를 소진하면 계정이 잠깁니다."
+            : ""
+        }`,
   ALREADY_USED_EMAIL: "이미 사용 중인 이메일 입니다.",
   LOCKED_ACCOUNT_REQUIRED_RESET: `잠긴 계정입니다. 이메일을 통해 비밀번호를 재설정 해주세요.`,
   ACCESS_DENIED: "잘못된 접근입니다.",

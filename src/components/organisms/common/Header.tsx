@@ -1,3 +1,4 @@
+import { ColorModeContext } from "@/context/ThemeProvider";
 import {
   TOKEN_ACTION,
   TokenContext,
@@ -5,6 +6,8 @@ import {
 } from "@/context/TokenProvider";
 import { BRAND_NAME } from "@/util/global.constants";
 import AccountCircle from "@mui/icons-material/AccountCircle";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Box } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
@@ -21,12 +24,11 @@ export default function Header() {
   const tokenDispatch = useContext(TokenDispatchContext);
   const token = useContext(TokenContext);
   const navigate = useNavigate();
+  const theme = useContext(ColorModeContext);
 
-  useEffect(() => {
-    tokenDispatch({
-      type: TOKEN_ACTION.LOAD,
-    });
-  }, []);
+  function changeMode() {
+    theme.toggleColorMode();
+  }
 
   const handleMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -94,15 +96,32 @@ export default function Header() {
           sx={{ mr: 2 }}>
           <MenuIcon />
         </IconButton>
-        <Typography
-          variant='h6'
-          component={Link}
-          fontWeight={700}
-          sx={{ flexGrow: 1, textDecoration: "none", color: "inherit" }}
-          to='/'>
-          {BRAND_NAME}
-        </Typography>
+        <Box sx={{ flexGrow: 1 }}>
+          <Typography
+            variant='h6'
+            component={Link}
+            fontWeight={700}
+            sx={{ textDecoration: "none", color: "inherit" }}
+            to='/'>
+            {BRAND_NAME}
+          </Typography>
+        </Box>
         <Box>
+          <IconButton
+            size='large'
+            aria-label='dark mode'
+            aria-controls='menu-appbar'
+            aria-haspopup='true'
+            onClick={() => {
+              changeMode();
+            }}
+            color='inherit'>
+            {theme.currentMode() === "light" ? (
+              <DarkModeIcon />
+            ) : (
+              <LightModeIcon />
+            )}
+          </IconButton>
           <IconButton
             size='large'
             aria-label='account of current user'

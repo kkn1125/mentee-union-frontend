@@ -1,5 +1,9 @@
-import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
-import { FAIL_MESSAGE, ERROR_MESSAGE, REGEX } from "@/util/global.constants";
+import {
+  TOKEN_ACTION,
+  TokenContext,
+  TokenDispatchContext,
+} from "@/context/TokenProvider";
+import { ERROR_MESSAGE, FAIL_MESSAGE, REGEX } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import { Box, Button, Container, Paper, Stack, TextField } from "@mui/material";
 import { useFormik } from "formik";
@@ -22,6 +26,7 @@ const validationSchema = yup.object({
 });
 
 function Signin() {
+  const token = useContext(TokenContext);
   const tokenDispatch = useContext(TokenDispatchContext);
   const navigate = useNavigate();
   const locate = useLocation();
@@ -64,7 +69,8 @@ function Signin() {
               alert(FAIL_MESSAGE.REQUIRE_EMAIL_AUTH);
               break;
             case "user not found":
-              alert(FAIL_MESSAGE.NO_ACCOUNT);
+              // alert(FAIL_MESSAGE.NO_ACCOUNT);
+              alert(FAIL_MESSAGE.INCORRECT_ACCOUNT_INFO(-1));
               break;
             case "Incorrect email or password. You have n attempts left. Please try again.":
               alert(FAIL_MESSAGE.INCORRECT_ACCOUNT_INFO(+data.detail, 3));
@@ -143,6 +149,7 @@ function Signin() {
             to={`/auth/request-pass?r=${encodeURIComponent(locate.pathname)}`}
             color='success'
             sx={{
+              color: "inherit",
               textDecoration: "none",
               fontSize: (theme) => theme.typography.pxToRem(12),
             }}>

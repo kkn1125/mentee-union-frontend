@@ -2,10 +2,30 @@ import { CssBaseline, PaletteMode } from "@mui/material";
 import { amber, deepOrange, grey } from "@mui/material/colors";
 import {
   createTheme,
+  PaletteColor,
+  PaletteColorOptions,
   ThemeOptions,
   ThemeProvider as ThemeProviders,
 } from "@mui/material/styles";
 import { ReactElement, createContext, useMemo, useState } from "react";
+
+// declare type MappedType<T, U> = {
+//   [Property in T]: U;
+// };
+
+declare type CustomPaletteColors = "white" | "bg" /*  | "nature" */;
+
+declare type CustomPalette = {
+  [_ in CustomPaletteColors]: PaletteColor;
+};
+declare type CustomPaletteOptions = {
+  [_ in keyof CustomPalette]?: PaletteColorOptions;
+};
+
+declare module "@mui/material/styles" {
+  export interface Palette extends CustomPalette {}
+  export interface PaletteOptions extends CustomPaletteOptions {}
+}
 
 const theme = createTheme({
   palette: {
@@ -33,10 +53,15 @@ const getDesignTokens: (mode: PaletteMode) => ThemeOptions = (
           background: {
             default: "#f1f1f1",
             paper: "#ffffff",
+            dark: "#565656",
           },
           text: {
             primary: grey[900],
             secondary: grey[800],
+            third: grey[600],
+          },
+          bg: {
+            main: grey[800],
           },
         }
       : {
@@ -45,11 +70,16 @@ const getDesignTokens: (mode: PaletteMode) => ThemeOptions = (
           divider: grey[700],
           background: {
             default: "#232323",
-            paper: "#232323",
+            paper: "#191919",
+            dark: "#565656",
           },
           text: {
             primary: "#fff",
             secondary: grey[500],
+            third: grey[300],
+          },
+          bg: {
+            main: grey[900],
           },
         }),
   },
@@ -58,7 +88,7 @@ const getDesignTokens: (mode: PaletteMode) => ThemeOptions = (
 export const ColorModeContext = createContext(
   {} as {
     toggleColorMode: () => void;
-    currentMode: () => void;
+    currentMode: () => "light" | "dark";
   }
 );
 
@@ -80,7 +110,7 @@ export default function ThemeProvider({
         return mode;
       },
     }),
-    []
+    [mode]
   );
 
   // Update the theme only if the mode changes

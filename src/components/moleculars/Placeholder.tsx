@@ -29,7 +29,7 @@ function Placeholder({
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
     canvas.width = width;
     canvas.height = height;
-    ctx.fillStyle = color;
+    ctx.fillStyle = color + (src ? "00" : "");
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     return canvas.toDataURL("image/png");
   }
@@ -37,10 +37,15 @@ function Placeholder({
   return src || placeholder ? (
     <Box
       component='img'
-      src={src || placeholder}
+      src={placeholder}
       alt={alt}
       width={maxWidth ? "100%" : width}
       height={height}
+      sx={{
+        backgroundImage: `url(${src})`,
+        backgroundPosition: "top center",
+        backgroundSize: "cover",
+      }}
     />
   ) : (
     <Box
