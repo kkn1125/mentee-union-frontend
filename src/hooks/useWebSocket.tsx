@@ -22,10 +22,12 @@ function useWebSocket() {
       uid: "" + user.id,
       e: user.email,
       p: user?.profiles[0]?.new_name || "none",
+      u: user.username,
     });
     const websocket = new WebSocket(
       "ws://localhost:8081/mentoring" + "?" + params
     );
+    websocket.binaryType = "arraybuffer";
     setup(websocket);
     setWs(websocket);
   }

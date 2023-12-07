@@ -5,6 +5,7 @@ export type IntialState = {
   refresh?: string;
   expired?: number;
   status?: "exists" | "no-exists";
+  keep_sign: boolean;
 };
 
 export enum TOKEN_ACTION {
@@ -17,11 +18,13 @@ type ActionType = {
   type: TOKEN_ACTION;
   token?: string;
   refresh?: string;
+  keep_sign?: boolean;
   // expired?: number;
 };
 
 export const initialState: IntialState = {
   status: undefined,
+  keep_sign: false,
 };
 
 export const TokenContext = createContext(initialState);
@@ -42,6 +45,7 @@ const reducer = (state: IntialState, action: ActionType) => {
       token: action.token,
       status: "exists",
       refresh: action.refresh,
+      keep_sign: action.keep_sign,
     };
     localStorage.setItem("user", JSON.stringify(data));
     return data;

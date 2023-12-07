@@ -5,7 +5,19 @@ import {
 } from "@/context/TokenProvider";
 import { ERROR_MESSAGE, FAIL_MESSAGE, REGEX } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
-import { Box, Button, Container, Paper, Stack, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  Checkbox,
+  Container,
+  Divider,
+  FormControlLabel,
+  FormGroup,
+  Input,
+  Paper,
+  Stack,
+  TextField,
+} from "@mui/material";
 import { useFormik } from "formik";
 import { useContext } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -23,6 +35,7 @@ const validationSchema = yup.object({
     .max(20, ERROR_MESSAGE.PASSWORD.MAX(20))
     .required(ERROR_MESSAGE.REQUIRED)
     .typeError(ERROR_MESSAGE.ONLY_STRING),
+  keep_sign: yup.boolean().typeError(ERROR_MESSAGE.ONLY_BOOLEAN),
 });
 
 function Signin() {
@@ -35,9 +48,11 @@ function Signin() {
     initialValues: {
       email: "",
       password: "",
+      keep_sign: false,
     },
     validationSchema: validationSchema,
     validate(values) {
+      // console.log(values);
       const errors: { email?: string } = {};
       const matched = values.email.match(REGEX.EMAIL);
       if (!values.email) {
@@ -59,6 +74,7 @@ function Signin() {
             type: TOKEN_ACTION.SAVE,
             token: access_token,
             refresh: refresh_token,
+            keep_sign: values.keep_sign,
           });
           navigate("/");
         })
@@ -77,6 +93,7 @@ function Signin() {
               formik.setValues({
                 email: formik.values.email,
                 password: "",
+                keep_sign: formik.values.keep_sign,
               });
               break;
             case "You have exceeded the maximum number of login attempts. Please try again later.":
@@ -84,6 +101,7 @@ function Signin() {
               formik.setValues({
                 email: formik.values.email,
                 password: "",
+                keep_sign: formik.values.keep_sign,
               });
               break;
             default:
@@ -119,6 +137,17 @@ function Signin() {
             onBlur={formik.handleBlur}
             error={formik.touched.email && Boolean(formik.errors.email)}
             helperText={formik.touched.email && formik.errors.email}
+            sx={{
+              position: "relative",
+              mb: 2,
+            }}
+            FormHelperTextProps={{
+              sx: {
+                position: "absolute",
+                top: "100%",
+                left: 0,
+              },
+            }}
           />
           <TextField
             size='small'
@@ -132,7 +161,19 @@ function Signin() {
             onBlur={formik.handleBlur}
             error={formik.touched.password && Boolean(formik.errors.password)}
             helperText={formik.touched.password && formik.errors.password}
+            sx={{
+              position: "relative",
+              mb: 3,
+            }}
+            FormHelperTextProps={{
+              sx: {
+                position: "absolute",
+                top: "100%",
+                left: 0,
+              },
+            }}
           />
+
           <Button type='submit' variant='contained'>
             로그인
           </Button>
@@ -143,18 +184,53 @@ function Signin() {
             onClick={() => navigate("/auth/signup")}>
             계정이 없으신가요?
           </Button>
-          <Box
-            component={Link}
-            type='button'
-            to={`/auth/request-pass?r=${encodeURIComponent(locate.pathname)}`}
-            color='success'
+          <Stack
+            direction='row'
+            gap={3}
+            justifyContent={"space-between"}
+            alignItems='center'
             sx={{
-              color: "inherit",
-              textDecoration: "none",
-              fontSize: (theme) => theme.typography.pxToRem(12),
+              userSelect: "none",
             }}>
-            비밀번호 찾기
-          </Box>
+            <Box
+              component={Link}
+              type='button'
+              to={`/auth/request-pass?r=${encodeURIComponent(locate.pathname)}`}
+              color='success'
+              sx={{
+                pt: 0.5,
+                color: "inherit",
+                textDecoration: "none",
+                fontSize: (theme) => theme.typography.pxToRem(12),
+              }}>
+              비밀번호 찾기
+            </Box>
+            <FormGroup>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    name='keep_sign'
+                    size='small' /* defaultChecked */
+                    value={formik.values.keep_sign}
+                    onChange={formik.handleChange}
+                    onBlur={formik.handleBlur}
+                  />
+                }
+                label='로그인 유지'
+                labelPlacement='start'
+                sx={{ alignItems: "center" }}
+                componentsProps={{
+                  typography: {
+                    sx: {
+                      display: "inline-block",
+                      pt: 0.5,
+                      fontSize: (theme) => theme.typography.pxToRem(12),
+                    },
+                  },
+                }}
+              />
+            </FormGroup>
+          </Stack>
         </Stack>
       </Paper>
     </Container>

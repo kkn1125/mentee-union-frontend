@@ -2,7 +2,7 @@ import Loading from "@/components/atoms/Loading";
 import { TokenContext } from "@/context/TokenProvider";
 import useWebSocket from "@/hooks/useWebSocket";
 import { axiosInstance } from "@/util/instances";
-import { Stack } from "@mui/material";
+import { Alert, AlertTitle, Stack } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -73,7 +73,7 @@ export default function Mentoring() {
 
   useEffect(() => {
     /* sockete message 받는 곳 */
-
+    console.log("origin", socketData);
     const json = JSON.parse(socketData.data || "{}");
     console.log(json);
     if (
@@ -82,34 +82,34 @@ export default function Mentoring() {
       json.event === "dequeue" ||
       json.event === "toWaitList"
     ) {
-      setSocketUser(json.data);
+      setSocketUser(() => json.data.user);
     } else if (json.event === "findAllChannels") {
-      setChannels(json.data.channels);
+      setChannels(() => json.data.channels);
     } else if (json.event === "outChannel") {
       if (json.data.user.user_id === socketUser?.user_id) {
-        setSocketUser(json.data.user);
-        setCurrentChannel(-1);
+        setSocketUser(() => json.data.user);
       }
     } else if (json.event === "outChannel/admin") {
-      alert("다른 사용자가 채널을 나가 매칭으로 이동합니다.");
-      setSocketUser(json.data.user);
-      setCurrentChannel(-1);
-    } else if (json.event === "chattings") {
-      setChattings(json.data.chattings);
-      const current = chattingRef.current;
-      if (current) {
-        setTimeout(() => {
-          current.scrollTo({
-            behavior: "smooth",
-            left: 0,
-            top: current.scrollHeight,
-          });
-        }, 500);
+      alert(
+        "해당 채널에 혼자 남았습니다. 이제부터 어드민입니다. 채널이 매칭 대기열에 추가 됩니다."
+      );
+      if (json.data.user.user_id === socketUser?.user_id) {
+        setSocketUser(() => json.data.user);
       }
+    } else if (json.event === "chattings") {
+      setChattings(() => json.data.chattings);
+      chattingWindowScrolldown();
+    } else if (json.event === "switchChannel") {
+      setCurrentChannel(() => json.data.channel_id);
+      setSocketUser(() => json.data.user);
+      setChattings(() => json.data.chattings);
+      chattingWindowScrolldown();
     } else if (json.event === "matched") {
       console.log("matched?");
-      setCurrentChannel(json.data.channel_id);
-      setSocketUser(json.data.user);
+      setCurrentChannel(() => json.data.channel_id);
+      setSocketUser(() => json.data.user);
+      setChattings(() => json.data.chattings);
+      chattingWindowScrolldown();
     } else {
       console.log("안된놈", json);
     }
@@ -232,6 +232,8 @@ export default function Mentoring() {
         data: { channel_id: currentChannel },
       })
     );
+    setCurrentChannel(-1);
+    setChattings([]);
   }
 
   function matchingDequeue() {
@@ -246,9 +248,45 @@ export default function Mentoring() {
     );
   }
 
+  function switchChannel(channel_id: number) {
+    ws.send(
+      JSON.stringify({
+        type: "manager",
+        event: "switchChannel",
+        data: {
+          channel_id,
+        },
+      })
+    );
+  }
+
   function handleInputValue(e: ChangeEvent<HTMLInputElement>) {
     const target = e.target;
     setInputValue(target.value);
+  }
+
+  function toWaitList() {
+    ws.send(
+      JSON.stringify({
+        type: "manager",
+        event: "toWaitList",
+      })
+    );
+    setChattings([]);
+    setCurrentChannel(-1);
+  }
+
+  function chattingWindowScrolldown() {
+    setTimeout(() => {
+      const current = chattingRef.current;
+      if (current) {
+        current.scrollTo({
+          behavior: "smooth",
+          left: 0,
+          top: current.scrollHeight,
+        });
+      }
+    }, 500);
   }
 
   return (
@@ -277,22 +315,34 @@ export default function Mentoring() {
           </Paper>
           {/* <Divider sx={{ borderColor: "text.third" }} /> */}
           <List>
-            {channels.map((channel) => (
-              <ListItem key={channel.id}>
-                <ListItemAvatar>
-                  <Avatar
-                    alt='User 1'
-                    src={
-                      channel.admin.profile !== "none"
-                        ? "http://localhost:8080/api/users/profile/" +
-                          channel.admin.profile
-                        : ""
-                    }
-                  />
-                </ListItemAvatar>
-                <ListItemText primary={`Channel ${channel.id}`} />
-              </ListItem>
-            ))}
+            {channels
+              .filter((channel) =>
+                channel.users.some(
+                  (user) => user.user_id === socketUser?.user_id
+                )
+              )
+              .map((channel) => (
+                <ListItem
+                  key={channel.id}
+                  onClick={() =>
+                    channel.id === currentChannel
+                      ? () => {}
+                      : switchChannel(channel.id)
+                  }>
+                  <ListItemAvatar>
+                    <Avatar
+                      alt='User 1'
+                      src={
+                        channel.admin.profile !== "none"
+                          ? "http://localhost:8080/api/users/profile/" +
+                            channel.admin.profile
+                          : ""
+                      }
+                    />
+                  </ListItemAvatar>
+                  <ListItemText primary={`Channel ${channel.id}`} />
+                </ListItem>
+              ))}
           </List>
         </Box>
       </Box>
@@ -396,18 +446,39 @@ export default function Mentoring() {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
+                zIndex: 5,
                 px: 3,
                 py: 2,
                 bgcolor: "background.paper",
               }}>
-              <Typography variant='h6'>Channel {currentChannel}</Typography>
-              <Button
-                size='small'
-                variant='contained'
-                color='warning'
-                onClick={outChannel}>
-                나가기
-              </Button>
+              <Typography variant='h6'>
+                {(
+                  channels.find((channel) => channel.id === currentChannel)
+                    ?.name || `Channel ${currentChannel}`
+                ).length > 8
+                  ? (
+                      channels.find((channel) => channel.id === currentChannel)
+                        ?.name || `Channel ${currentChannel}`
+                    ).slice(0, 8) + "..."
+                  : channels.find((channel) => channel.id === currentChannel)
+                      ?.name || `Channel ${currentChannel}`}
+              </Typography>
+              <Stack direction='row' gap={1}>
+                <Button
+                  size='small'
+                  variant='contained'
+                  color='warning'
+                  onClick={toWaitList}>
+                  대기열로 돌아가기
+                </Button>
+                <Button
+                  size='small'
+                  variant='contained'
+                  color='warning'
+                  onClick={outChannel}>
+                  나가기
+                </Button>
+              </Stack>
             </Paper>
             {/* chatting panel - chat zone */}
             <Box
@@ -428,7 +499,17 @@ export default function Mentoring() {
                 },
               }}>
               {chattings.map((chat) =>
-                chat.user_id === socketUser.user_id ? (
+                chat.username === "system" ? (
+                  <Alert
+                    key={chat.id}
+                    color='success'
+                    sx={{
+                      mb: 2,
+                    }}>
+                    <AlertTitle>{chat.username}</AlertTitle>
+                    {chat.message}
+                  </Alert>
+                ) : chat.user_id === socketUser.user_id ? (
                   <Box
                     key={chat.id}
                     sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}
@@ -489,83 +570,20 @@ export default function Mentoring() {
                 )
               )}
               {/* Chat bubbles */}
-              {/* <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-                <Paper
-                  sx={{
-                    bgcolor: "primary.main",
-                    color: "primary.contrastText",
-                    p: 2,
-                    borderRadius: 2,
-                    maxWidth: "75%",
-                  }}>
-                  <Typography>Hi! How can I help you today?</Typography>
-                </Paper>
-                <Avatar
-                  alt='My User'
-                  src='/placeholder-user.jpg'
-                  sx={{ ml: 2 }}
-                />
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-                <Paper
-                  sx={{
-                    bgcolor: "primary.main",
-                    color: "primary.contrastText",
-                    p: 2,
-                    borderRadius: 2,
-                    maxWidth: "75%",
-                  }}>
-                  <Typography>Hi! How can I help you today?</Typography>
-                </Paper>
-                <Avatar
-                  alt='My User'
-                  src='/placeholder-user.jpg'
-                  sx={{ ml: 2 }}
-                />
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-                <Paper
-                  sx={{
-                    bgcolor: "primary.main",
-                    color: "primary.contrastText",
-                    p: 2,
-                    borderRadius: 2,
-                    maxWidth: "75%",
-                  }}>
-                  <Typography>Hi! How can I help you today?</Typography>
-                </Paper>
-                <Avatar
-                  alt='My User'
-                  src='/placeholder-user.jpg'
-                  sx={{ ml: 2 }}
-                />
-              </Box>
-              <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}>
-                <Paper
-                  sx={{
-                    bgcolor: "primary.main",
-                    color: "primary.contrastText",
-                    p: 2,
-                    borderRadius: 2,
-                    maxWidth: "75%",
-                  }}>
-                  <Typography>Hi! How can I help you today?</Typography>
-                </Paper>
-                <Avatar
-                  alt='My User'
-                  src='/placeholder-user.jpg'
-                  sx={{ ml: 2 }}
-                />
-              </Box> */}
             </Box>
             <Divider sx={{ borderColor: "text.third" }} />
             <Box
+              component='form'
               sx={{
                 display: "flex",
                 alignItems: "center",
                 gap: 2,
                 p: 3,
                 bgcolor: "background.paper",
+              }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                return;
               }}>
               <TextField
                 fullWidth
@@ -574,7 +592,13 @@ export default function Mentoring() {
                 value={inputValue}
                 onChange={handleInputValue}
               />
-              <Button variant='contained' onClick={sendChat}>
+              <Button
+                variant='contained'
+                onClick={sendChat}
+                type='submit'
+                sx={{
+                  display: "none",
+                }}>
                 Send
               </Button>
             </Box>

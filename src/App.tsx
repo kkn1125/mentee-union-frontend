@@ -110,17 +110,16 @@ function App() {
           <Route path='profile' element={<Profile />} />
         </Route>
         <Route path='community'>
-          <Route path='' element={<CommunityLayout />}>
+          <Route
+            path=''
+            element={
+              <ProtectedRoute isSigned={token.status === "exists"}>
+                <CommunityLayout />
+              </ProtectedRoute>
+            }>
             <Route path='' element={<Community />} />
             <Route path='seminars'>
-              <Route
-                path=':id'
-                element={
-                  <ProtectedRoute isSigned={token.status === "exists"}>
-                    <SeminarDetail />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path=':id' element={<SeminarDetail />} />
             </Route>
             <Route path='forums'>
               <Route

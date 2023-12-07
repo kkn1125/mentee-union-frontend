@@ -44,11 +44,45 @@ function useGuards(initGuard?: Guard) {
               alert(FAIL_MESSAGE.MALFORMED_TOKEN);
               navigate("/");
             } else if (detail === "jwt expired") {
-              alert(FAIL_MESSAGE.EXPIRED_TOKEN);
-              tokenDispatch({
-                type: TOKEN_ACTION.SIGNOUT,
-              });
-              navigate("/");
+              if (token.keep_sign) {
+                console.log("try keep sign state as user's refresh token");
+                axiosInstance
+                  .post(
+                    "/auth/signin",
+                    {},
+                    {
+                      headers: {
+                        Authorization: "Bearer " + token.refresh,
+                      },
+                    }
+                  )
+                  .then(({ data }) => {
+                    data;
+                  })
+                  .catch((err) => {
+                    const _message = err.response.data.message;
+                    const _detail = err.response.data.detail;
+                    if (_message === "no token") {
+                      alert(FAIL_MESSAGE.MALFORMED_TOKEN);
+                      navigate("/");
+                    } else if (_detail === "jwt expired") {
+                      alert(FAIL_MESSAGE.EXPIRED_TOKEN);
+                      tokenDispatch({
+                        type: TOKEN_ACTION.SIGNOUT,
+                      });
+                      navigate("/");
+                    } else {
+                      alert(FAIL_MESSAGE.PROBLEM_WITH_SERVER);
+                      navigate("/");
+                    }
+                  });
+              } else {
+                alert(FAIL_MESSAGE.EXPIRED_TOKEN);
+                tokenDispatch({
+                  type: TOKEN_ACTION.SIGNOUT,
+                });
+                navigate("/");
+              }
             } else {
               alert(FAIL_MESSAGE.PROBLEM_WITH_SERVER);
               navigate("/");

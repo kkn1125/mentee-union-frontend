@@ -34,6 +34,7 @@ export const ERROR_MESSAGE = {
   REQUIRED: "필수 항목입니다.",
   MIN: (value: number) => `최소 ${value}자 이상 입력 해야합니다.`,
   MAX: (value: number) => `최대 ${value}자 까지 입력 가능합니다.`,
+  ONLY_BOOLEAN: "참, 거짓만 가능합니다.",
   ONLY_STRING: "문자만 입력 가능합니다.",
   ONLY_NUMBER: "숫자만 입력 가능합니다.",
   EMAIL_FORMAT: "이메일 형식이 아닙니다.",
