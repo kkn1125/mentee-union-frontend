@@ -40,15 +40,24 @@ function useGuards(initGuard?: Guard) {
           } catch (error: any) {
             const message = error.response.data.message;
             const detail = error.response.data.detail;
-            if (message === "no token") {
+            if (message === "not found" || message === "not found user") {
+              alert(FAIL_MESSAGE.NO_ACCOUNT);
+              tokenDispatch({
+                type: TOKEN_ACTION.SIGNOUT,
+              });
+              navigate("/");
+            } else if (message === "no token") {
               alert(FAIL_MESSAGE.MALFORMED_TOKEN);
+              tokenDispatch({
+                type: TOKEN_ACTION.SIGNOUT,
+              });
               navigate("/");
             } else if (detail === "jwt expired") {
               if (token.keep_sign) {
                 console.log("try keep sign state as user's refresh token");
                 axiosInstance
                   .post(
-                    "/auth/signin",
+                    "/auth/refresh",
                     {},
                     {
                       headers: {
@@ -57,13 +66,32 @@ function useGuards(initGuard?: Guard) {
                     }
                   )
                   .then(({ data }) => {
-                    data;
+                    tokenDispatch({
+                      type: TOKEN_ACTION.SAVE,
+                      token: data.access_token,
+                      refresh: data.refresh_token,
+                      keep_sign: token.keep_sign,
+                    });
+                    guard.signed?.();
+                    setValidated(true);
                   })
                   .catch((err) => {
                     const _message = err.response.data.message;
                     const _detail = err.response.data.detail;
-                    if (_message === "no token") {
+                    if (
+                      _message === "not found" ||
+                      _message === "not found user"
+                    ) {
+                      alert(FAIL_MESSAGE.NO_ACCOUNT);
+                      tokenDispatch({
+                        type: TOKEN_ACTION.SIGNOUT,
+                      });
+                      navigate("/");
+                    } else if (_message === "no token") {
                       alert(FAIL_MESSAGE.MALFORMED_TOKEN);
+                      tokenDispatch({
+                        type: TOKEN_ACTION.SIGNOUT,
+                      });
                       navigate("/");
                     } else if (_detail === "jwt expired") {
                       alert(FAIL_MESSAGE.EXPIRED_TOKEN);

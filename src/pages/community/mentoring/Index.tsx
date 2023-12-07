@@ -65,6 +65,7 @@ export default function Mentoring() {
     if (!socketUser) {
       if (token.status === "exists") {
         if (token.token) {
+          console.log(123);
           getUserProfile();
         }
       }
@@ -323,7 +324,7 @@ export default function Mentoring() {
               )
               .map((channel) => (
                 <ListItem
-                  key={channel.id}
+                  key={channel.id + channel.name}
                   onClick={() =>
                     channel.id === currentChannel
                       ? () => {}

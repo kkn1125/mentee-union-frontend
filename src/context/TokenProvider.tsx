@@ -34,6 +34,10 @@ const reducer = (state: IntialState, action: ActionType) => {
   if (action.type === TOKEN_ACTION.LOAD) {
     const userItem = localStorage.getItem("user");
     const user = JSON.parse(userItem || "{}");
+    if (!("token" in user)) {
+      Object.assign(user, {});
+      localStorage.setItem("user", "{}");
+    }
     return {
       ...state,
       status: user.token ? "exists" : "no-exists",

@@ -9,13 +9,16 @@ function Community() {
   const navigate = useNavigate();
   const [forums, setForums] = useState<Forum[]>([]);
   const [seminars, setSeminars] = useState<Seminar[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axiosInstance.get("/forums").then(({ data: { data } }) => {
-      setForums(data);
-    });
-    axiosInstance.get("/seminars").then(({ data: { data } }) => {
-      setSeminars(data);
+    Promise.all([
+      axiosInstance.get("/forums"),
+      axiosInstance.get("/seminars"),
+    ]).then(([{ data: forumData }, { data: seminarData }]) => {
+      setForums(forumData.data);
+      setSeminars(seminarData.data);
+      setLoading(false);
     });
   }, []);
 
@@ -30,7 +33,7 @@ function Community() {
     navigate(`/community/mentoring`);
   };
 
-  return forums.length > 0 || seminars.length > 0 ? (
+  return !loading ? (
     <Box>
       {/* mentoring */}
       <Stack flex={1} gap={1}>
