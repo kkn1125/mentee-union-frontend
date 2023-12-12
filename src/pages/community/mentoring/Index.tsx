@@ -2,7 +2,15 @@ import Loading from "@/components/atoms/Loading";
 import { TokenContext } from "@/context/TokenProvider";
 import useWebSocket from "@/hooks/useWebSocket";
 import { axiosInstance } from "@/util/instances";
-import { Alert, AlertTitle, Stack } from "@mui/material";
+import {
+  Alert,
+  AlertTitle,
+  Input,
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  Stack,
+} from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -34,6 +42,12 @@ export default function Mentoring() {
   const [channels, setChannels] = useState<ChannelModel[]>([]);
   const [chattings, setChattings] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [sessionInfo, setSessionInfo] = useState({
+    type: "",
+    limit: 2,
+  });
+  const [group, setGroup] = useState<UserModel[]>([]);
   const chattingRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -65,7 +79,7 @@ export default function Mentoring() {
     if (!socketUser) {
       if (token.status === "exists") {
         if (token.token) {
-          console.log(123);
+          getCategories();
           getUserProfile();
         }
       }
@@ -77,100 +91,70 @@ export default function Mentoring() {
     console.log("origin", socketData);
     const json = JSON.parse(socketData.data || "{}");
     console.log(json);
-    if (
-      json.event === "getUserState" ||
-      json.event === "addQueue" ||
-      json.event === "dequeue" ||
-      json.event === "toWaitList"
-    ) {
-      setSocketUser(() => json.data.user);
-    } else if (json.event === "findAllChannels") {
-      setChannels(() => json.data.channels);
-    } else if (json.event === "outChannel") {
-      if (json.data.user.user_id === socketUser?.user_id) {
-        setSocketUser(() => json.data.user);
+    if (json.event === "users/state") {
+      setSocketUser(json.data.user);
+    } else if (json.event === "users/matched") {
+      setSocketUser(json.data.user);
+      setChannels((channels) => [
+        ...new Set([...channels, ...json.data.session]),
+      ]);
+      setGroup(json.data.group);
+      setCurrentChannel(json.data.session_id);
+    } else if (json.event === "users/matching") {
+      setSocketUser(json.data.user);
+    } else if (json.event === "users/cancelmatching") {
+      setSocketUser(json.data.user);
+      setGroup([]);
+    } else if (json.event === "sessions/findall") {
+      setSocketUser(json.data.user);
+      setChannels((channels) => [
+        ...new Set([...channels, ...json.data.session]),
+      ]);
+    } else if (json.event === "sessions/change") {
+      setSocketUser(json.data.user);
+      setCurrentChannel(json.data.session_id);
+    } else if (json.event === "sessions/leave") {
+      setSocketUser(json.data.user);
+    } else if (json.event === "sessions/out") {
+      setSocketUser(json.data.user);
+      setChannels((channels) => [
+        ...new Set([...channels, ...json.data.session]),
+      ]);
+      if (json.data.group) {
+        setGroup(group);
+      } else {
+        setGroup([]);
       }
-    } else if (json.event === "outChannel/admin") {
-      alert(
-        "해당 채널에 혼자 남았습니다. 이제부터 어드민입니다. 채널이 매칭 대기열에 추가 됩니다."
-      );
-      if (json.data.user.user_id === socketUser?.user_id) {
-        setSocketUser(() => json.data.user);
-      }
-    } else if (json.event === "chattings") {
-      setChattings(() => json.data.chattings);
-      chattingWindowScrolldown();
-    } else if (json.event === "switchChannel") {
-      setCurrentChannel(() => json.data.channel_id);
-      setSocketUser(() => json.data.user);
-      setChattings(() => json.data.chattings);
-      chattingWindowScrolldown();
-    } else if (json.event === "matched") {
-      console.log("matched?");
-      setCurrentChannel(() => json.data.channel_id);
-      setSocketUser(() => json.data.user);
-      setChattings(() => json.data.chattings);
-      chattingWindowScrolldown();
-    } else {
-      console.log("안된놈", json);
     }
   }, [socketData]);
 
+  function getCategories() {
+    axiosInstance
+      .get("/categories?seminars=true&mentoringSessions=true")
+      .then(({ data }) => {
+        setCategories(data.data);
+      });
+  }
+
   function getUserProfile() {
-    axiosInstance("/users/profile", {
-      headers: {
-        Authorization: "Bearer " + token.token,
-      },
-    }).then(({ data }) => {
-      const user = data.data as User;
-      setUserData(user);
-      setUser(user);
-    });
+    axiosInstance
+      .get("/users/profile", {
+        headers: {
+          Authorization: "Bearer " + token.token,
+        },
+      })
+      .then(({ data }) => {
+        const user = data.data as User;
+        setUserData(user);
+        setUser(user);
+      });
   }
 
   function requestUserState() {
     ws.send(
       JSON.stringify({
-        type: "manager",
-        event: "getUserState",
-      })
-    );
-  }
-
-  function handleCreateMentoringSession() {
-    ws.send(
-      JSON.stringify({
-        type: "manager",
-        event: "addChannel",
-        data: {
-          type: "it",
-          content: "커스텀 내용",
-        },
-      })
-    );
-  }
-
-  function joinChannel() {
-    ws.send(
-      JSON.stringify({
-        type: "manager",
-        event: "joinChannel",
-        data: {
-          channel_id: 5,
-        },
-      })
-    );
-  }
-
-  function matching() {
-    ws.send(
-      JSON.stringify({
-        type: "manager",
-        event: "addQueue",
-        data: {
-          type: "it",
-          content: "다음 내용",
-        },
+        type: "users",
+        event: "users/state",
       })
     );
   }
@@ -217,64 +201,9 @@ export default function Mentoring() {
     );
   }
 
-  function matchingDone() {
-    matchingDequeue();
-  }
-
-  function matchingCancel() {
-    matchingDequeue();
-  }
-
-  function outChannel() {
-    ws.send(
-      JSON.stringify({
-        type: "manager",
-        event: "outChannel",
-        data: { channel_id: currentChannel },
-      })
-    );
-    setCurrentChannel(-1);
-    setChattings([]);
-  }
-
-  function matchingDequeue() {
-    ws.send(
-      JSON.stringify({
-        type: "manager",
-        event: "dequeue",
-        data: {
-          type: "it",
-        },
-      })
-    );
-  }
-
-  function switchChannel(channel_id: number) {
-    ws.send(
-      JSON.stringify({
-        type: "manager",
-        event: "switchChannel",
-        data: {
-          channel_id,
-        },
-      })
-    );
-  }
-
   function handleInputValue(e: ChangeEvent<HTMLInputElement>) {
     const target = e.target;
     setInputValue(target.value);
-  }
-
-  function toWaitList() {
-    ws.send(
-      JSON.stringify({
-        type: "manager",
-        event: "toWaitList",
-      })
-    );
-    setChattings([]);
-    setCurrentChannel(-1);
   }
 
   function chattingWindowScrolldown() {
@@ -288,6 +217,76 @@ export default function Mentoring() {
         });
       }
     }, 500);
+  }
+
+  function addMatching() {
+    ws.send(
+      JSON.stringify({
+        type: "users",
+        event: "users/matching",
+        data: sessionInfo,
+      })
+    );
+  }
+
+  function cancelMatching() {
+    ws.send(
+      JSON.stringify({
+        type: "users",
+        event: "users/cancelmatching",
+        data: sessionInfo,
+      })
+    );
+  }
+
+  function handleCreateMentoringSession() {}
+
+  function toWaitlist() {
+    ws.send(
+      JSON.stringify({
+        type: "sessions",
+        event: "sessions/leave",
+      })
+    );
+    setSessionInfo({
+      type: "",
+      limit: 2,
+    });
+    setCurrentChannel(-1);
+  }
+
+  function outSession(session_id: number) {
+    ws.send(
+      JSON.stringify({
+        type: "sessions",
+        event: "sessions/out",
+        data: {
+          session_id: session_id,
+        },
+      })
+    );
+    setCurrentChannel(-1);
+  }
+
+  function handleSelectChangeSessionInfo(
+    e: SelectChangeEvent<HTMLInputElement>
+  ) {
+    const target = e.target;
+    if (target) {
+      setSessionInfo((sessionInfo) => ({
+        ...sessionInfo,
+        [target.name]: +target.value,
+      }));
+    }
+  }
+  function handleChangeSessionInfo(e: ChangeEvent<HTMLInputElement>) {
+    const target = e.target;
+    if (target) {
+      setSessionInfo((sessionInfo) => ({
+        ...sessionInfo,
+        [target.name]: +target.value,
+      }));
+    }
   }
 
   return (
@@ -318,25 +317,21 @@ export default function Mentoring() {
           <List>
             {channels
               .filter((channel) =>
-                channel.users.some(
-                  (user) => user.user_id === socketUser?.user_id
+                channel.mentorings.some(
+                  (user) => user.mentee_id === socketUser?.user_id
                 )
               )
               .map((channel) => (
                 <ListItem
-                  key={channel.id + channel.name}
-                  onClick={() =>
-                    channel.id === currentChannel
-                      ? () => {}
-                      : switchChannel(channel.id)
-                  }>
+                  key={channel.id + channel.objective}
+                  onClick={() => {}}>
                   <ListItemAvatar>
                     <Avatar
-                      alt='User 1'
+                      alt={channel.mentorings[0].user.username}
                       src={
-                        channel.admin.profile !== "none"
+                        channel.mentorings[0].user.profiles.new_name !== "none"
                           ? "http://localhost:8080/api/users/profile/" +
-                            channel.admin.profile
+                            channel.mentorings[0].user.profiles.new_name
                           : ""
                       }
                     />
@@ -350,8 +345,7 @@ export default function Mentoring() {
       {/* channel matching panel */}
       {!connected || !socketUser ? (
         <Loading />
-      ) : socketUser.status === "waitlist" ||
-        socketUser.status === "matching" ? (
+      ) : socketUser.state === "waitlist" || socketUser.state === "matching" ? (
         <Box
           sx={{
             display: "flex",
@@ -411,24 +405,61 @@ export default function Mentoring() {
               gap={5}
               justifyContent={"center"}
               sx={{ height: "100%" }}>
-              <Box sx={{ my: 2 }}>
+              {/* <Box sx={{ my: 2 }}>
                 <Button
                   variant='contained'
                   onClick={handleCreateMentoringSession}>
                   멘토링 세션 생성
                 </Button>
-              </Box>
-              <Box sx={{ my: 2 }}>
+              </Box> */}
+              <Stack
+                direction='row'
+                alignItems={"center"}
+                gap={1}
+                sx={{ my: 2 }}>
+                <Stack direction='row' gap={1}>
+                  <Select
+                    fullWidth
+                    name='type'
+                    label='Category'
+                    value={sessionInfo.type as "" & string}
+                    onChange={handleSelectChangeSessionInfo}
+                    sx={{
+                      flex: 1,
+                    }}>
+                    <MenuItem value=''>Select</MenuItem>
+                    {categories.map((category) => (
+                      <MenuItem key={category.id} value={category.id}>
+                        {category.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                  <TextField
+                    fullWidth
+                    type='number'
+                    inputProps={{
+                      min: 2,
+                      max: 5,
+                    }}
+                    value={sessionInfo.limit}
+                    onChange={handleChangeSessionInfo}
+                    sx={{
+                      flex: 1,
+                    }}
+                  />
+                </Stack>
                 <Button
                   variant='contained'
                   onClick={
-                    socketUser.status === "matching" ? matchingCancel : matching
+                    socketUser.state === "matching"
+                      ? cancelMatching
+                      : addMatching
                   }>
-                  {socketUser.status === "matching"
+                  {socketUser.state === "matching"
                     ? "매칭 취소"
                     : "멘토링 세션 매칭"}
                 </Button>
-              </Box>
+              </Stack>
             </Stack>
           </Box>
         </Box>
@@ -455,28 +486,28 @@ export default function Mentoring() {
               <Typography variant='h6'>
                 {(
                   channels.find((channel) => channel.id === currentChannel)
-                    ?.name || `Channel ${currentChannel}`
+                    ?.category.name || `Channel ${currentChannel}`
                 ).length > 8
                   ? (
                       channels.find((channel) => channel.id === currentChannel)
-                        ?.name || `Channel ${currentChannel}`
+                        ?.category.name || `Channel ${currentChannel}`
                     ).slice(0, 8) + "..."
                   : channels.find((channel) => channel.id === currentChannel)
-                      ?.name || `Channel ${currentChannel}`}
+                      ?.category.name || `Channel ${currentChannel}`}
               </Typography>
               <Stack direction='row' gap={1}>
                 <Button
                   size='small'
                   variant='contained'
                   color='warning'
-                  onClick={toWaitList}>
+                  onClick={toWaitlist}>
                   대기열로 돌아가기
                 </Button>
                 <Button
                   size='small'
                   variant='contained'
                   color='warning'
-                  onClick={outChannel}>
+                  onClick={() => outSession(currentChannel)}>
                   나가기
                 </Button>
               </Stack>

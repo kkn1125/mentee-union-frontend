@@ -124,25 +124,28 @@ export declare global {
   }
 
   export declare interface UserModel {
-    id: number;
+    currentSession: number;
+    state: string;
     user_id: number;
-    token: string;
     email: string;
-    url: string;
     profile: string;
-    status: string;
-    joined: number;
+    username: string;
+    token: string;
+    url: string;
   }
   export declare interface ChannelModel {
     id: number;
-    name: string;
-    category: string;
-    content: string;
-    limit: number;
-    users: UserModel[];
-    whiteList: number[];
-    blackList: number[];
-    admin: UserModel;
+    category_id: number;
+    topic: string;
+    objective: string;
+    format: string;
+    note: string;
+    mentorings: UserModel[];
+    messages: Message[];
+    category: Category;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
   }
   export declare interface Message {
     id: number;

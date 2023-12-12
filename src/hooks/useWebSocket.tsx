@@ -42,6 +42,7 @@ function useWebSocket() {
   function onOpen() {
     console.log("connected!");
     // alert("멘토링 채널에 연결되었습니다!");
+
     setConnected(true);
   }
 
