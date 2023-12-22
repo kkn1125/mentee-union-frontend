@@ -1,4 +1,4 @@
-import { Stack } from "@mui/material";
+import { Stack, Toolbar } from "@mui/material";
 import { Outlet } from "react-router-dom";
 
 function CommunityLayout() {
@@ -6,8 +6,12 @@ function CommunityLayout() {
     <Stack
       gap={10}
       sx={{
-        width: "60%",
+        width: {
+          xs: "90%",
+          lg: "60%",
+        },
         margin: "auto",
+        py: 5,
       }}>
       <Outlet />
     </Stack>

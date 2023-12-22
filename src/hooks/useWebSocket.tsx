@@ -1,8 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 function useWebSocket() {
   const [user, setUser] = useState<User | null>(null);
-  const [ws, setWs] = useState<WebSocket>();
+  const ws = useRef<WebSocket>(null);
   const [connected, setConnected] = useState<boolean | undefined>(undefined);
   const [socketData, setSocketData] = useState<Partial<MessageEvent<any>>>({});
 
@@ -10,11 +16,6 @@ function useWebSocket() {
     if (user) {
       connect(user);
     }
-    return () => {
-      if (ws) {
-        disconnect(ws);
-      }
-    };
   }, [user]);
 
   function connect(user: User) {
@@ -27,9 +28,11 @@ function useWebSocket() {
     const websocket = new WebSocket(
       "ws://localhost:8081/mentoring" + "?" + params
     );
+
     websocket.binaryType = "arraybuffer";
     setup(websocket);
-    setWs(websocket);
+    console.log("connect websocket", websocket);
+    Object.assign(ws, { current: websocket });
   }
 
   function setup(socket: WebSocket) {
@@ -62,19 +65,24 @@ function useWebSocket() {
     setConnected(false);
   }
 
-  function disconnect(ws: WebSocket) {
+  function disconnect() {
     // NOTICE: 1000은 정상 종료 코드
-    ws?.close(1000);
+    console.log("ws disconnect", ws.current);
+    ws?.current?.close(1000);
     setUser(null);
     setConnected(false);
   }
 
-  return [ws, connected, socketData, setUser, disconnect] as [
-    WebSocket,
+  const getWs = useCallback(() => {
+    return ws.current;
+  }, [ws?.current?.readyState]);
+
+  return [getWs, connected, socketData, setUser, disconnect] as unknown as [
+    () => WebSocket,
     boolean,
     Partial<MessageEvent<any>>,
     React.Dispatch<React.SetStateAction<User | null>>,
-    (ws: WebSocket) => void
+    () => void
   ];
 }
 

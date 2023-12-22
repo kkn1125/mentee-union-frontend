@@ -5,7 +5,7 @@ import { axiosInstance } from "@/util/instances";
 import {
   Alert,
   AlertTitle,
-  Input,
+  Badge,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -22,14 +22,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Paper from "@mui/material/Paper";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import {
-  ChangeEvent,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Mentoring() {
@@ -37,9 +30,9 @@ export default function Mentoring() {
   const token = useContext(TokenContext);
   const [userData, setUserData] = useState<User | null>(null);
   const [socketUser, setSocketUser] = useState<UserModel | null>(null);
-  const [ws, connected, socketData, setUser, disconnect] = useWebSocket();
+  const [getWs, connected, socketData, setUser, disconnect] = useWebSocket();
   const [currentChannel, setCurrentChannel] = useState<number>(-1);
-  const [channels, setChannels] = useState<ChannelModel[]>([]);
+  const [channels, setChannels] = useState<MentoringSession[]>([]);
   const [chattings, setChattings] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState<string>("");
   const [categories, setCategories] = useState<Category[]>([]);
@@ -52,9 +45,10 @@ export default function Mentoring() {
 
   useEffect(() => {
     return () => {
-      if (ws) {
-        disconnect(ws);
-      }
+      console.log("page out");
+      console.log(getWs());
+      console.log(disconnect);
+      disconnect();
     };
   }, []);
 
@@ -91,13 +85,46 @@ export default function Mentoring() {
     console.log("origin", socketData);
     const json = JSON.parse(socketData.data || "{}");
     console.log(json);
-    if (json.event === "users/state") {
+    if (json.event === "messages/save") {
+      // if (currentChannel !== -1) {
+      //   setChattings(() => {
+      //     chattingWindowScrolldown();
+      //     return json.data.messages;
+      //   });
+      // }
+      // chattingWindowScrolldown();
+    } else if (json.event === "messages/removechat") {
+      //
+    } else if (json.event === "messages/new") {
+      setChannels((channels) => {
+        const temp = [...channels];
+        let index = -1;
+        for (let i = 0; i < temp.length; i++) {
+          const channel = temp[i];
+          if (channel.id === json.data.session.id) {
+            index = temp.indexOf(channel);
+            break;
+          }
+        }
+        if (index > -1) {
+          temp.splice(index, 1, json.data.session);
+        }
+        return temp;
+      });
+      chattingWindowScrolldown();
+    } else if (json.event === "users/state") {
       setSocketUser(json.data.user);
     } else if (json.event === "users/matched") {
       setSocketUser(json.data.user);
-      setChannels((channels) => [
-        ...new Set([...channels, ...json.data.session]),
-      ]);
+      setChannels((channels) => {
+        const temp = [...channels];
+        for (const newChannel of json.data.session as MentoringSession[]) {
+          if (channels.every((ch) => ch.id !== newChannel.id)) {
+            temp.push(newChannel);
+          }
+        }
+        return temp;
+      });
       setGroup(json.data.group);
       setCurrentChannel(json.data.session_id);
     } else if (json.event === "users/matching") {
@@ -107,19 +134,63 @@ export default function Mentoring() {
       setGroup([]);
     } else if (json.event === "sessions/findall") {
       setSocketUser(json.data.user);
-      setChannels((channels) => [
-        ...new Set([...channels, ...json.data.session]),
-      ]);
+      setChannels((channels) => {
+        const temp = [...channels];
+        for (const newChannel of json.data.session as MentoringSession[]) {
+          if (channels.every((ch) => ch.id !== newChannel.id)) {
+            temp.push(newChannel);
+          }
+        }
+        return temp;
+      });
+    } else if (json.event === "sessions/update") {
+      setSocketUser(json.data.user);
+      if (json.data.session.id === currentChannel) {
+        setGroup(json.data.group);
+      }
+      setChannels((channels) => {
+        const temp = [...channels];
+        let index = -1;
+        for (let i = 0; i < temp.length; i++) {
+          const channel = temp[i];
+          if (channel.id === json.data.session.id) {
+            index = temp.indexOf(channel);
+            break;
+          }
+        }
+        console.log("json.data.session", json.data.session);
+        if (index > -1) {
+          temp.splice(index, 1, json.data.session);
+        }
+        return temp;
+      });
     } else if (json.event === "sessions/change") {
       setSocketUser(json.data.user);
       setCurrentChannel(json.data.session_id);
+      setChattings(() => {
+        chattingWindowScrolldown(true);
+        return json.data.messages;
+      });
+      setChannels((channels) => {
+        const temp = [...channels];
+        let index = -1;
+        for (let i = 0; i < temp.length; i++) {
+          const channel = temp[i];
+          if (channel.id === json.data.session.id) {
+            index = temp.indexOf(channel);
+            break;
+          }
+        }
+        if (index > -1) {
+          temp.splice(index, 1, json.data.session);
+        }
+        return temp;
+      });
     } else if (json.event === "sessions/leave") {
       setSocketUser(json.data.user);
     } else if (json.event === "sessions/out") {
       setSocketUser(json.data.user);
-      setChannels((channels) => [
-        ...new Set([...channels, ...json.data.session]),
-      ]);
+      setChannels(json.data.session);
       if (json.data.group) {
         setGroup(group);
       } else {
@@ -127,6 +198,18 @@ export default function Mentoring() {
       }
     }
   }, [socketData]);
+
+  function switchChannel(session_id: number) {
+    getWs().send(
+      JSON.stringify({
+        type: "sessions",
+        event: "sessions/change",
+        data: {
+          session_id,
+        },
+      })
+    );
+  }
 
   function getCategories() {
     axiosInstance
@@ -151,7 +234,7 @@ export default function Mentoring() {
   }
 
   function requestUserState() {
-    ws.send(
+    getWs().send(
       JSON.stringify({
         type: "users",
         event: "users/state",
@@ -163,18 +246,13 @@ export default function Mentoring() {
     const message = inputValue;
     setInputValue("");
     if (userData) {
-      ws.send(
+      getWs().send(
         JSON.stringify({
-          type: "message",
-          event: "chattings",
+          type: "messages",
+          event: "messages/save",
           data: {
-            user_id: userData.id,
-            username: userData.username,
-            profile:
-              userData?.profiles[0]?.new_name || socketUser?.profile || "none",
-            message,
-            removed: false,
-            time: +new Date(),
+            session_id: currentChannel,
+            message: message,
           },
         })
       );
@@ -190,12 +268,13 @@ export default function Mentoring() {
   }
 
   function removeChat(chat_id: number) {
-    ws.send(
+    getWs().send(
       JSON.stringify({
-        type: "message",
-        event: "remove/chat",
+        type: "messages",
+        event: "messages/removechat",
         data: {
-          chat_id,
+          message_id: chat_id,
+          session_id: currentChannel,
         },
       })
     );
@@ -206,21 +285,21 @@ export default function Mentoring() {
     setInputValue(target.value);
   }
 
-  function chattingWindowScrolldown() {
+  function chattingWindowScrolldown(direct: boolean = false) {
     setTimeout(() => {
       const current = chattingRef.current;
       if (current) {
         current.scrollTo({
-          behavior: "smooth",
+          behavior: direct ? "instant" : "smooth",
           left: 0,
-          top: current.scrollHeight,
+          top: current.scrollHeight + 100,
         });
       }
-    }, 500);
+    }, 50);
   }
 
   function addMatching() {
-    ws.send(
+    getWs().send(
       JSON.stringify({
         type: "users",
         event: "users/matching",
@@ -230,7 +309,7 @@ export default function Mentoring() {
   }
 
   function cancelMatching() {
-    ws.send(
+    getWs().send(
       JSON.stringify({
         type: "users",
         event: "users/cancelmatching",
@@ -239,10 +318,10 @@ export default function Mentoring() {
     );
   }
 
-  function handleCreateMentoringSession() {}
+  // function handleCreateMentoringSession() {}
 
   function toWaitlist() {
-    ws.send(
+    getWs().send(
       JSON.stringify({
         type: "sessions",
         event: "sessions/leave",
@@ -256,7 +335,7 @@ export default function Mentoring() {
   }
 
   function outSession(session_id: number) {
-    ws.send(
+    getWs().send(
       JSON.stringify({
         type: "sessions",
         event: "sessions/out",
@@ -265,7 +344,11 @@ export default function Mentoring() {
         },
       })
     );
-    setCurrentChannel(-1);
+
+    setCurrentChannel((currentChannel) =>
+      // 현재 채널과 동일하면 유지, 아니면 대기열로
+      currentChannel === session_id ? -1 : currentChannel
+    );
   }
 
   function handleSelectChangeSessionInfo(
@@ -289,27 +372,39 @@ export default function Mentoring() {
     }
   }
 
-  return (
-    <Box
+  return !connected || !socketUser ? (
+    <Loading />
+  ) : (
+    <Stack
+      direction={{
+        xs: "column",
+        md: "row",
+      }}
       sx={{
-        display: "grid",
-        // ...(connected &&
-        //   socketUser &&
-        //   socketUser.status.startsWith("room") && {
-        //     gridTemplateColumns: "300px 1fr",
-        //   }),
-        gridTemplateColumns: "300px 1fr",
         height: "inherit",
       }}>
       {/* channel list zone */}
       <Box
         sx={{
           borderRight: 1,
+          flex: 0.4,
           borderColor: "text.third",
           bgcolor: "background.default",
           overflowY: "auto",
+          position: "relative",
         }}>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+        <Box
+          sx={{
+            position: {
+              xs: "absolute",
+              md: "relative",
+            },
+            top: 0,
+            left: 0,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+          }}>
           <Paper square sx={{ py: 2, px: 3, bgcolor: "background.paper" }}>
             <Typography variant='h6'>Mentoring Chats</Typography>
           </Paper>
@@ -318,38 +413,54 @@ export default function Mentoring() {
             {channels
               .filter((channel) =>
                 channel.mentorings.some(
-                  (user) => user.mentee_id === socketUser?.user_id
+                  (mentoring) => mentoring.mentee_id === socketUser?.user_id
                 )
               )
               .map((channel) => (
                 <ListItem
-                  key={channel.id + channel.objective}
-                  onClick={() => {}}>
-                  <ListItemAvatar>
-                    <Avatar
-                      alt={channel.mentorings[0].user.username}
-                      src={
-                        channel.mentorings[0].user.profiles.new_name !== "none"
-                          ? "http://localhost:8080/api/users/profile/" +
-                            channel.mentorings[0].user.profiles.new_name
-                          : ""
-                      }
-                    />
-                  </ListItemAvatar>
+                  key={channel.id}
+                  onClick={() => switchChannel(channel.id)}>
+                  <Badge
+                    badgeContent={
+                      channel.messages.filter((message) =>
+                        message.readedUsers.every(
+                          (user) => user.user_id !== socketUser?.user_id
+                        )
+                      ).length
+                    }
+                    color='primary'>
+                    <ListItemAvatar>
+                      <Avatar
+                        alt={channel.mentorings[0].user.username}
+                        src={
+                          channel.mentorings[0].user.profiles[0]?.new_name !==
+                          "none"
+                            ? "http://localhost:8080/api/users/profile/" +
+                              channel.mentorings[0].user.profiles[0]?.new_name
+                            : ""
+                        }
+                      />
+                    </ListItemAvatar>
+                  </Badge>
                   <ListItemText primary={`Channel ${channel.id}`} />
+                  <Button
+                    size='small'
+                    variant='contained'
+                    color='error'
+                    onClick={() => outSession(channel.id)}>
+                    나가기
+                  </Button>
                 </ListItem>
               ))}
           </List>
         </Box>
       </Box>
       {/* channel matching panel */}
-      {!connected || !socketUser ? (
-        <Loading />
-      ) : socketUser.state === "waitlist" || socketUser.state === "matching" ? (
-        <Box
+      {socketUser.state === "waitlist" || socketUser.state === "matching" ? (
+        <Stack
+          direction='column'
+          flex={1}
           sx={{
-            display: "flex",
-            flexDirection: "column",
             overflow: "hidden",
           }}>
           {/* chatting panel */}
@@ -400,18 +511,7 @@ export default function Mentoring() {
                 대화방 인원의 동의를 얻으면 참가 가능합니다.
               </Typography>
             </Stack>
-            <Stack
-              direction='row'
-              gap={5}
-              justifyContent={"center"}
-              sx={{ height: "100%" }}>
-              {/* <Box sx={{ my: 2 }}>
-                <Button
-                  variant='contained'
-                  onClick={handleCreateMentoringSession}>
-                  멘토링 세션 생성
-                </Button>
-              </Box> */}
+            <Stack direction='row' gap={5} justifyContent={"center"}>
               <Stack
                 direction='row'
                 alignItems={"center"}
@@ -462,14 +562,15 @@ export default function Mentoring() {
               </Stack>
             </Stack>
           </Box>
-        </Box>
+        </Stack>
       ) : (
-        <>
+        <Stack flex={1}>
           <Box
             sx={{
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",
+              height: "100%",
             }}>
             {/* chatting panel */}
             <Paper
@@ -530,77 +631,87 @@ export default function Mentoring() {
                   backgroundColor: (theme) => theme.palette.text.primary,
                 },
               }}>
-              {chattings.map((chat) =>
-                chat.username === "system" ? (
-                  <Alert
-                    key={chat.id}
-                    color='success'
-                    sx={{
-                      mb: 2,
-                    }}>
-                    <AlertTitle>{chat.username}</AlertTitle>
-                    {chat.message}
-                  </Alert>
-                ) : chat.user_id === socketUser.user_id ? (
-                  <Box
-                    key={chat.id}
-                    sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}
-                    title={"" + chat.user_id}
-                    onClick={() => handleRemoveChat(chat.id)}>
-                    <Paper
+              {channels
+                .find((channel) => channel.id === currentChannel)
+                ?.messages.map((chat) =>
+                  chat.user_id === null ? (
+                    <Alert
+                      key={chat.id}
+                      color='success'
                       sx={{
-                        bgcolor: "primary.main",
-                        color: "primary.contrastText",
-                        p: 2,
-                        borderRadius: 2,
-                        maxWidth: "75%",
+                        mb: 2,
                       }}>
-                      <Typography>{chat.username}</Typography>
-                      <Typography>
-                        {chat.removed ? "삭제된 메세지 입니다." : chat.message}
-                      </Typography>
-                    </Paper>
-                    <Avatar
-                      alt='My User'
-                      src={
-                        chat.profile !== "none"
-                          ? "http://localhost:8080/api/users/profile/" +
-                            chat.profile
-                          : ""
-                      }
-                      sx={{ ml: 2 }}
-                    />
-                  </Box>
-                ) : (
-                  <Box
-                    key={chat.id}
-                    sx={{ display: "flex", mb: 2 }}
-                    title={"" + chat.user_id}>
-                    <Avatar
-                      alt='User'
-                      src={
-                        chat.profile !== "none"
-                          ? "http://localhost:8080/api/users/profile/" +
-                            chat.profile
-                          : ""
-                      }
-                      sx={{ mr: 2 }}
-                    />
-                    <Paper
+                      <AlertTitle>{chat.username}</AlertTitle>
+                      {chat.message}
+                    </Alert>
+                  ) : chat.user_id === socketUser.user_id ? (
+                    <Box
+                      key={chat.id}
                       sx={{
-                        bgcolor: "grey.300",
-                        p: 2,
-                        borderRadius: 2,
-                        maxWidth: "75%",
-                      }}>
-                      <Typography>{chat.username}</Typography>
-                      <Typography>
-                        {chat.removed ? "삭제된 메세지 입니다." : chat.message}
-                      </Typography>
-                    </Paper>
-                  </Box>
-                )
-              )}
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        mb: 2,
+                      }}
+                      title={"" + chat.user_id}
+                      onClick={() => handleRemoveChat(chat.id)}>
+                      <Paper
+                        sx={{
+                          bgcolor: "primary.main",
+                          color: "primary.contrastText",
+                          p: 2,
+                          borderRadius: 2,
+                          maxWidth: "75%",
+                        }}>
+                        <Typography>{chat.username}</Typography>
+                        <Typography>
+                          {chat.is_deleted
+                            ? "삭제된 메세지 입니다."
+                            : chat.message}
+                        </Typography>
+                      </Paper>
+                      <Avatar
+                        alt='My User'
+                        src={
+                          chat.profile !== "none"
+                            ? "http://localhost:8080/api/users/profile/" +
+                              chat.profile
+                            : ""
+                        }
+                        sx={{ ml: 2 }}
+                      />
+                    </Box>
+                  ) : (
+                    <Box
+                      key={chat.id}
+                      sx={{ display: "flex", mb: 2 }}
+                      title={"" + chat.user_id}>
+                      <Avatar
+                        alt='User'
+                        src={
+                          chat.profile !== "none"
+                            ? "http://localhost:8080/api/users/profile/" +
+                              chat.profile
+                            : ""
+                        }
+                        sx={{ mr: 2 }}
+                      />
+                      <Paper
+                        sx={{
+                          bgcolor: "grey.300",
+                          p: 2,
+                          borderRadius: 2,
+                          maxWidth: "75%",
+                        }}>
+                        <Typography>{chat.username}</Typography>
+                        <Typography>
+                          {chat.is_deleted
+                            ? "삭제된 메세지 입니다."
+                            : chat.message}
+                        </Typography>
+                      </Paper>
+                    </Box>
+                  )
+                )}
               {/* Chat bubbles */}
             </Box>
             <Divider sx={{ borderColor: "text.third" }} />
@@ -615,6 +726,7 @@ export default function Mentoring() {
               }}
               onSubmit={(e) => {
                 e.preventDefault();
+                sendChat();
                 return;
               }}>
               <TextField
@@ -626,7 +738,6 @@ export default function Mentoring() {
               />
               <Button
                 variant='contained'
-                onClick={sendChat}
                 type='submit'
                 sx={{
                   display: "none",
@@ -635,8 +746,8 @@ export default function Mentoring() {
               </Button>
             </Box>
           </Box>
-        </>
+        </Stack>
       )}
-    </Box>
+    </Stack>
   );
 }

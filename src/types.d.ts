@@ -81,6 +81,17 @@ export declare global {
     updated_at: Date;
 
     profiles: Profile[];
+    mentorings: Mentoring[];
+    grade: Grade;
+  }
+  export declare interface Grade {
+    id: number;
+    name: string;
+    description: string;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
+    users: User[];
   }
   export declare interface Profile {
     id: number;
@@ -140,21 +151,61 @@ export declare global {
     objective: string;
     format: string;
     note: string;
-    mentorings: UserModel[];
-    messages: Message[];
-    category: Category;
     deleted_at: Date;
     created_at: Date;
     updated_at: Date;
+    mentorings: Mentoring[];
+    messages: Message[];
+    category: Category;
   }
+
+  export declare interface Mentoring {
+    id: number;
+    mentee_id: number;
+    mentoring_session_id: number;
+    token: string;
+    status: string;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
+    mentoringSession: MentoringSession;
+    user: User;
+  }
+
+  export declare interface MentoringSession {
+    id: number;
+    category_id: number;
+    topic: string;
+    objective: string;
+    format: string;
+    note: string;
+    limit: number;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
+    mentorings: Mentoring[];
+    messages: Message[];
+    category: Category;
+  }
+
   export declare interface Message {
     id: number;
     user_id: number;
     username: string;
     profile: string;
     message: string;
-    removed: boolean;
-    created_at: number;
+    is_deleted: boolean;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
+    readedUsers: ReadUser[];
+  }
+  export declare interface ReadUser {
+    id: number;
+    user_id: number;
+    message_id: number;
+    message: Message;
+    user: User;
   }
 
   // declare type MappedType<T, U> = {
