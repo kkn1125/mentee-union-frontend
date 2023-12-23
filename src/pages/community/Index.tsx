@@ -34,7 +34,7 @@ function Community() {
   };
 
   return !loading ? (
-    <Box>
+    <Stack gap={3}>
       {/* mentoring */}
       <Stack flex={1} gap={1}>
         <Typography variant='h4' textTransform={"capitalize"}>
@@ -109,7 +109,7 @@ function Community() {
           ))}
         </Stack>
       </Stack>
-    </Box>
+    </Stack>
   ) : (
     <Loading />
   );

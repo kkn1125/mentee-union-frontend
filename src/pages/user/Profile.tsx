@@ -1,7 +1,7 @@
 import GuageBar from "@/components/atoms/GaugeBar";
 import Loading from "@/components/atoms/Loading";
 import ModalWithButton from "@/components/atoms/ModalWithButton";
-import Placeholder from "@/components/moleculars/Placeholder";
+import Placeholder from "@/components/moleculars/common/Placeholder";
 import {
   TOKEN_ACTION,
   TokenContext,

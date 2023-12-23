@@ -1,9 +1,9 @@
 import SeminarItem from "@/components/atoms/SeminarItem";
 import PaperContent from "@/components/atoms/home/PaperContent";
 import Step from "@/components/atoms/home/Step";
-import FlowIssues from "@/components/moleculars/FlowIssues";
-import Placeholder from "@/components/moleculars/Placeholder";
-import Section from "@/components/moleculars/Section";
+import FlowIssues from "@/components/moleculars/home/FlowIssues";
+import Placeholder from "@/components/moleculars/common/Placeholder";
+import Section from "@/components/moleculars/common/Section";
 import BackgroundSection from "@/components/organisms/home/BackgroundSection";
 import MainSections from "@/components/organisms/home/MainSections";
 import { TokenContext } from "@/context/TokenProvider";
