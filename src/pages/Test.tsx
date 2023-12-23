@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { axiosInstance } from "@/util/instances";
 import SeminarItem from "@/components/atoms/SeminarItem";
-import LevelSystem from "@/components/moleculars/LevelSystem";
+import LevelSystem from "@/components/moleculars/home/LevelSystem";
 
 const StickySidebar = styled(Box)(({ theme }) => ({
   position: "sticky",

@@ -1,6 +1,6 @@
 import SeminarItem from "@/components/atoms/SeminarItem";
 import StickySidebar from "@/components/atoms/common/StickySidebar";
-import LevelSystem from "@/components/moleculars/LevelSystem";
+import LevelSystem from "@/components/moleculars/home/LevelSystem";
 import {
   Container,
   Grid,

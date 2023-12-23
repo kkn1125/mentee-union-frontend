@@ -8,6 +8,7 @@ function CommunityLayout() {
       sx={{
         width: "60%",
         margin: "auto",
+        py: 5,
       }}>
       <Outlet />
     </Stack>

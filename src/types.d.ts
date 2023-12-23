@@ -82,6 +82,14 @@ export declare global {
 
     profiles: Profile[];
   }
+  export declare interface JwtDto {
+    userId: number;
+    username: string;
+    email: string;
+    phone_number: string;
+    last_sign_in: Date;
+  }
+
   export declare interface Profile {
     id: number;
     user_id: number;
@@ -123,24 +131,25 @@ export declare global {
     height: number;
   }
 
-  export declare interface UserModel {
-    currentSession: number;
-    state: string;
-    user_id: number;
-    email: string;
-    profile: string;
-    username: string;
-    token: string;
-    url: string;
+  export declare interface Mentoring {
+    id: number;
+    mentee_id: number;
+    mentoring_session_id: number;
+    mentoringSession: MentoringSession;
+    user: User;
+    status: string;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
   }
-  export declare interface ChannelModel {
+  export declare interface MentoringSession {
     id: number;
     category_id: number;
     topic: string;
     objective: string;
     format: string;
     note: string;
-    mentorings: UserModel[];
+    mentorings: Mentoring[];
     messages: Message[];
     category: Category;
     deleted_at: Date;
@@ -155,6 +164,14 @@ export declare global {
     message: string;
     removed: boolean;
     created_at: number;
+    readedUsers: ReadMessage[];
+  }
+  export declare interface ReadMessage {
+    id: number;
+    user_id: number;
+    message_id: number;
+    message: Message;
+    user: User;
   }
 
   // declare type MappedType<T, U> = {
