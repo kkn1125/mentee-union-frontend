@@ -3,7 +3,7 @@ import SeminarItem from "@/components/atoms/SeminarItem";
 import { axiosInstance } from "@/util/instances";
 import { Box, Button, List, Paper, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Community() {
   const navigate = useNavigate();
@@ -16,8 +16,8 @@ function Community() {
       axiosInstance.get("/forums"),
       axiosInstance.get("/seminars"),
     ]).then(([{ data: forumData }, { data: seminarData }]) => {
-      setForums(forumData.data);
-      setSeminars(seminarData.data);
+      setForums(forumData.data.slice(0, 5));
+      setSeminars(seminarData.data.slice(0, 5));
       setLoading(false);
     });
   }, []);
@@ -25,6 +25,7 @@ function Community() {
   const handleRedirectSeminar = (path: number) => {
     navigate(`/community/seminars/${path}`);
   };
+
   const handleRedirectForum = (path: number) => {
     navigate(`/community/forums/${path}`);
   };
@@ -52,10 +53,27 @@ function Community() {
         </Stack>
       </Stack>
 
-      {/* forum */}
+      {/* seminars */}
       <Stack flex={1} gap={1}>
-        <Typography variant='h4' textTransform={"capitalize"}>
-          seminars
+        <Typography
+          variant='h4'
+          textTransform={"capitalize"}
+          sx={{
+            textDecoration: "none",
+            color: "inherit",
+          }}>
+          <Typography
+            component={Link}
+            to='/community/seminars'
+            sx={{
+              textDecoration: "inherit",
+              textTransform: "inherit",
+              color: "inherit",
+              fontSize: "inherit",
+              fontWeight: "inherit",
+            }}>
+            seminars
+          </Typography>
         </Typography>
         <List>
           {/* 세미나 항목 */}
@@ -64,34 +82,34 @@ function Community() {
           {seminars.map((seminar: Seminar) => (
             <SeminarItem
               key={seminar.id}
-              host_id={seminar.host_id} // 예시 데이터를 적절한 필드로 대체해야 함
-              category_id={seminar.category_id} // 예시 데이터를 적절한 필드로 대체해야 함
-              title={seminar.title}
-              content={seminar.content}
-              meeting_place={seminar.meeting_place}
-              limit_participant_amount={seminar.limit_participant_amount}
-              recruit_start_date={seminar.recruit_start_date}
-              recruit_end_date={seminar.recruit_end_date}
-              seminar_start_date={seminar.seminar_start_date}
-              seminar_end_date={seminar.seminar_end_date}
-              is_recruit_finished={seminar.is_recruit_finished}
-              is_seminar_finished={seminar.is_seminar_finished}
-              user={seminar.user}
-              category={seminar.category}
-              id={seminar.id}
-              deleted_at={seminar.deleted_at}
-              created_at={seminar.created_at}
-              updated_at={seminar.updated_at}
-              seminarParticipants={seminar.seminarParticipants} // ... 기타 필요한 props ...
+              seminar={seminar}
+              onClick={() => handleRedirectSeminar(seminar.id)}
             />
           ))}
         </List>
       </Stack>
 
-      {/* seminars */}
+      {/* forums */}
       <Stack flex={1} gap={1}>
-        <Typography variant='h4' textTransform={"capitalize"}>
-          forums
+        <Typography
+          variant='h4'
+          textTransform={"capitalize"}
+          sx={{
+            textDecoration: "none",
+            color: "inherit",
+          }}>
+          <Typography
+            component={Link}
+            to='/community/forums'
+            sx={{
+              textDecoration: "inherit",
+              textTransform: "inherit",
+              color: "inherit",
+              fontSize: "inherit",
+              fontWeight: "inherit",
+            }}>
+            forums
+          </Typography>
         </Typography>
         <Stack gap={3}>
           {forums.length === 0 && "등록된 포럼이 없습니다."}

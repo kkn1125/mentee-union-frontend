@@ -1,3 +1,5 @@
+import GroupIcon from "@mui/icons-material/Group";
+import MenuIcon from "@mui/icons-material/Menu";
 import {
   Alert,
   AlertTitle,
@@ -6,24 +8,28 @@ import {
   Box,
   Button,
   Divider,
+  IconButton,
   Paper,
   Stack,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
-import GroupIcon from "@mui/icons-material/Group";
-import { ChangeEvent, ReactElement, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 
 type ChattingPageProps = {
   socket: Socket;
-  sidebar: ReactElement;
+  handleDrawerToggle: () => void;
   user: JwtDto;
   session: MentoringSession;
 };
 
-function ChattingPage({ socket, sidebar, user, session }: ChattingPageProps) {
+function ChattingPage({
+  socket,
+  handleDrawerToggle,
+  user,
+  session,
+}: ChattingPageProps) {
   const [chattings, setChattings] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const chattingRef = useRef<HTMLDivElement>(null);
@@ -51,10 +57,21 @@ function ChattingPage({ socket, sidebar, user, session }: ChattingPageProps) {
   }
 
   function sendChat() {
-    socket.emit("message", {
+    socket.emit("saveMessage", {
       session_id: session.id,
-      topic: session.topic,
       message: inputValue,
+    });
+  }
+
+  function handleWaitList() {
+    socket.emit("waitlist", {
+      session_id: session.id,
+    });
+  }
+
+  function handleOutSession() {
+    socket.emit("outSession", {
+      session_id: session.id,
     });
   }
 
@@ -70,12 +87,29 @@ function ChattingPage({ socket, sidebar, user, session }: ChattingPageProps) {
         alignItems='center'
         gap={1}
         sx={{ p: 2, minHeight: 66 }}>
-        {sidebar}
-        <Typography>{session.topic}</Typography>
-
-        <Badge color={"info"} badgeContent={session.mentorings.length}>
-          <GroupIcon />
-        </Badge>
+        <Stack
+          flex={1}
+          direction='row'
+          justifyContent={"space-between"}
+          alignItems='center'
+          gap={3}>
+          <Box>
+            <IconButton
+              color='inherit'
+              aria-label='open drawer'
+              edge='start'
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { sm: "none" } }}>
+              <MenuIcon />
+            </IconButton>
+            <Badge color={"info"} badgeContent={session.mentorings.length}>
+              <GroupIcon />
+            </Badge>
+          </Box>
+          <Typography>{session.topic}</Typography>
+          <Button onClick={handleWaitList}>대기열</Button>
+          <Button onClick={handleOutSession}>나가기</Button>
+        </Stack>
       </Stack>
       <Divider sx={{ borderColor: "#565656" }} />
       <Stack

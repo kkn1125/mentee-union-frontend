@@ -5,16 +5,23 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 function ForumDetail() {
-  const [forum, setForum] = useState<Partial<Forum>>();
+  const [forum, setForum] = useState<Forum | null>(null);
   const params = useParams();
 
   useEffect(() => {
-    axiosInstance.get(`/forums/${params.id}`).then(({ data: { data } }) => {
-      setForum((forum) => data);
-    });
+    axiosInstance
+      .get(`/forums/${params.id}`)
+      .then(({ data }) => data.data)
+      .then((data) => {
+        setForum(data);
+      });
   }, []);
 
-  return forum ? <Box>{forum.title}</Box> : <Loading />;
+  if (forum === null) {
+    return <Loading />;
+  }
+
+  return <Box>{forum.title}</Box>;
 }
 
 export default ForumDetail;

@@ -13,8 +13,10 @@ import ResetPassword from "./pages/auth/ResetPassword";
 import Signin from "./pages/auth/Signin";
 import Signup from "./pages/auth/Signup";
 import Community from "./pages/community/Index";
+import Forums from "./pages/community/forums/Index";
 import ForumDetail from "./pages/community/forums/ForumDetail";
 import Mentoring from "./pages/community/mentoring/Index";
+import Seminars from "./pages/community/seminars/Index";
 import SeminarDetail from "./pages/community/seminars/SeminarDetail";
 import Profile from "./pages/user/Profile";
 import { FAIL_MESSAGE } from "./util/global.constants";
@@ -119,9 +121,11 @@ function App() {
             }>
             <Route path='' element={<Community />} />
             <Route path='seminars'>
+              <Route path='' element={<Seminars />} />
               <Route path=':id' element={<SeminarDetail />} />
             </Route>
             <Route path='forums'>
+              <Route path='' element={<Forums />} />
               <Route
                 path=':id'
                 element={

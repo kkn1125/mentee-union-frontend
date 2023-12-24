@@ -55,9 +55,13 @@ export default function Sidebar({
 
   async function enterNew(session_id: number) {
     if (confirm("새로운 모임에 참여하시겠습니까?")) {
-      socket.emitWithAck("joinRoom", {
-        session_id,
-      });
+      try {
+        await socket.emitWithAck("joinRoom", {
+          session_id,
+        });
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 

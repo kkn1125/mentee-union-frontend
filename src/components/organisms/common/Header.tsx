@@ -20,6 +20,7 @@ import { MouseEvent, useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const [anchorMainEl, setAnchorMainEl] = useState<null | HTMLElement>(null);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const tokenDispatch = useContext(TokenDispatchContext);
   const token = useContext(TokenContext);
@@ -29,6 +30,14 @@ export default function Header() {
   function changeMode() {
     theme.toggleColorMode();
   }
+
+  const handleMainMenu = (event: MouseEvent<HTMLElement>) => {
+    setAnchorMainEl(event.currentTarget);
+  };
+
+  const handleMainClose = () => {
+    setAnchorMainEl(null);
+  };
 
   const handleMenu = (event: MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -47,6 +56,33 @@ export default function Header() {
   const handleRedirect = (path: string) => {
     navigate(path);
   };
+
+  const menuMainListInfo = [
+    {
+      name: "Mentoring",
+      onClick: () => {
+        handleMainClose();
+        handleRedirect("/community/mentoring");
+      },
+      isShow: !!token.token,
+    },
+    {
+      name: "Seminars",
+      onClick: () => {
+        handleMainClose();
+        handleRedirect("/community/seminars");
+      },
+      isShow: !!token.token,
+    },
+    {
+      name: "Forums",
+      onClick: () => {
+        handleMainClose();
+        handleRedirect("/community/forums");
+      },
+      isShow: !!token.token,
+    },
+  ];
 
   const menuListInfo = [
     {
@@ -84,7 +120,7 @@ export default function Header() {
       position='static'
       color='transparent'
       sx={{
-        zIndex: 100,
+        zIndex: (theme) => theme.zIndex.drawer + 1,
         backgroundColor: (theme) => theme.palette.background.paper,
       }}>
       <Toolbar>
@@ -93,9 +129,33 @@ export default function Header() {
           edge='start'
           color='inherit'
           aria-label='menu'
-          sx={{ mr: 2 }}>
+          sx={{ mr: 2 }}
+          onClick={handleMainMenu}>
           <MenuIcon />
         </IconButton>
+        <Menu
+          id='menu-main-appbar'
+          anchorEl={anchorMainEl}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+          open={Boolean(anchorMainEl)}
+          onClose={handleMainClose}>
+          {menuMainListInfo.map(
+            (info) =>
+              info.isShow && (
+                <MenuItem key={info.name} onClick={info.onClick}>
+                  {info.name}
+                </MenuItem>
+              )
+          )}
+        </Menu>
         <Box sx={{ flexGrow: 1 }}>
           <Typography
             variant='h6'

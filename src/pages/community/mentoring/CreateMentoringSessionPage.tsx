@@ -1,5 +1,6 @@
 import { ERROR_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
+import MenuIcon from "@mui/icons-material/Menu";
 import PowerIcon from "@mui/icons-material/Power";
 import {
   Badge,
@@ -8,6 +9,7 @@ import {
   Container,
   Divider,
   FormHelperText,
+  IconButton,
   MenuItem,
   Paper,
   Select,
@@ -17,7 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { ReactElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Socket } from "socket.io-client";
 import * as yup from "yup";
 
@@ -52,20 +54,20 @@ const validationSchema = yup.object({
 
 type CreateMentoringSessionPageProps = {
   isConnected: boolean;
+  handleDrawerToggle: () => void;
   socket: Socket;
-  sidebar: ReactElement;
 };
 
 function CreateMentoringSessionPage({
   isConnected,
+  handleDrawerToggle,
   socket,
-  sidebar,
 }: CreateMentoringSessionPageProps) {
   const [categories, setCategories] = useState<Category[]>([]);
 
   const formik = useFormik({
     initialValues: {
-      topic: "test",
+      topic: "",
       category: 1,
       objective: "",
       format: "",
@@ -80,18 +82,13 @@ function CreateMentoringSessionPage({
       return errors;
     },
     onSubmit: async (values) => {
-      console.log(values);
       const { category, ...rest } = values;
       try {
         const copy = {
           ...rest,
           category_id: category,
         };
-        const response = await socket.emitWithAck(
-          "createMentoringSession",
-          copy
-        );
-        console.debug("response", response);
+        socket.emit("createSession", copy);
       } catch (error) {
         console.log("error", error);
       }
@@ -113,7 +110,14 @@ function CreateMentoringSessionPage({
         alignItems='center'
         gap={1}
         sx={{ p: 2, minHeight: 66 }}>
-        {sidebar}
+        <IconButton
+          color='inherit'
+          aria-label='open drawer'
+          edge='start'
+          onClick={handleDrawerToggle}
+          sx={{ mr: 2, display: { sm: "none" } }}>
+          <MenuIcon />
+        </IconButton>
         <Typography>멘토링 안내</Typography>
         <Tooltip title={isConnected ? "connected" : "disconnected"}>
           <Badge variant='dot' color={isConnected ? "success" : "error"}>
