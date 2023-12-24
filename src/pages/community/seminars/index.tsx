@@ -7,6 +7,8 @@ import {
   List,
   ListItem,
   ListItemButton,
+  Button,
+  Box,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -24,14 +26,26 @@ function Seminars() {
       });
   }, []);
 
-  const handleRedirectSeminar = (path: number) => {
-    navigate(`/community/seminars/${path}`);
-  };
+  // const handleRedirectSeminar = (path: number) => {
+  //   navigate(`${path}`);
+  // };
+
+  function handleRedirect(path: string) {
+    navigate(path);
+  }
 
   return seminars.length === 0 ? (
     <Loading />
   ) : (
     <Stack flex={1} gap={1}>
+      <Box>
+        <Button
+          variant='contained'
+          color='info'
+          onClick={() => handleRedirect("/community")}>
+          커뮤니티 돌아가기
+        </Button>
+      </Box>
       <Typography
         variant='h4'
         textTransform={"capitalize"}
@@ -60,7 +74,7 @@ function Seminars() {
           <SeminarItem
             key={seminar.id}
             seminar={seminar}
-            onClick={() => handleRedirectSeminar(seminar.id)}
+            onClick={() => handleRedirect("/community/seminars/" + seminar.id)}
           />
         ))}
       </List>

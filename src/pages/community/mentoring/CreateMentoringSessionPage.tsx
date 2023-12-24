@@ -98,7 +98,7 @@ function CreateMentoringSessionPage({
   useEffect(() => {
     axiosInstance.get("/categories").then((res) => {
       const { data } = res.data;
-      console.log(data);
+      // console.log(data);
       setCategories(data);
     });
   }, []);

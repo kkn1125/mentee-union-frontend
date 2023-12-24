@@ -22,7 +22,6 @@ export declare global {
     created_at: Date;
     updated_at: Date;
 
-    category: Category;
     user: User;
   }
   export declare interface Category {
@@ -52,7 +51,7 @@ export declare global {
     updated_at: Date;
 
     user: User;
-    seminarParticipants: SeminarParticipants;
+    seminarParticipants: SeminarParticipants[];
     category: Category;
   }
   export declare interface Channel {
@@ -89,7 +88,15 @@ export declare global {
     phone_number: string;
     last_sign_in: Date;
   }
-
+  export declare interface AuthProfile {
+    userId: number;
+    username: string;
+    email: string;
+    phone_number: string;
+    last_sign_in: string;
+    iat: number;
+    exp: number;
+  }
   export declare interface Profile {
     id: number;
     user_id: number;
@@ -159,11 +166,15 @@ export declare global {
   export declare interface Message {
     id: number;
     user_id: number;
-    username: string;
-    profile: string;
+    mentoring_session_id: number;
     message: string;
-    removed: boolean;
-    created_at: number;
+    is_top: boolean;
+    is_deleted: boolean;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
+    user: User;
+    mentoringSession: MentoringSession;
     readedUsers: ReadMessage[];
   }
   export declare interface ReadMessage {

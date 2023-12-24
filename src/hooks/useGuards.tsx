@@ -4,14 +4,9 @@ import {
   TokenContext,
   TokenDispatchContext,
 } from "@/context/TokenProvider";
-import {
-  CHECK_MESSAGE,
-  ERROR_MESSAGE,
-  FAIL_MESSAGE,
-  PRIVKEY,
-} from "@/util/global.constants";
+import { FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
-import { Dispatch, useContext, useEffect, useMemo, useState } from "react";
+import { Dispatch, useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 interface Guard {
@@ -43,6 +38,18 @@ function useGuards(initGuard?: Guard) {
             guard.signed?.();
             setValidated(true);
           } catch (error: any) {
+            console.log(error);
+            if (error.message === "Network Error") {
+              alert(
+                FAIL_MESSAGE.PROBLEM_WITH_SERVER_ASK_ADMIN +
+                  "\n보안을 위해 로그인 정보는 삭제됩니다."
+              );
+              tokenDispatch({
+                type: TOKEN_ACTION.SIGNOUT,
+              });
+              setValidated(true);
+              return;
+            }
             const message = error.response.data.message;
             const detail = error.response.data.detail;
             if (message === "not found" || message === "not found user") {

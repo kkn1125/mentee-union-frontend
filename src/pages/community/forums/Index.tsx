@@ -1,6 +1,6 @@
 import Loading from "@/components/atoms/Loading";
 import { axiosInstance } from "@/util/instances";
-import { Stack, Typography, Paper } from "@mui/material";
+import { Stack, Typography, Paper, Box, Button } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -17,14 +17,22 @@ function Index() {
       });
   }, []);
 
-  const handleRedirectForum = (path: number) => {
-    navigate(`/community/forums/${path}`);
+  const handleRedirect = (path: string) => {
+    navigate(path);
   };
 
   return forums.length === 0 ? (
     <Loading />
   ) : (
     <Stack flex={1} gap={1}>
+      <Box>
+        <Button
+          variant='contained'
+          color='info'
+          onClick={() => handleRedirect("/community")}>
+          커뮤니티 돌아가기
+        </Button>
+      </Box>
       <Typography
         variant='h4'
         textTransform={"capitalize"}
@@ -50,7 +58,7 @@ function Index() {
         {forums.map((forum) => (
           <Paper
             key={forum.id}
-            onClick={() => handleRedirectForum(forum.id)}
+            onClick={() => handleRedirect("/community/forums/" + forum.id)}
             sx={{ p: 3, cursor: "pointer" }}>
             <Typography variant='h6' component='h6'>
               {forum.title}

@@ -1,35 +1,26 @@
-import Sidebar from "@/components/moleculars/common/Sidebar";
 // import { socket } from "@/libs/socket";
-import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
+import { TokenContext } from "@/context/TokenProvider";
 import {
-  Badge,
   Box,
   Divider,
   Drawer,
-  IconButton,
-  List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Stack,
   Toolbar,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import { useContext, useEffect, useRef, useState } from "react";
+import io, { Socket } from "socket.io-client";
 import ChattingPage from "./ChattingPage";
 import CreateMentoringSessionPage from "./CreateMentoringSessionPage";
-import { TokenContext } from "@/context/TokenProvider";
-import io, { Socket } from "socket.io-client";
 
-import MailIcon from "@mui/icons-material/Mail";
-import MenuIcon from "@mui/icons-material/Menu";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
+import Loading from "@/components/atoms/Loading";
 import ChatIcon from "@mui/icons-material/Chat";
 import MarkUnreadChatAltIcon from "@mui/icons-material/MarkUnreadChatAlt";
-import Loading from "@/components/atoms/Loading";
+import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 
 const URL = "http://localhost:8080";
 
@@ -155,7 +146,6 @@ function Index(props: Props) {
       console.log("connected");
       setIsConnected(true);
       try {
-        console.log("here");
         socket.emit("initialize");
       } catch (error) {
         console.log(error);
@@ -168,7 +158,6 @@ function Index(props: Props) {
     }
 
     function onNowSession({ session }: { session: MentoringSession }) {
-      console.log("setCurrentSession");
       setCurrentSession(session);
     }
 
@@ -177,7 +166,6 @@ function Index(props: Props) {
     }: {
       sessionList: MentoringSession[];
     }) {
-      console.log(sessionList);
       setSessionList(sessionList);
     }
     function onUpdateSession({ session }: { session: MentoringSession }) {
@@ -201,57 +189,14 @@ function Index(props: Props) {
     }
 
     function onUserData({ user }: { user: JwtDto }) {
-      console.log(user);
       setUserData(user);
     }
 
-    // function onBroadcast(value: any) {
-    //   console.log(value);
-    //   setSessionList(value.sessions);
-    // }
-
-    // function onAllMentoringSessions({ sessions, user }: any) {
-    //   console.log("onAllMentoringSessions", sessions, user);
-    //   setSessionList(sessions);
-    //   setUserData(user);
-    // }
-
-    // function updateSession({ session }: any) {
-    //   console.log("update session", currentSession, session);
-    //   setCurrentSession((currentSession) =>
-    //     currentSession?.id === session.id ? session : currentSession
-    //   );
-    //   setSessionList((list) => {
-    //     const temp = [...list];
-    //     for (let i = 0; i < list.length; i++) {
-    //       const item = list[i];
-    //       if (item.id === session.id) {
-    //         temp.splice(i, 1, session);
-    //         break;
-    //       }
-    //     }
-    //     return temp;
-    //   });
-    //   // }
-    //   // setMentoring(mentoring);
-    // }
-
-    // function enterRoom({ mentoring, session }: any) {
-    //   console.log("enter room value", currentSession, mentoring, session);
-    //   setCurrentSession(() => session);
-    //   // setMentoring(mentoring);
-    // }
-
-    // function createMentoringSession({ sessions, session }: any) {
-    //   console.log(sessions, session);
-    //   setSessionList(() => sessions);
-    //   setCurrentSession(() => session);
-    // }
-
-    // function waitlist(value: any) {}
-
     function onReject(rejected: any) {
-      console.log(rejected);
+      // console.log(rejected);
+      if (rejected.message === "Session limit exceeded") {
+        alert("멘토링 제한 인원에 도달하여 입장 불가합니다.");
+      }
     }
 
     socket.on("connect", onConnect);
