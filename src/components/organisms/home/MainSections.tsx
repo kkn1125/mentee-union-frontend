@@ -1,4 +1,4 @@
-import SeminarItem from "@/components/atoms/SeminarItem";
+import SeminarItem from "@/components/atoms/seminar/SeminarItem";
 import StickySidebar from "@/components/atoms/common/StickySidebar";
 import LevelSystem from "@/components/moleculars/home/LevelSystem";
 import {

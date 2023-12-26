@@ -64,10 +64,17 @@ function Signin() {
     },
     onSubmit: (values) => {
       axiosInstance
-        .post("/auth/signin", {
-          email: values.email,
-          password: values.password,
-        })
+        .post(
+          "/auth/signin",
+          {
+            email: values.email,
+            password: values.password,
+          },
+          {
+            timeout: 5000,
+            timeoutErrorMessage: "서버 요청 시간이 초과되었습니다.",
+          }
+        )
         .then(({ data: { data } }) => {
           const { access_token, refresh_token } = data;
           tokenDispatch({
@@ -78,8 +85,12 @@ function Signin() {
           });
           navigate("/");
         })
-        .catch((err: unknown) => {
-          const data = (err as CustomAxiosError).response.data;
+        .catch((error) => {
+          if (error.message === "Network Error") {
+            alert(FAIL_MESSAGE.PROBLEM_WITH_SERVER_ASK_ADMIN);
+            return;
+          }
+          const data = (error as CustomAxiosError).response.data;
           switch (data.message) {
             case "email authentication required":
               alert(FAIL_MESSAGE.REQUIRE_EMAIL_AUTH);

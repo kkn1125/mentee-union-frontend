@@ -7,7 +7,7 @@ function CommunityLayout() {
       gap={10}
       sx={{
         width: "60%",
-        margin: "auto",
+        mx: "auto",
         py: 5,
       }}>
       <Outlet />

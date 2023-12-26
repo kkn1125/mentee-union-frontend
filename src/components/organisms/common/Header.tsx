@@ -93,7 +93,14 @@ export default function Header() {
       },
       isShow: !!token.token,
     },
-    { name: "My Account", onClick: handleClose, isShow: !!token.token },
+    {
+      name: "My Mentee",
+      onClick: () => {
+        handleClose();
+        handleRedirect("/user/my-mentee");
+      },
+      isShow: !!token.token,
+    },
     {
       name: "Sign in",
       onClick: () => {

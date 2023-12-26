@@ -21,6 +21,7 @@ import SeminarDetail from "./pages/community/seminars/SeminarDetail";
 import Profile from "./pages/user/Profile";
 import { FAIL_MESSAGE } from "./util/global.constants";
 import Loading from "./components/atoms/Loading";
+import MyMentee from "./pages/user/MyMentee";
 
 interface ProtectedRouteProps {
   isSigned: boolean;
@@ -110,6 +111,7 @@ function App() {
             </ProtectedRoute>
           }>
           <Route path='profile' element={<Profile />} />
+          <Route path='my-mentee' element={<MyMentee />} />
         </Route>
         <Route path='community'>
           <Route

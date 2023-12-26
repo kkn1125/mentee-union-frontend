@@ -1,4 +1,4 @@
-import SeminarItem from "@/components/atoms/SeminarItem";
+import SeminarItem from "@/components/atoms/seminar/SeminarItem";
 import PaperContent from "@/components/atoms/home/PaperContent";
 import Step from "@/components/atoms/home/Step";
 import FlowIssues from "@/components/moleculars/home/FlowIssues";

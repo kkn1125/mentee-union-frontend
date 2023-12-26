@@ -34,6 +34,10 @@ function ChattingPage({
   user,
   session,
 }: ChattingPageProps) {
+  const [changeSession, setChangeSession] = useState<MentoringSession | null>(
+    null
+  );
+  const inputRef = useRef<HTMLInputElement>(null);
   const [initialized, setInitialized] = useState(false);
   const [chattings, setChattings] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
@@ -45,6 +49,7 @@ function ChattingPage({
     chattingWindowScrolldown(true);
     setTimeout(() => {
       setInitialized(true);
+      inputRef.current?.focus();
     }, 50);
 
     if (chattingRef.current) {
@@ -53,11 +58,19 @@ function ChattingPage({
     return () => {
       chattingRef.current?.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [changeSession]);
 
   useEffect(() => {
     setChattings(session.messages);
     chattingWindowScrolldown();
+    setChangeSession((changeSession) => {
+      if (changeSession?.id !== session.id) {
+        // console.log("new session");
+        setInitialized(false);
+        return session;
+      }
+      return changeSession;
+    });
   }, [session]);
 
   function handleScroll(e: Event) {
@@ -115,6 +128,7 @@ function ChattingPage({
         message: inputValue,
       });
     }
+    inputRef.current?.focus();
   }
 
   function handleWaitList() {
@@ -225,25 +239,37 @@ function ChattingPage({
                 <AlertTitle>{"[System]"}</AlertTitle>
                 {chat.message}
               </Alert>
-            ) : chat.user_id === user.userId ? (
+            ) : (
               <Box
                 key={chat.id}
-                sx={{ display: "flex", justifyContent: "flex-end", mb: 2 }}
-                title={chat.user.username}
-                onClick={
-                  !chat.is_deleted && chat.user_id === user.userId
-                    ? () => handleRemoveChat(chat.id)
-                    : () => {}
-                }>
+                sx={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  ...(chat.user_id !== user.userId && {
+                    flexDirection: "row-reverse",
+                  }),
+                  mb: 2,
+                }}
+                title={chat.user.username}>
                 <Stack
-                  alignItems='flex-end'
+                  alignItems={
+                    chat.user_id !== user.userId ? "flex-start" : "flex-end"
+                  }
                   sx={{
                     maxWidth: "75%",
                   }}>
                   {chattings[index - 1]?.user_id !== chat.user_id && (
                     <Typography>{chat.user.username}</Typography>
                   )}
-                  <Stack direction='row' alignItems='flex-end' gap={1}>
+                  <Stack
+                    direction='row'
+                    alignItems='flex-end'
+                    gap={1}
+                    sx={{
+                      ...(chat.user_id !== user.userId && {
+                        flexDirection: "row-reverse",
+                      }),
+                    }}>
                     <Typography
                       fontSize={(theme) => theme.typography.pxToRem(10)}>
                       {timeFormat(chat.created_at, "YYYY-MM-dd HH:mm:ss")}
@@ -254,8 +280,17 @@ function ChattingPage({
                         color: "primary.contrastText",
                         p: 2,
                         borderRadius: 2,
+                        cursor: "pointer",
+                        "&:hover": {
+                          filter: "brightness(1.2)",
+                        },
                       }}>
-                      <Typography>
+                      <Typography
+                        onClick={
+                          !chat.is_deleted && chat.user_id === user.userId
+                            ? () => handleRemoveChat(chat.id)
+                            : () => {}
+                        }>
                         {chat.is_deleted
                           ? "삭제된 메세지 입니다."
                           : chat.message}
@@ -272,58 +307,13 @@ function ChattingPage({
                           chat.user.profiles[0].new_name
                         : ""
                     }
-                    sx={{ ml: 2 }}
+                    sx={{
+                      [chat.user_id !== user.userId ? "mr" : "ml"]: 2,
+                    }}
                   />
                 ) : (
                   <Box sx={{ width: 40 + 16, height: 40 }} />
                 )}
-              </Box>
-            ) : (
-              <Box
-                key={chat.id}
-                sx={{ display: "flex", mb: 2 }}
-                title={chat.user.username}>
-                {chattings[index - 1]?.user_id !== chat.user_id ? (
-                  <Avatar
-                    alt={chat.user.username}
-                    src={
-                      chat.user.profiles[0]
-                        ? "http://localhost:8080/api/users/profile/" +
-                          chat.user.profiles[0].new_name
-                        : ""
-                    }
-                    sx={{ mr: 2 }}
-                  />
-                ) : (
-                  <Box sx={{ width: 40 + 16, height: 40 }} />
-                )}
-                <Stack
-                  alignItems='flex-start'
-                  sx={{
-                    maxWidth: "75%",
-                  }}>
-                  {chattings[index - 1]?.user_id !== chat.user_id && (
-                    <Typography>{chat.user.username}</Typography>
-                  )}
-                  <Stack direction='row' alignItems='flex-end' gap={1}>
-                    <Paper
-                      sx={{
-                        bgcolor: "grey.300",
-                        p: 2,
-                        borderRadius: 2,
-                      }}>
-                      <Typography>
-                        {chat.is_deleted
-                          ? "삭제된 메세지 입니다."
-                          : chat.message}
-                      </Typography>
-                    </Paper>
-                    <Typography
-                      fontSize={(theme) => theme.typography.pxToRem(10)}>
-                      {timeFormat(chat.created_at, "YYYY-MM-dd HH:mm:ss")}
-                    </Typography>
-                  </Stack>
-                </Stack>
               </Box>
             )
           )}
@@ -366,6 +356,7 @@ function ChattingPage({
           return;
         }}>
         <TextField
+          inputRef={inputRef}
           fullWidth
           placeholder='입력 후 엔터를 누르세요.'
           variant='outlined'

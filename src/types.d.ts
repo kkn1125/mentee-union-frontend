@@ -51,7 +51,7 @@ export declare global {
     updated_at: Date;
 
     user: User;
-    seminarParticipants: SeminarParticipants[];
+    seminarParticipants: SeminarParticipant[];
     category: Category;
   }
   export declare interface Channel {
@@ -80,6 +80,19 @@ export declare global {
     updated_at: Date;
 
     profiles: Profile[];
+    mentorings: Mentoring[];
+    grade: Grade;
+    receiveres: User[];
+    givers: User[];
+    seminarParticipants: SeminarParticipant[];
+  }
+  export declare interface Grade {
+    id: number;
+    name: string;
+    description: string;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
   }
   export declare interface JwtDto {
     userId: number;
@@ -104,7 +117,7 @@ export declare global {
     new_name: string;
     user: User;
   }
-  export declare interface SeminarParticipants {
+  export declare interface SeminarParticipant {
     id: number;
     seminar_id: number;
     user_id: number;
@@ -112,6 +125,7 @@ export declare global {
     deleted_at: Date;
     created_at: Date;
     updated_at: Date;
+    seminar: Seminar;
   }
   export declare interface CustomAxiosError extends Error {
     response: {

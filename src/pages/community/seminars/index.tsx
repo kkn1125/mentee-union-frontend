@@ -1,5 +1,7 @@
 import Loading from "@/components/atoms/Loading";
-import SeminarItem from "@/components/atoms/SeminarItem";
+import SeminarItem from "@/components/atoms/seminar/SeminarItem";
+import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
+import { FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import {
   Stack,
@@ -10,12 +12,14 @@ import {
   Button,
   Box,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function Seminars() {
   const navigate = useNavigate();
+  const tokenDispatch = useContext(TokenDispatchContext);
   const [seminars, setSeminars] = useState<Seminar[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     axiosInstance
@@ -23,6 +27,19 @@ function Seminars() {
       .then(({ data }) => data.data)
       .then((data) => {
         setSeminars(data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        if (error.message === "Network Error") {
+          alert(
+            FAIL_MESSAGE.PROBLEM_WITH_SERVER_ASK_ADMIN +
+              "\n보안을 위해 로그인 정보는 삭제됩니다."
+          );
+          tokenDispatch({
+            type: TOKEN_ACTION.SIGNOUT,
+          });
+          navigate("/");
+        }
       });
   }, []);
 
@@ -30,23 +47,27 @@ function Seminars() {
   //   navigate(`${path}`);
   // };
 
-  function handleRedirect(path: string) {
-    navigate(path);
+  function handleRedirect(path: string | number) {
+    if (typeof path === "string") {
+      navigate(path);
+    } else {
+      navigate(path);
+    }
   }
 
-  return seminars.length === 0 ? (
+  return loading ? (
     <Loading />
   ) : (
     <Stack flex={1} gap={1}>
-      <Box>
+      <Stack direction='row' gap={1}>
         <Button
           variant='contained'
           color='info'
           onClick={() => handleRedirect("/community")}>
           커뮤니티 돌아가기
         </Button>
-      </Box>
-      <Typography
+      </Stack>
+      {/* <Typography
         variant='h4'
         textTransform={"capitalize"}
         sx={{
@@ -65,17 +86,13 @@ function Seminars() {
           }}>
           seminars
         </Typography>
-      </Typography>
+      </Typography> */}
       <List>
         {/* 세미나 항목 */}
         {/* 더 많은 세미나 항목들 */}
         {seminars.length === 0 && "등록된 세미나가 없습니다."}
         {seminars.map((seminar: Seminar) => (
-          <SeminarItem
-            key={seminar.id}
-            seminar={seminar}
-            onClick={() => handleRedirect("/community/seminars/" + seminar.id)}
-          />
+          <SeminarItem key={seminar.id} seminar={seminar} />
         ))}
       </List>
     </Stack>

@@ -13,7 +13,7 @@ import {
   styled,
 } from "@mui/material";
 import { axiosInstance } from "@/util/instances";
-import SeminarItem from "@/components/atoms/SeminarItem";
+import SeminarItem from "@/components/atoms/seminar/SeminarItem";
 import LevelSystem from "@/components/moleculars/home/LevelSystem";
 
 const StickySidebar = styled(Box)(({ theme }) => ({
@@ -98,28 +98,7 @@ function Test() {
                 </ListItem> */}
                 {/* 더 많은 세미나 항목들 */}
                 {seminars.map((seminar) => (
-                  <SeminarItem
-                    key={seminar.id}
-                    host_id={seminar.host_id} // 예시 데이터를 적절한 필드로 대체해야 함
-                    category_id={seminar.category_id} // 예시 데이터를 적절한 필드로 대체해야 함
-                    title={seminar.title}
-                    content={seminar.content}
-                    meeting_place={seminar.meeting_place}
-                    limit_participant_amount={seminar.limit_participant_amount}
-                    recruit_start_date={seminar.recruit_start_date}
-                    recruit_end_date={seminar.recruit_end_date}
-                    seminar_start_date={seminar.seminar_start_date}
-                    seminar_end_date={seminar.seminar_end_date}
-                    is_recruit_finished={seminar.is_recruit_finished}
-                    is_seminar_finished={seminar.is_seminar_finished}
-                    user={seminar.user}
-                    category={seminar.category}
-                    id={seminar.id}
-                    deleted_at={seminar.deleted_at}
-                    created_at={seminar.created_at}
-                    updated_at={seminar.updated_at}
-                    seminarParticipants={seminar.seminarParticipants} // ... 기타 필요한 props ...
-                  />
+                  <SeminarItem key={seminar.id} seminar={seminar} />
                 ))}
               </List>
             </Paper>

@@ -1,15 +1,35 @@
 import Loading from "@/components/atoms/Loading";
-import SeminarItem from "@/components/atoms/SeminarItem";
+import SeminarItem from "@/components/atoms/seminar/SeminarItem";
+import ForumCard from "@/components/atoms/forum/ForumCard";
 import { axiosInstance } from "@/util/instances";
-import { Box, Button, List, Paper, Stack, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import {
+  Box,
+  Button,
+  Grid,
+  List,
+  Paper,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
+const SHOW_LIMIT = 5;
 
 function Community() {
   const navigate = useNavigate();
   const [forums, setForums] = useState<Forum[]>([]);
   const [seminars, setSeminars] = useState<Seminar[]>([]);
   const [loading, setLoading] = useState(true);
+  const theme = useTheme();
+  const isXsUp = useMediaQuery(theme.breakpoints.up("xs"));
+  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
+  const isLgUp = useMediaQuery(theme.breakpoints.up("lg"));
+  const isXlUp = useMediaQuery(theme.breakpoints.up("xl"));
+
+  const forumCardAmount = isXlUp ? 4 : isLgUp ? 3 : isMdUp ? 2 : isXsUp ? 1 : 1;
 
   useEffect(() => {
     Promise.all([
@@ -34,7 +54,32 @@ function Community() {
     navigate(`/community/mentoring`);
   };
 
-  return !loading ? (
+  const forumsList = useMemo(() => {
+    return forums.slice(0, SHOW_LIMIT).reduce(
+      (acc: Forum[][], cur, index) => {
+        if (acc[acc.length - 1].length === forumCardAmount) {
+          acc.push([]);
+        }
+        acc[acc.length - 1].push(cur);
+        if (
+          index === forums.length - 1 &&
+          acc[acc.length - 1].length !== forumCardAmount
+        ) {
+          acc[acc.length - 1] = acc[acc.length - 1].concat(
+            ...new Array(forumCardAmount - acc[acc.length - 1].length).fill(
+              null
+            )
+          );
+        }
+        return acc;
+      },
+      [[]]
+    );
+  }, [loading, forumCardAmount]);
+
+  return loading ? (
+    <Loading />
+  ) : (
     <Stack gap={3}>
       {/* mentoring */}
       <Stack flex={1} gap={1}>
@@ -79,12 +124,8 @@ function Community() {
           {/* 세미나 항목 */}
           {/* 더 많은 세미나 항목들 */}
           {seminars.length === 0 && "등록된 세미나가 없습니다."}
-          {seminars.map((seminar: Seminar) => (
-            <SeminarItem
-              key={seminar.id}
-              seminar={seminar}
-              onClick={() => handleRedirectSeminar(seminar.id)}
-            />
+          {seminars.slice(0, SHOW_LIMIT).map((seminar: Seminar) => (
+            <SeminarItem key={seminar.id} seminar={seminar} />
           ))}
         </List>
       </Stack>
@@ -111,25 +152,31 @@ function Community() {
             forums
           </Typography>
         </Typography>
-        <Stack gap={3}>
+        <Stack gap={2}>
           {forums.length === 0 && "등록된 포럼이 없습니다."}
-          {forums.map((forum) => (
-            <Paper
-              key={forum.id}
-              onClick={() => handleRedirectForum(forum.id)}
-              sx={{ p: 3, cursor: "pointer" }}>
-              <Typography variant='h6' component='h6'>
-                {forum.title}
-              </Typography>
-              <Typography variant='body1'>{forum.content}</Typography>
-              <Typography variant='body2'>{forum.user.username}</Typography>
-            </Paper>
+          {forumsList.map((forums, i) => (
+            <Stack
+              direction='row'
+              flexWrap={"wrap"}
+              gap={2}
+              key={i + "|" + forums.length}>
+              {forums.map((forum, idx) =>
+                forum ? (
+                  <ForumCard key={forum.id} forum={forum} />
+                ) : (
+                  <Box
+                    key={"empty|" + idx}
+                    sx={{
+                      flex: 1,
+                    }}
+                  />
+                )
+              )}
+            </Stack>
           ))}
         </Stack>
       </Stack>
     </Stack>
-  ) : (
-    <Loading />
   );
 }
 
