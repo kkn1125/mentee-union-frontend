@@ -13,6 +13,7 @@ import {
   Button,
   Container,
   Divider,
+  IconButton,
   Paper,
   Stack,
   Tooltip,
@@ -20,9 +21,12 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import ForumLikeButton from "@/components/atoms/forum/ForumLikeButton";
 
 function ForumDetail() {
   const navigate = useNavigate();
+  const [profileData, setProfileData] = useState<JwtDto | null>(null);
   const [forum, setForum] = useState<Forum | null>(null);
   const params = useParams();
   const token = useContext(TokenContext);
@@ -34,6 +38,14 @@ function ForumDetail() {
       .then(({ data }) => data.data)
       .then((data) => {
         setForum(data);
+        axiosInstance
+          .get("/auth/profile", {
+            headers: {
+              Authorization: "Bearer " + token.token,
+            },
+          })
+          .then(({ data }) => data.data)
+          .then((data) => setProfileData(data));
       })
       .catch((error) => {
         if (error.message === "Network Error") {
@@ -58,10 +70,12 @@ function ForumDetail() {
     user_id,
     title,
     content,
+    view_count,
     deleted_at,
     created_at,
     updated_at,
     user,
+    forumLikes,
   } = forum;
 
   function handleRedirect(path: string | number) {
@@ -70,6 +84,10 @@ function ForumDetail() {
     } else {
       navigate(path);
     }
+  }
+
+  function handleUpdateForum(forum_id: number) {
+    navigate("/community/forums/edit/" + forum_id);
   }
 
   return (
@@ -89,9 +107,35 @@ function ForumDetail() {
         </Button>
       </Stack>
       <Paper elevation={3} sx={{ p: 3, marginTop: 2 }}>
-        <Typography variant='h4' gutterBottom>
-          {title}
-        </Typography>
+        <Stack
+          direction='row'
+          justifyContent={"space-between"}
+          alignItems='center'
+          sx={{ mb: 1 }}>
+          <Stack direction='row' gap={1} alignItems='center'>
+            <Typography variant='h4'>{title}</Typography>
+            <Stack direction='row' gap={0} alignItems='center'>
+              <IconButton>
+                <VisibilityIcon />
+              </IconButton>
+              <Typography>{view_count || 0}</Typography>
+            </Stack>
+            <ForumLikeButton
+              forum_id={id}
+              likeCount={forumLikes.length}
+              token={token.token}
+            />
+          </Stack>
+
+          {forum.user_id === profileData?.userId && (
+            <Button
+              variant='contained'
+              color='info'
+              onClick={() => handleUpdateForum(forum.id)}>
+              수정
+            </Button>
+          )}
+        </Stack>
         <Stack gap={1}>
           <Stack direction='row' alignItems='center'>
             <AccountCircleIcon />
@@ -99,9 +143,14 @@ function ForumDetail() {
           </Stack>
         </Stack>
         <Divider sx={{ my: 2, borderColor: "#565656" }} />
-        <Typography variant='body1' paragraph minHeight={"50vh"}>
-          {content}
-        </Typography>
+
+        <Typography
+          variant='body1'
+          paragraph
+          minHeight={"50vh"}
+          dangerouslySetInnerHTML={{
+            __html: content.replace(/<script|^<.*\s?onload=/gm, ""),
+          }}></Typography>
         <Divider sx={{ my: 2, borderColor: "#565656" }} />
         <Box>
           <Tooltip title='작성 시간' placement='right'>

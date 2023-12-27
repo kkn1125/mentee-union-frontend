@@ -8,12 +8,15 @@ import {
   Button,
   Container,
   Divider,
+  FormControlLabel,
+  FormGroup,
   FormHelperText,
   IconButton,
   MenuItem,
   Paper,
   Select,
   Stack,
+  Switch,
   TextField,
   Tooltip,
   Typography,
@@ -42,7 +45,7 @@ const validationSchema = yup.object({
     .typeError(ERROR_MESSAGE.ONLY_STRING),
   note: yup
     .string()
-    .required(ERROR_MESSAGE.REQUIRED)
+    // .required(ERROR_MESSAGE.REQUIRED)
     .typeError(ERROR_MESSAGE.ONLY_STRING),
   limit: yup
     .number()
@@ -50,6 +53,15 @@ const validationSchema = yup.object({
     .max(20, ERROR_MESSAGE.MAX(20))
     .required(ERROR_MESSAGE.REQUIRED)
     .typeError(ERROR_MESSAGE.ONLY_NUMBER),
+  password: yup
+    .string()
+    .min(5, ERROR_MESSAGE.MIN(5))
+    .max(20, ERROR_MESSAGE.MAX(20))
+    .typeError(ERROR_MESSAGE.ONLY_STRING),
+  is_private: yup
+    .boolean()
+    .required(ERROR_MESSAGE.REQUIRED)
+    .typeError(ERROR_MESSAGE.ONLY_BOOLEAN),
 });
 
 type CreateMentoringSessionPageProps = {
@@ -73,6 +85,8 @@ function CreateMentoringSessionPage({
       format: "",
       note: "",
       limit: 2,
+      password: "",
+      is_private: false,
     },
     validationSchema: validationSchema,
     validate(values) {
@@ -269,6 +283,7 @@ function CreateMentoringSessionPage({
                   name='note'
                   label='메모'
                   size='small'
+                  autoComplete='memo'
                   fullWidth
                   inputProps={{
                     min: 2,
@@ -310,6 +325,65 @@ function CreateMentoringSessionPage({
                     },
                   }}
                 />
+                <TextField
+                  name='password'
+                  label='비밀번호'
+                  type='password'
+                  size='small'
+                  autoComplete='current-password'
+                  fullWidth
+                  inputProps={{
+                    min: 2,
+                    max: 20,
+                  }}
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  error={
+                    formik.touched.password && Boolean(formik.errors.password)
+                  }
+                  helperText={formik.touched.password && formik.errors.password}
+                  FormHelperTextProps={{
+                    sx: {
+                      position: "absolute",
+                      top: "100%",
+                      left: 0,
+                    },
+                  }}
+                />
+                <FormGroup
+                  sx={{
+                    position: "relative",
+                  }}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        name='is_private'
+                        size='small'
+                        inputProps={{
+                          min: 2,
+                          max: 20,
+                        }}
+                        value={formik.values.is_private}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                      />
+                    }
+                    label='비공개 여부'
+                  />
+                  {formik.touched.is_private &&
+                    Boolean(formik.errors.is_private) && (
+                      <FormHelperText
+                        sx={{
+                          color: "error.main",
+                          position: "absolute",
+                          top: "100%",
+                          left: 0,
+                        }}>
+                        {formik.errors.is_private}
+                      </FormHelperText>
+                    )}
+                </FormGroup>
                 <Box sx={{ mt: 2 }}>
                   <Button variant='contained' type='submit'>
                     생성

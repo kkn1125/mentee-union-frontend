@@ -65,7 +65,6 @@ function ChattingPage({
     chattingWindowScrolldown();
     setChangeSession((changeSession) => {
       if (changeSession?.id !== session.id) {
-        // console.log("new session");
         setInitialized(false);
         return session;
       }

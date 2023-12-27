@@ -48,6 +48,14 @@ function Home() {
     }
   }, [token.status]);
 
+  function handleRedirect(path: string | number) {
+    if (typeof path === "string") {
+      navigate(path);
+    } else {
+      navigate(path);
+    }
+  }
+
   return (
     <Stack gap={mediaQuery ? 10 : 1}>
       <BackgroundSection />
@@ -67,8 +75,8 @@ function Home() {
                 variant='contained'
                 onClick={() =>
                   token.token
-                    ? navigate("community")
-                    : navigate(
+                    ? handleRedirect("community")
+                    : handleRedirect(
                         confirm(CHECK_MESSAGE.REQUIRED_SIGN_IN)
                           ? "/auth/signin"
                           : "/"
@@ -145,7 +153,11 @@ function Home() {
             다가오는 세미나 일정과 과거 세미나 요약을 확인하고 참여해 보세요.
           </Typography>
           {/* 세미나 목록 */}
-          <Button size='large' variant='contained' sx={{ mt: 2 }}>
+          <Button
+            size='large'
+            variant='contained'
+            sx={{ mt: 2 }}
+            onClick={() => handleRedirect("/community/seminars")}>
             세미나 참여하기
           </Button>
         </Paper>
@@ -160,7 +172,11 @@ function Home() {
           </Typography>
           {/* 정보 공유 게시물 */}
           {/* ... */}
-          <Button size='large' variant='contained' sx={{ mt: 2 }}>
+          <Button
+            size='large'
+            variant='contained'
+            sx={{ mt: 2 }}
+            onClick={() => handleRedirect("/community/forums")}>
             정보 공유 참여하기
           </Button>
         </Paper>

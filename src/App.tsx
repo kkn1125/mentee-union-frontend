@@ -22,6 +22,8 @@ import Profile from "./pages/user/Profile";
 import { FAIL_MESSAGE } from "./util/global.constants";
 import Loading from "./components/atoms/Loading";
 import MyMentee from "./pages/user/MyMentee";
+import WriteForum from "./pages/community/forums/WriteForum";
+import UpdateForum from "./pages/community/forums/UpdateForum";
 
 interface ProtectedRouteProps {
   isSigned: boolean;
@@ -128,6 +130,8 @@ function App() {
             </Route>
             <Route path='forums'>
               <Route path='' element={<Forums />} />
+              <Route path='edit' element={<WriteForum />} />
+              <Route path='edit/:id' element={<UpdateForum />} />
               <Route
                 path=':id'
                 element={

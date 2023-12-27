@@ -1,10 +1,13 @@
 import Loading from "@/components/atoms/Loading";
+import ForumCard from "@/components/atoms/forum/ForumCard";
+import ForumCardList from "@/components/moleculars/forum/ForumCardList";
+import LevelSystem from "@/components/moleculars/home/LevelSystem";
 import {
   TOKEN_ACTION,
   TokenContext,
   TokenDispatchContext,
 } from "@/context/TokenProvider";
-import { FAIL_MESSAGE } from "@/util/global.constants";
+import { CHECK_MESSAGE, FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import {
   Box,
@@ -16,8 +19,23 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+enum GRADE_COLOR {
+  mentee0 = "#56ad6c",
+  mentee1 = "#89ad56",
+  mentor0 = "#6841bf",
+  mentor1 = "#dc7031",
+  mentor2 = "#cf2398",
+}
+
+type GRADE_COLOR_TYPE =
+  | "mentee0"
+  | "mentee1"
+  | "mentor0"
+  | "mentor1"
+  | "mentor2";
 
 function MyMentee() {
   const navigate = useNavigate();
@@ -45,12 +63,7 @@ function MyMentee() {
   }
 
   function handleConfirmJoinSeminar(seminar_id: number) {
-    if (
-      !confirm(
-        "세미나 참여 확정 후 취소하시면 다시 신청하셔야합니다. 세미나에 참여 확정 하시겠습니까?"
-      )
-    )
-      return;
+    if (!confirm(CHECK_MESSAGE.CONFIRM_JOIN_SEMINAR)) return;
     axiosInstance
       .post(
         "/seminars/confirm",
@@ -73,7 +86,7 @@ function MyMentee() {
   }
 
   function handleCancelJoinSeminar(seminar_id: number) {
-    if (!confirm("세미나 참여를 취소하시겠습니까?")) return;
+    if (!confirm(CHECK_MESSAGE.CONFIRM_CANCEL_JOIN_SEMINAR)) return;
     axiosInstance
       .delete("/seminars/cancel", {
         headers: {
@@ -106,51 +119,124 @@ function MyMentee() {
       });
   }
 
+  const gradeColor = profileData
+    ? GRADE_COLOR[profileData.grade.name as GRADE_COLOR_TYPE]
+    : "mentee0";
+
+  const removeDuplicatedForumLikes = useMemo(() => {
+    return profileData
+      ? profileData.forumLikes.reduce((acc: Forum[], cur) => {
+          if (!acc.some((item) => item.id === cur.forum.id)) {
+            acc.push(cur.forum);
+          }
+          return acc;
+        }, [])
+      : [];
+  }, [profileData]);
+
   return !profileData || loading ? (
     <Loading />
   ) : (
-    <Stack>
-      <Paper
-        sx={{
-          p: 3,
-        }}>
+    <Stack
+      component={Paper}
+      gap={5}
+      sx={{
+        my: 3,
+        p: 3,
+      }}>
+      <Box>
         <Typography variant='h4' gutterBottom>
           멘티 활동
         </Typography>
-        <Typography variant='body2'>멘티 활동을 관리해보세요!</Typography>
-
-        {/* <Divider
-          sx={{
-            my: 2,
-            borderColor: "#565656",
-          }}
-        /> */}
+        <Typography variant='body2'>
+          멘티와 함께 공유하고 서로 성장하면서 활동 영역을 넓혀보세요!
+        </Typography>
 
         {/* 등급 */}
         <Paper sx={{ p: 2, my: 3 }}>
-          <Typography variant='body1' gutterBottom>
-            현재 등급
+          <Typography variant='h6' gutterBottom>
+            레벨 시스템
           </Typography>
           <Stack direction='row' alignItems='center' gap={1}>
-            <Chip label={profileData.grade.name} size='small' />
+            <Chip
+              label={profileData.grade.name}
+              size='small'
+              sx={{
+                color: "#ffffff",
+                backgroundColor: gradeColor + " !important",
+              }}
+            />
             <Box>{profileData.grade.description}</Box>
           </Stack>
-        </Paper>
 
-        {/* <Divider
+          <LevelSystem
+            level={profileData.level}
+            points={
+              profileData.points -
+              (profileData.level > 0 ? (profileData.level - 1) * 50 + 100 : 0)
+            }
+            maxPoints={profileData.level * 50 + 100}
+          />
+        </Paper>
+      </Box>
+
+      {/* <Divider
           sx={{
             my: 2,
             borderColor: "#565656",
           }}
         /> */}
 
+      <Box>
+        {/* 참여 중인 세미나 리스트 */}
+        <Typography variant='h5' gutterBottom>
+          추천한 멘티
+        </Typography>
+        <List>
+          {profileData.receivers.length === 0 && (
+            <Typography variant='body2'>추천한 멘티가 없습니다.</Typography>
+          )}
+          {profileData.receivers.map((receiver) => (
+            <Typography key={receiver.id}>{receiver.username}</Typography>
+          ))}
+        </List>
+      </Box>
+
+      <Box>
+        <Typography variant='h5' gutterBottom>
+          추천 해준 멘티
+        </Typography>
+        <List>
+          {profileData.givers.length === 0 && (
+            <Typography variant='body2'>
+              나를 추천한 멘티가 없습니다.
+            </Typography>
+          )}
+          {profileData.givers.map((giver) => (
+            <Typography key={giver.id}>{giver.username}</Typography>
+          ))}
+        </List>
+      </Box>
+
+      <Box>
+        <Typography variant='h5' gutterBottom>
+          내가 추천한 포럼 기사
+        </Typography>
+        <List>
+          <ForumCardList forums={removeDuplicatedForumLikes} />
+        </List>
+      </Box>
+
+      <Box>
         {/* 참여 중인 세미나 리스트 */}
         <Typography variant='h5' gutterBottom>
           참여 중인 세미나
         </Typography>
         <List>
           {profileData.seminarParticipants.length === 0 && (
-            <Typography>참여 중인 세미나가 없습니다.</Typography>
+            <Typography variant='body2'>
+              참여 중인 세미나가 없습니다.
+            </Typography>
           )}
           {profileData.seminarParticipants.map(({ seminar, is_confirm }) => (
             <Paper key={seminar.id}>
@@ -188,9 +274,17 @@ function MyMentee() {
             </Paper>
           ))}
         </List>
+      </Box>
 
+      <Box>
+        <Typography variant='h5' gutterBottom>
+          나의 포럼
+        </Typography>
         {/* 작성한 포럼 리스트 */}
-      </Paper>
+        <List>
+          <ForumCardList forums={profileData.forums} />
+        </List>
+      </Box>
     </Stack>
   );
 }

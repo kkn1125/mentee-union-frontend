@@ -4,6 +4,7 @@ import {
   Typography,
   LinearProgress,
   linearProgressClasses,
+  Stack,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
@@ -59,8 +60,12 @@ const LevelSystem: React.FC<LevelSystemProps> = ({
     (((value > maxPoints ? maxPoints : value) - 0) * 100) / (maxPoints - 0);
 
   return (
-    <Box sx={{ padding: "16px", userSelect: "none" }}>
-      <Typography variant='h6'>Level {level}</Typography>
+    <Stack
+      gap={1}
+      sx={{ p: (theme) => theme.typography.pxToRem(16), userSelect: "none" }}>
+      <Typography fontWeight={700} variant='body1'>
+        Level {level}
+      </Typography>
       <CustomLinearProgress
         variant='determinate'
         value={normalise(points)}
@@ -74,7 +79,7 @@ const LevelSystem: React.FC<LevelSystemProps> = ({
       <Typography variant='caption' color='text.third'>
         다음 레벨까지 {maxPoints - points} 점 남았습니다!
       </Typography>
-    </Box>
+    </Stack>
   );
 };
 

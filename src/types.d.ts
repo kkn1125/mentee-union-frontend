@@ -18,10 +18,22 @@ export declare global {
     user_id: number;
     title: string;
     content: string;
+    view_count: number;
     deleted_at: Date;
     created_at: Date;
     updated_at: Date;
 
+    user: User;
+    forumLikes: ForumLike[];
+  }
+  export declare interface ForumLike {
+    id: number;
+    user_id: number;
+    forum_id: number;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
+    forum: Forum;
     user: User;
   }
   export declare interface Category {
@@ -79,12 +91,14 @@ export declare global {
     created_at: Date;
     updated_at: Date;
 
+    forums: Forum[];
     profiles: Profile[];
     mentorings: Mentoring[];
     grade: Grade;
-    receiveres: User[];
+    receivers: User[];
     givers: User[];
     seminarParticipants: SeminarParticipant[];
+    forumLikes: ForumLike[];
   }
   export declare interface Grade {
     id: number;
@@ -170,6 +184,8 @@ export declare global {
     objective: string;
     format: string;
     note: string;
+    password: string | null;
+    is_private: boolean;
     mentorings: Mentoring[];
     messages: Message[];
     category: Category;

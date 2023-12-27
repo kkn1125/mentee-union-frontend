@@ -28,6 +28,9 @@ export const CHECK_MESSAGE = {
     "서비스 정책에 따라 회원 가입 기간 동안 발생한 결제에 대한 환불은 제공되지 않습니다. 탈퇴 시 모든 서비스 이용이 종료되며, 이에 대한 추가적인 정보는 [이용 약관 링크]에서 확인하실 수 있습니다. 탈퇴를 진행하시겠습니까?",
   REQUIRED_SIGN_IN:
     "개인회원 로그인 후 이용해 주세요.\n로그인 페이지로 이동하시겠습니까?",
+  CONFIRM_JOIN_SEMINAR:
+    "세미나 참여 확정 후 취소하시면 다시 신청하셔야합니다. 세미나에 참여 확정 하시겠습니까?",
+  CONFIRM_CANCEL_JOIN_SEMINAR: "세미나 참여를 취소하시겠습니까?",
 };
 
 export const ERROR_MESSAGE = {

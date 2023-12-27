@@ -42,9 +42,14 @@ function ForumCard({ forum }: ForumCardProps) {
     <Paper sx={{ flex: 1 }}>
       <Stack gap={1} sx={{ p: 2 }}>
         <Typography variant='h6' textTransform='capitalize'>
-          test title
+          {forum.title}
         </Typography>
-        <Typography variant='body2'>test content</Typography>
+        <Typography
+          variant='body2'
+          dangerouslySetInnerHTML={{
+            __html: forum.content,
+          }}
+        />
       </Stack>
       <Divider sx={{ borderColor: "#565656" }} />
       <Stack

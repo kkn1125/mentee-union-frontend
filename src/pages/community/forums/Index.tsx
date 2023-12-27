@@ -1,5 +1,6 @@
 import Loading from "@/components/atoms/Loading";
 import ForumCard from "@/components/atoms/forum/ForumCard";
+import ForumCardList from "@/components/moleculars/forum/ForumCardList";
 import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
 import { FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
@@ -19,11 +20,6 @@ function Index() {
   const tokenDispatch = useContext(TokenDispatchContext);
   const [forums, setForums] = useState<Forum[]>([]);
   const [loading, setLoading] = useState(true);
-  const theme = useTheme();
-  const isXsUp = useMediaQuery(theme.breakpoints.up("xs"));
-  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const isLgUp = useMediaQuery(theme.breakpoints.up("lg"));
-  const isXlUp = useMediaQuery(theme.breakpoints.up("xl"));
 
   useEffect(() => {
     axiosInstance
@@ -55,40 +51,23 @@ function Index() {
     }
   }
 
-  const forumCardAmount = isXlUp ? 4 : isLgUp ? 3 : isMdUp ? 2 : isXsUp ? 1 : 1;
-  const forumsList = useMemo(() => {
-    return forums.reduce(
-      (acc: Forum[][], cur, index) => {
-        if (acc[acc.length - 1].length === forumCardAmount) {
-          acc.push([]);
-        }
-        acc[acc.length - 1].push(cur);
-        if (
-          index === forums.length - 1 &&
-          acc[acc.length - 1].length !== forumCardAmount
-        ) {
-          acc[acc.length - 1] = acc[acc.length - 1].concat(
-            ...new Array(forumCardAmount - acc[acc.length - 1].length).fill(
-              null
-            )
-          );
-        }
-        return acc;
-      },
-      [[]]
-    );
-  }, [loading, forumCardAmount]);
+  function handleWriteArticle() {
+    navigate("/community/forums/edit");
+  }
 
   return loading ? (
     <Loading />
   ) : (
-    <Stack flex={1} gap={1} alignSelf="stretch">
-      <Stack direction='row' gap={1}>
+    <Stack flex={1} gap={1} alignSelf='stretch'>
+      <Stack direction='row' justifyContent='space-between' gap={1}>
         <Button
           variant='contained'
           color='info'
           onClick={() => handleRedirect("/community")}>
           커뮤니티 돌아가기
+        </Button>
+        <Button variant='contained' color='info' onClick={handleWriteArticle}>
+          글 작성
         </Button>
       </Stack>
       {/* <Typography
@@ -112,27 +91,7 @@ function Index() {
         </Typography>
       </Typography> */}
       <Stack gap={2} sx={{ minHeight: "90%" }}>
-        {forums.length === 0 && "등록된 포럼이 없습니다."}
-        {forumsList.map((forums, i) => (
-          <Stack
-            direction='row'
-            flexWrap={"wrap"}
-            gap={2}
-            key={i + "|" + forums.length}>
-            {forums.map((forum, idx) =>
-              forum ? (
-                <ForumCard key={forum.id} forum={forum} />
-              ) : (
-                <Box
-                  key={"empty|" + idx}
-                  sx={{
-                    flex: 1,
-                  }}
-                />
-              )
-            )}
-          </Stack>
-        ))}
+        <ForumCardList forums={forums} />
       </Stack>
     </Stack>
   );

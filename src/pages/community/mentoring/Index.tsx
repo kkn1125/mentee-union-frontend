@@ -4,6 +4,7 @@ import {
   Box,
   Divider,
   Drawer,
+  List,
   ListItem,
   ListItemButton,
   ListItemIcon,
@@ -12,7 +13,7 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import io, { Socket } from "socket.io-client";
 import ChattingPage from "./ChattingPage";
 import CreateMentoringSessionPage from "./CreateMentoringSessionPage";
@@ -61,8 +62,24 @@ const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
     });
   }
 
+  const publicSessionList = useMemo(
+    () => sessionList.filter((session) => !session.is_private),
+    [sessionList]
+  );
+  const privateSessionList = useMemo(
+    () =>
+      sessionList.filter(
+        (session) =>
+          session.is_private &&
+          session.mentorings.some(
+            (mentoring) => mentoring.mentee_id === user.userId
+          )
+      ),
+    [sessionList]
+  );
+
   return (
-    <Box>
+    <List>
       <Toolbar />
       <Divider sx={{ borderColor: "transparent" }} />
       {sessionList.length === 0 && (
@@ -72,7 +89,7 @@ const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
           </ListItemButton>
         </ListItem>
       )}
-      {sessionList.map(({ id, topic, mentorings, messages }, index) => (
+      {publicSessionList.map(({ id, topic, mentorings, messages }, index) => (
         <ListItem key={id} disablePadding>
           <ListItemButton
             onClick={() =>
@@ -98,20 +115,34 @@ const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
           </ListItemButton>
         </ListItem>
       ))}
-      {/* <Divider />
-      <List>
-        {["All mail", "Trash", "Spam"].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List> */}
-    </Box>
+      {privateSessionList.length > 0 && <Divider />}
+      {privateSessionList.map(({ id, topic, mentorings, messages }, index) => (
+        <ListItem key={id} disablePadding>
+          <ListItemButton
+            onClick={() =>
+              mentorings.every((mtr) => mtr.mentee_id !== user.userId)
+                ? enterNew(id)
+                : enterRoom(id)
+            }>
+            <ListItemIcon>
+              {mentorings.some((mtr) => mtr.mentee_id === user.userId) ? (
+                messages.length > 0 &&
+                messages.some((msg) =>
+                  msg.readedUsers.every((usr) => usr.user_id !== user.userId)
+                ) ? (
+                  <MarkUnreadChatAltIcon />
+                ) : (
+                  <ChatIcon />
+                )
+              ) : (
+                <QuestionMarkIcon />
+              )}
+            </ListItemIcon>
+            <ListItemText primary={topic} />
+          </ListItemButton>
+        </ListItem>
+      ))}
+    </List>
   );
 };
 

@@ -166,17 +166,18 @@ function Profile() {
           Authorization: "Bearer " + token.token,
         },
       })
-      .then(({ data }: { data: { data: User } }) => {
+      .then(({ data }) => data.data)
+      .then((data: User) => {
         setLoading(false);
-        const originData = data.data;
+        const originData = data;
         const convertedProfileData = convertDateStringPropertyToDate(
           originData
         ) as User;
         setProfileData(convertedProfileData);
-        if (data.data.profiles[0]) {
+        if (data.profiles[0]) {
           setProfilePreview(
             "http://localhost:8080/api/users/profile/" +
-              data.data.profiles[0].new_name
+              data.profiles[0].new_name
           );
         }
         formik.setValues({
@@ -187,7 +188,7 @@ function Profile() {
         });
       })
       .catch((err) => {
-        console.log(err.response);
+        // console.log(err.response);
         if (err.response.data.code === 401) {
           if (err.response.data.detail === "jwt expired") {
             alert(FAIL_MESSAGE.EXPIRED_TOKEN);
@@ -413,7 +414,7 @@ function Profile() {
         </Stack>
       </Stack>
 
-      <Stack
+      {/* <Stack
         flex={1}
         gap={1}
         sx={{
@@ -451,7 +452,7 @@ function Profile() {
             }}
           />
         </Stack>
-      </Stack>
+      </Stack> */}
 
       <Stack
         flex={1}

@@ -6,7 +6,7 @@ export const convertDateStringPropertyToDate: (formatData: object) => object = (
       ([key, value]: [string, string | number | boolean | object]) => {
         if (key.match(/(birth|date|at$|time)/gi)) {
           return [key, new Date(value as string)];
-        } else if (typeof value === "object") {
+        } else if (value !== null && typeof value === "object") {
           return [key, convertDateStringPropertyToDate(value)];
         } else {
           return [key, value];
