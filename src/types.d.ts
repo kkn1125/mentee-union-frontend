@@ -62,6 +62,7 @@ export declare global {
     created_at: Date;
     updated_at: Date;
 
+    cover: Cover;
     user: User;
     seminarParticipants: SeminarParticipant[];
     category: Category;
