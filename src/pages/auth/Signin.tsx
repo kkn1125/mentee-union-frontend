@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   Checkbox,
+  CircularProgress,
   Container,
   Divider,
   FormControlLabel,
@@ -19,7 +20,7 @@ import {
   TextField,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as yup from "yup";
 
@@ -39,6 +40,7 @@ const validationSchema = yup.object({
 });
 
 function Signin() {
+  const [signing, setSigning] = useState(false);
   const token = useContext(TokenContext);
   const tokenDispatch = useContext(TokenDispatchContext);
   const navigate = useNavigate();
@@ -63,6 +65,7 @@ function Signin() {
       return errors;
     },
     onSubmit: (values) => {
+      setSigning(true);
       axiosInstance
         .post(
           "/auth/signin",
@@ -119,6 +122,9 @@ function Signin() {
               alert(FAIL_MESSAGE.PROBLEM_WITH_SERVER);
               break;
           }
+        })
+        .finally(() => {
+          setSigning(false);
         });
     },
   });
@@ -185,8 +191,17 @@ function Signin() {
             }}
           />
 
-          <Button type='submit' variant='contained'>
-            로그인
+          <Button
+            type='submit'
+            variant='contained'
+            sx={{
+              height: 36.5,
+            }}>
+            {signing ? (
+              <CircularProgress size={25} color='inherit' />
+            ) : (
+              "로그인"
+            )}
           </Button>
           <Button
             type='button'
