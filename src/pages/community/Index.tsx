@@ -1,22 +1,20 @@
 import Loading from "@/components/atoms/Loading";
 import SeminarItem from "@/components/atoms/seminar/SeminarItem";
-import ForumCard from "@/components/atoms/forum/ForumCard";
+import ForumCardList from "@/components/moleculars/forum/ForumCardList";
 import { axiosInstance } from "@/util/instances";
 import {
   Box,
   Button,
-  Grid,
   List,
-  Paper,
   Stack,
   Typography,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-const SHOW_LIMIT = 5;
+const SHOW_LIMIT = 4;
 
 function Community() {
   const navigate = useNavigate();
@@ -42,40 +40,13 @@ function Community() {
     });
   }, []);
 
-  const handleRedirectSeminar = (path: number) => {
-    navigate(`/community/seminars/${path}`);
+  const handleRedirect = (path: string | number) => {
+    if (typeof path === "string") {
+      navigate(path);
+    } else {
+      navigate(path);
+    }
   };
-
-  const handleRedirectForum = (path: number) => {
-    navigate(`/community/forums/${path}`);
-  };
-
-  const handleRedirectMentoring = () => {
-    navigate(`/community/mentoring`);
-  };
-
-  const forumsList = useMemo(() => {
-    return forums.slice(0, SHOW_LIMIT).reduce(
-      (acc: Forum[][], cur, index) => {
-        if (acc[acc.length - 1].length === forumCardAmount) {
-          acc.push([]);
-        }
-        acc[acc.length - 1].push(cur);
-        if (
-          index === forums.length - 1 &&
-          acc[acc.length - 1].length !== forumCardAmount
-        ) {
-          acc[acc.length - 1] = acc[acc.length - 1].concat(
-            ...new Array(forumCardAmount - acc[acc.length - 1].length).fill(
-              null
-            )
-          );
-        }
-        return acc;
-      },
-      [[]]
-    );
-  }, [loading, forumCardAmount]);
 
   return loading ? (
     <Loading />
@@ -91,7 +62,9 @@ function Community() {
             관심사 매칭을 통해 멘토/멘티와 소통해보세요!
           </Typography>
           <Box>
-            <Button variant='contained' onClick={handleRedirectMentoring}>
+            <Button
+              variant='contained'
+              onClick={() => handleRedirect(`/community/mentoring`)}>
               매칭하기
             </Button>
           </Box>
@@ -152,28 +125,8 @@ function Community() {
             forums
           </Typography>
         </Typography>
-        <Stack gap={2}>
-          {forums.length === 0 && "등록된 포럼이 없습니다."}
-          {forumsList.map((forums, i) => (
-            <Stack
-              direction='row'
-              flexWrap={"wrap"}
-              gap={2}
-              key={i + "|" + forums.length}>
-              {forums.map((forum, idx) =>
-                forum ? (
-                  <ForumCard key={forum.id} forum={forum} />
-                ) : (
-                  <Box
-                    key={"empty|" + idx}
-                    sx={{
-                      flex: 1,
-                    }}
-                  />
-                )
-              )}
-            </Stack>
-          ))}
+        <Stack gap={2} sx={{ minHeight: "90%" }}>
+          <ForumCardList forums={forums.slice(0, SHOW_LIMIT)} />
         </Stack>
       </Stack>
     </Stack>

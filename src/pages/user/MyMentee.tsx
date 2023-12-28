@@ -223,7 +223,9 @@ function MyMentee() {
           내가 추천한 포럼 기사
         </Typography>
         <List>
-          <ForumCardList forums={removeDuplicatedForumLikes} />
+          <Stack gap={2} sx={{ minHeight: "90%" }}>
+            <ForumCardList forums={removeDuplicatedForumLikes} />
+          </Stack>
         </List>
       </Box>
 
@@ -282,7 +284,9 @@ function MyMentee() {
         </Typography>
         {/* 작성한 포럼 리스트 */}
         <List>
-          <ForumCardList forums={profileData.forums} />
+          <Stack gap={2} sx={{ minHeight: "90%" }}>
+            <ForumCardList forums={profileData.forums} />
+          </Stack>
         </List>
       </Box>
     </Stack>
