@@ -1,7 +1,7 @@
 import Loading from "@/components/atoms/Loading";
 import ForumCard from "@/components/atoms/forum/ForumCard";
-import { Stack, Box, useMediaQuery, useTheme } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import { Box, Stack, useMediaQuery, useTheme } from "@mui/material";
+import { useEffect, useMemo, useState } from "react";
 
 type ForumCardListProps = {
   forums: Forum[];
@@ -44,10 +44,12 @@ function ForumCardList({ forums }: ForumCardListProps) {
       },
       [[]]
     );
-  }, [loading, forumCardAmount]);
+  }, [loading, forums, forumCardAmount]);
+
   if (loading) {
     return <Loading />;
   }
+
   return forums.length === 0
     ? "등록된 포럼이 없습니다."
     : forumsList.map((forums, i) => (
@@ -58,7 +60,11 @@ function ForumCardList({ forums }: ForumCardListProps) {
           key={i + "|" + forums.length}>
           {forums.map((forum, idx) =>
             forum ? (
-              <ForumCard key={forum.id} forum={forum} />
+              <ForumCard
+                key={forum.id}
+                forum={forum}
+                forumCardAmount={forumCardAmount}
+              />
             ) : (
               <Box
                 key={"empty|" + idx}
