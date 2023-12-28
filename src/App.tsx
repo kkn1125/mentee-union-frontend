@@ -116,13 +116,7 @@ function App() {
           <Route path='my-mentee' element={<MyMentee />} />
         </Route>
         <Route path='community'>
-          <Route
-            path=''
-            element={
-              <ProtectedRoute isSigned={token.status === "exists"}>
-                <CommunityLayout />
-              </ProtectedRoute>
-            }>
+          <Route path='' element={<CommunityLayout />}>
             <Route path='' element={<Community />} />
             <Route path='seminars'>
               <Route path='' element={<Seminars />} />
@@ -132,14 +126,7 @@ function App() {
               <Route path='' element={<Forums />} />
               <Route path='edit' element={<WriteForum />} />
               <Route path='edit/:id' element={<UpdateForum />} />
-              <Route
-                path=':id'
-                element={
-                  <ProtectedRoute isSigned={token.status === "exists"}>
-                    <ForumDetail />
-                  </ProtectedRoute>
-                }
-              />
+              <Route path=':id' element={<ForumDetail />} />
             </Route>
           </Route>
           <Route
