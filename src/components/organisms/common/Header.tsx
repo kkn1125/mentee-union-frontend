@@ -64,7 +64,7 @@ export default function Header() {
         handleMainClose();
         handleRedirect("/community/mentoring");
       },
-      isShow: !!token.token,
+      isShow: true,
     },
     {
       name: "Seminars",
@@ -72,7 +72,7 @@ export default function Header() {
         handleMainClose();
         handleRedirect("/community/seminars");
       },
-      isShow: !!token.token,
+      isShow: true,
     },
     {
       name: "Forums",
@@ -80,7 +80,7 @@ export default function Header() {
         handleMainClose();
         handleRedirect("/community/forums");
       },
-      isShow: !!token.token,
+      isShow: true,
     },
   ];
 
