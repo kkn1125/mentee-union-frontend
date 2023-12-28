@@ -1,9 +1,8 @@
 import ArticleIcon from "@mui/icons-material/Article";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import {
-  Button,
   Divider,
-  Grid,
   IconButton,
   Paper,
   Stack,
@@ -12,13 +11,14 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import SunEditorViewer from "../common/SunEditorViewer";
 
 type ForumCardProps = {
   forum: Forum;
+  forumCardAmount: number;
 };
 
-function ForumCard({ forum }: ForumCardProps) {
+function ForumCard({ forum, forumCardAmount }: ForumCardProps) {
   const navigate = useNavigate();
   const [copied, setCopied] = useState(false);
 
@@ -39,15 +39,22 @@ function ForumCard({ forum }: ForumCardProps) {
   }
 
   return (
-    <Paper sx={{ flex: 1 }}>
+    <Paper
+      sx={{
+        width: `calc(100% / ${forumCardAmount} - (16px * ${
+          (forumCardAmount - 1) / forumCardAmount
+        }))`,
+      }}>
       <Stack gap={1} sx={{ p: 2 }}>
         <Typography variant='h6' textTransform='capitalize'>
           {forum.title}
         </Typography>
-        <Typography
-          variant='body2'
-          dangerouslySetInnerHTML={{
-            __html: forum.content,
+        <SunEditorViewer
+          content={forum.content}
+          sx={{
+            overflow: "hidden",
+            minHeight: "5em",
+            maxHeight: "5em",
           }}
         />
       </Stack>
