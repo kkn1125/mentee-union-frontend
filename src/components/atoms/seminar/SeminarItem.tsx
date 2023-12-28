@@ -1,5 +1,6 @@
 import { timeFormat } from "@/util/tool";
 import {
+  Box,
   Card,
   CardContent,
   CardMedia,
@@ -51,12 +52,12 @@ const SeminarItem = ({ seminar }: SeminarItemProps) => {
       sx={{
         display: "flex",
         marginBottom: 2,
-        padding: "8px",
+        // padding: "8px",
         alignItems: "center",
         width: "100%",
         cursor: "pointer",
       }}>
-      <CardContent sx={{ flex: 1 }}>
+      <CardContent sx={{ flex: 1, p: 4 }}>
         <Typography variant='h5' component='div'>
           {title}
         </Typography>
@@ -112,7 +113,15 @@ const SeminarItem = ({ seminar }: SeminarItemProps) => {
       {/* 커버 이미지 추가 */}
       <CardMedia
         component='img'
-        sx={{ width: 200, height: 200, objectFit: "cover" }}
+        sx={{
+          display: {
+            xs: "none",
+            lg: "inline-block",
+          },
+          alignSelf: "stretch",
+          width: 300,
+          objectFit: "cover",
+        }}
         image={"https://www.industrialempathy.com/img/remote/ZiClJf-1920w.jpg"}
         alt='Seminar cover'
       />
