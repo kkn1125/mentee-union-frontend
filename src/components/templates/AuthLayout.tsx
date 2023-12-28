@@ -8,8 +8,16 @@ function AuthLayout() {
       justifyContent={"center"}
       alignItems={"center"}
       flex={1}
-      sx={{ width: "100%", mx: "auto", my: 5 }}>
-      <Box sx={{ width: "60%" }}>
+      sx={{
+        width: {
+          xs: "90%",
+          md: "80%",
+          lg: "70%",
+        },
+        mx: "auto",
+        my: 5,
+      }}>
+      <Box>
         <Outlet />
       </Box>
     </Stack>

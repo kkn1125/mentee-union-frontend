@@ -6,7 +6,11 @@ function CommunityLayout() {
     <Stack
       gap={10}
       sx={{
-        width: "60%",
+        width: {
+          xs: "90%",
+          md: "80%",
+          lg: "70%",
+        },
         mx: "auto",
         py: 5,
       }}>
