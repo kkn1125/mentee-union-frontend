@@ -37,19 +37,21 @@ function ForumDetail() {
   const tokenDispatch = useContext(TokenDispatchContext);
 
   useEffect(() => {
+    if (token.token) {
+      axiosInstance
+        .get("/auth/profile", {
+          headers: {
+            Authorization: "Bearer " + token.token,
+          },
+        })
+        .then(({ data }) => data.data)
+        .then((data) => setProfileData(data));
+    }
     axiosInstance
       .get(`/forums/${params.id}`)
       .then(({ data }) => data.data)
       .then((data) => {
         setForum(data);
-        axiosInstance
-          .get("/auth/profile", {
-            headers: {
-              Authorization: "Bearer " + token.token,
-            },
-          })
-          .then(({ data }) => data.data)
-          .then((data) => setProfileData(data));
       })
       .catch((error) => {
         if (error.message === "Network Error") {
@@ -64,19 +66,6 @@ function ForumDetail() {
         }
       });
   }, []);
-
-  // useEffect(() => {
-  //   if (detailRef.current) {
-  //     const target = detailRef.current;
-  //     target.querySelectorAll<HTMLDivElement>("[data-align]").forEach((el) => {
-  //       if (el.parentNode) {
-  //         (
-  //           el.parentNode as HTMLDivElement
-  //         ).style.cssText = `text-align: ${el.dataset.align};`;
-  //       }
-  //     });
-  //   }
-  // }, [detailRef.current]);
 
   if (forum === null) {
     return <Loading />;

@@ -1,4 +1,8 @@
 import Loading from "@/components/atoms/Loading";
+import NoticeBadge from "@/components/atoms/common/NoticeBadge";
+import Duration from "@/components/atoms/seminar/Duration";
+import MeetingPlace from "@/components/atoms/seminar/MeetingPlace";
+import Participants from "@/components/atoms/seminar/Participants";
 import {
   TOKEN_ACTION,
   TokenContext,
@@ -32,14 +36,16 @@ function SeminarDetail() {
   const params = useParams();
 
   useEffect(() => {
-    axiosInstance
-      .get("/auth/profile", {
-        headers: { Authorization: "Bearer " + token.token },
-      })
-      .then(({ data }) => data.data)
-      .then((profile) => {
-        setProfile(profile);
-      });
+    if (token.token) {
+      axiosInstance
+        .get("/auth/profile", {
+          headers: { Authorization: "Bearer " + token.token },
+        })
+        .then(({ data }) => data.data)
+        .then((profile) => {
+          setProfile(profile);
+        });
+    }
     axiosInstance
       .get(`/seminars/${params.id}`)
       .then(({ data }) => data.data)
@@ -48,7 +54,7 @@ function SeminarDetail() {
       });
   }, []);
 
-  if (seminar === null || profile === null) {
+  if (seminar === null) {
     return <Loading />;
   }
 
@@ -163,9 +169,9 @@ function SeminarDetail() {
     }
   }
 
-  const alreadyJoined = seminarParticipants.some(
-    (part) => part.user_id === profile.userId
-  );
+  const alreadyJoined =
+    profile &&
+    seminarParticipants.some((part) => part.user_id === profile.userId);
 
   return (
     <Container maxWidth='md'>
@@ -201,52 +207,88 @@ function SeminarDetail() {
             />
           </Box>
         </Stack>
+        <Stack gap={1}>
+          <MeetingPlace place={meeting_place} />
+          <Participants
+            participants={seminar.seminarParticipants.length}
+            limitParticipants={limit_participant_amount}
+          />
+          <Duration
+            title={"모집 기간"}
+            start={recruit_start_date}
+            end={recruit_end_date}
+            format={"YYYY-MM-dd HH:mm"}
+          />
+          <Duration
+            title={"세미나 기간"}
+            start={seminar_start_date}
+            end={seminar_end_date}
+            format={"YYYY-MM-dd HH:mm"}
+          />
+        </Stack>
         <Divider sx={{ my: 2, borderColor: "#565656" }} />
         <Typography variant='body1' paragraph minHeight={"50vh"}>
           {content}
         </Typography>
         <Divider sx={{ my: 2, borderColor: "#565656" }} />
-        <Box sx={{ display: "flex", alignItems: "center", my: 2 }}>
-          <AccessTimeIcon sx={{ marginRight: 1 }} />
-          <Typography variant='body2'>{`모집 기간: ${timeFormat(
-            new Date(recruit_start_date),
-            "YYYY-MM-dd HH:mm"
-          )} - ${timeFormat(
-            new Date(recruit_end_date),
-            "YYYY-MM-dd HH:mm"
-          )}`}</Typography>
-        </Box>
-        <Box sx={{ display: "flex", alignItems: "center", my: 2 }}>
-          <AccessTimeIcon sx={{ marginRight: 1 }} />
-          <Typography variant='body2'>{`세미나 기간: ${timeFormat(
-            new Date(seminar_start_date),
-            "YYYY-MM-dd HH:mm"
-          )} - ${timeFormat(
-            new Date(seminar_end_date),
-            "YYYY-MM-dd HH:mm"
-          )}`}</Typography>
-        </Box>
-        <Typography variant='body2' paragraph>
-          {`Meeting Place: ${meeting_place}`}
-        </Typography>
-        <Typography variant='body2' paragraph>
-          {`최대 참여 인원: ${seminarParticipants.length}/${limit_participant_amount}`}
-        </Typography>
+
+        <Stack direction='row' gap={1}>
+          <NoticeBadge
+            title={
+              is_recruit_finished || new Date(recruit_end_date) < new Date()
+                ? "모집 완료"
+                : "모집 중"
+            }
+            level={
+              is_recruit_finished || new Date(recruit_end_date) < new Date()
+                ? 2
+                : 0
+            }
+          />
+          <NoticeBadge
+            title={
+              !is_recruit_finished && seminar_start_date > new Date()
+                ? "세미나 진행 전"
+                : (is_recruit_finished && !is_seminar_finished) ||
+                  (new Date(seminar_start_date) <= new Date() &&
+                    new Date(seminar_end_date) >= new Date())
+                ? "세미나 진행 중"
+                : "세미나 마감"
+            }
+            level={
+              !is_recruit_finished && new Date(seminar_start_date) > new Date()
+                ? 0
+                : (is_recruit_finished && !is_seminar_finished) ||
+                  (new Date(seminar_start_date) <= new Date() &&
+                    new Date(seminar_end_date) >= new Date())
+                ? 1
+                : 2
+            }
+          />
+        </Stack>
+
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
           <Tooltip
-            title={alreadyJoined ? "이미 신청한 세미나입니다." : ""}
+            title={
+              alreadyJoined
+                ? "이미 신청한 세미나입니다."
+                : profile
+                ? ""
+                : "로그인이 필요합니다."
+            }
             placement='top'>
             <Box>
               <Button
                 variant='contained'
                 color='secondary'
                 disabled={
+                  !profile ||
                   seminarParticipants.length >= limit_participant_amount ||
                   alreadyJoined ||
                   is_recruit_finished ||
                   is_seminar_finished
                 }
-                onClick={handleJoinSeminar}>
+                onClick={profile ? handleJoinSeminar : () => {}}>
                 {is_recruit_finished ? "Recruitment Finished" : "Join Seminar"}
               </Button>
             </Box>
