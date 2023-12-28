@@ -1,4 +1,6 @@
 import Loading from "@/components/atoms/Loading";
+import SunEditorViewer from "@/components/atoms/common/SunEditorViewer";
+import ForumLikeButton from "@/components/atoms/forum/ForumLikeButton";
 import {
   TOKEN_ACTION,
   TokenContext,
@@ -8,6 +10,7 @@ import { FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import { timeFormat } from "@/util/tool";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import {
   Box,
   Button,
@@ -21,10 +24,11 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import ForumLikeButton from "@/components/atoms/forum/ForumLikeButton";
+
+// TODO: 포럼 조회 시 조회수 카운트 추가
 
 function ForumDetail() {
+  // const detailRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
   const [profileData, setProfileData] = useState<JwtDto | null>(null);
   const [forum, setForum] = useState<Forum | null>(null);
@@ -60,6 +64,19 @@ function ForumDetail() {
         }
       });
   }, []);
+
+  // useEffect(() => {
+  //   if (detailRef.current) {
+  //     const target = detailRef.current;
+  //     target.querySelectorAll<HTMLDivElement>("[data-align]").forEach((el) => {
+  //       if (el.parentNode) {
+  //         (
+  //           el.parentNode as HTMLDivElement
+  //         ).style.cssText = `text-align: ${el.dataset.align};`;
+  //       }
+  //     });
+  //   }
+  // }, [detailRef.current]);
 
   if (forum === null) {
     return <Loading />;
@@ -143,14 +160,15 @@ function ForumDetail() {
           </Stack>
         </Stack>
         <Divider sx={{ my: 2, borderColor: "#565656" }} />
-
-        <Typography
-          variant='body1'
-          paragraph
-          minHeight={"50vh"}
-          dangerouslySetInnerHTML={{
-            __html: content.replace(/<script|^<.*\s?onload=/gm, ""),
-          }}></Typography>
+        <SunEditorViewer
+          content={content}
+          wrapSx={{
+            overflow: "auto",
+          }}
+          sx={{
+            minHeight: "50vh",
+          }}
+        />
         <Divider sx={{ my: 2, borderColor: "#565656" }} />
         <Box>
           <Tooltip title='작성 시간' placement='right'>
