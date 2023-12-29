@@ -3,20 +3,19 @@ import { ERROR_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import {
   Box,
-  Stack,
-  Paper,
-  Typography,
-  TextField,
   Button,
+  Paper,
+  Stack,
+  TextField,
+  Typography,
 } from "@mui/material";
 import { useFormik } from "formik";
-import React, { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SunEditor from "suneditor-react";
 import "suneditor/dist/css/suneditor.min.css"; // Import Sun Editor's CSS File
-import { default as SunEditorType } from "suneditor/src/lib/core";
-import * as yup from "yup";
 import Ko from "suneditor/src/lang/ko";
+import * as yup from "yup";
 
 type ForumEditorProps = {
   forum?: Forum;
