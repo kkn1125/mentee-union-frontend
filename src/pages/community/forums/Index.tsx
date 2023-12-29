@@ -70,26 +70,6 @@ function Index() {
           글 작성
         </Button>
       </Stack>
-      {/* <Typography
-        variant='h4'
-        textTransform={"capitalize"}
-        sx={{
-          textDecoration: "none",
-          color: "inherit",
-        }}>
-        <Typography
-          component={Link}
-          to='/community/forums'
-          sx={{
-            textDecoration: "inherit",
-            textTransform: "inherit",
-            color: "inherit",
-            fontSize: "inherit",
-            fontWeight: "inherit",
-          }}>
-          forums
-        </Typography>
-      </Typography> */}
       <Stack gap={2} sx={{ minHeight: "90%" }}>
         <ForumCardList forums={forums} />
       </Stack>
