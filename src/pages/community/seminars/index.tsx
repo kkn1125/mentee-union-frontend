@@ -55,16 +55,23 @@ function Seminars() {
     }
   }
 
+  function handleWriteArticle() {
+    navigate("/community/seminars/edit");
+  }
+
   return loading ? (
     <Loading />
   ) : (
     <Stack flex={1} gap={1}>
-      <Stack direction='row' gap={1}>
+      <Stack direction='row' justifyContent='space-between' gap={1}>
         <Button
           variant='contained'
           color='info'
           onClick={() => handleRedirect("/community")}>
           커뮤니티 돌아가기
+        </Button>
+        <Button variant='contained' color='info' onClick={handleWriteArticle}>
+          글 작성
         </Button>
       </Stack>
       {/* <Typography

@@ -1,18 +1,17 @@
 import Loading from "@/components/atoms/Loading";
 import NoticeBadge from "@/components/atoms/common/NoticeBadge";
+import SunEditorViewer from "@/components/atoms/common/SunEditorViewer";
 import Duration from "@/components/atoms/seminar/Duration";
 import MeetingPlace from "@/components/atoms/seminar/MeetingPlace";
+import Owner from "@/components/atoms/seminar/Owner";
 import Participants from "@/components/atoms/seminar/Participants";
 import {
   TOKEN_ACTION,
   TokenContext,
   TokenDispatchContext,
 } from "@/context/TokenProvider";
-import { FAIL_MESSAGE } from "@/util/global.constants";
+import { API_PATH, FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
-import { timeFormat } from "@/util/tool";
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {
   Box,
   Button,
@@ -29,7 +28,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 function SeminarDetail() {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<AuthProfile | null>(null);
+  const [profileData, setProfileData] = useState<JwtDto | null>(null);
   const token = useContext(TokenContext);
   const tokenDispatch = useContext(TokenDispatchContext);
   const [seminar, setSeminar] = useState<Seminar | null>(null);
@@ -43,7 +42,7 @@ function SeminarDetail() {
         })
         .then(({ data }) => data.data)
         .then((profile) => {
-          setProfile(profile);
+          setProfileData(profile);
         });
     }
     axiosInstance
@@ -75,6 +74,7 @@ function SeminarDetail() {
     category,
     seminarParticipants,
     user,
+    cover,
   } = seminar;
 
   function handleJoinSeminar() {
@@ -169,9 +169,13 @@ function SeminarDetail() {
     }
   }
 
+  function handleUpdateSeminar(seminar_id: number) {
+    navigate("/community/seminars/edit/" + seminar_id);
+  }
+
   const alreadyJoined =
-    profile &&
-    seminarParticipants.some((part) => part.user_id === profile.userId);
+    profileData &&
+    seminarParticipants.some((part) => part.user_id === profileData.userId);
 
   return (
     <Container maxWidth='md'>
@@ -190,14 +194,30 @@ function SeminarDetail() {
         </Button>
       </Stack>
       <Paper elevation={3} sx={{ p: 3, marginTop: 2 }}>
-        <Typography variant='h4' gutterBottom>
-          {title}
-        </Typography>
-        <Stack gap={1}>
-          <Stack direction='row' alignItems='center'>
-            <AccountCircleIcon />
-            <Typography>{user.username}</Typography>
+        <Stack
+          direction='row'
+          justifyContent={"space-between"}
+          alignItems='center'
+          sx={{ mb: 1 }}>
+          <Stack direction='row' gap={1} alignItems='center'>
+            <Typography variant='h4'>{title}</Typography>
+            {/* <Stack direction='row' gap={0} alignItems='center'>
+            <IconButton>
+              <VisibilityIcon />
+            </IconButton>
+            <Typography>{view_count || 0}</Typography>
+          </Stack> */}
           </Stack>
+          {seminar.host_id === profileData?.userId && (
+            <Button
+              variant='contained'
+              color='info'
+              onClick={() => handleUpdateSeminar(seminar.id)}>
+              수정
+            </Button>
+          )}
+        </Stack>
+        <Stack gap={1}>
           <Box>
             <Chip
               label={category.name}
@@ -208,6 +228,7 @@ function SeminarDetail() {
           </Box>
         </Stack>
         <Stack gap={1}>
+          <Owner username={user.username} />
           <MeetingPlace place={meeting_place} />
           <Participants
             participants={seminar.seminarParticipants.length}
@@ -226,10 +247,22 @@ function SeminarDetail() {
             format={"YYYY-MM-dd HH:mm"}
           />
         </Stack>
+        {cover && (
+          <Box
+            component='img'
+            width={300}
+            src={API_PATH + "/seminars/cover/" + cover.new_name}></Box>
+        )}
         <Divider sx={{ my: 2, borderColor: "#565656" }} />
-        <Typography variant='body1' paragraph minHeight={"50vh"}>
-          {content}
-        </Typography>
+        <SunEditorViewer
+          content={content}
+          wrapSx={{
+            overflow: "auto",
+          }}
+          sx={{
+            minHeight: "50vh",
+          }}
+        />
         <Divider sx={{ my: 2, borderColor: "#565656" }} />
 
         <Stack direction='row' gap={1}>
@@ -272,7 +305,7 @@ function SeminarDetail() {
             title={
               alreadyJoined
                 ? "이미 신청한 세미나입니다."
-                : profile
+                : profileData
                 ? ""
                 : "로그인이 필요합니다."
             }
@@ -282,13 +315,13 @@ function SeminarDetail() {
                 variant='contained'
                 color='secondary'
                 disabled={
-                  !profile ||
+                  !profileData ||
                   seminarParticipants.length >= limit_participant_amount ||
                   alreadyJoined ||
                   is_recruit_finished ||
                   is_seminar_finished
                 }
-                onClick={profile ? handleJoinSeminar : () => {}}>
+                onClick={profileData ? handleJoinSeminar : () => {}}>
                 {is_recruit_finished ? "Recruitment Finished" : "Join Seminar"}
               </Button>
             </Box>
