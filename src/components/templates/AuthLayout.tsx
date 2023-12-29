@@ -17,7 +17,10 @@ function AuthLayout() {
         mx: "auto",
         my: 5,
       }}>
-      <Box>
+      <Box
+        sx={{
+          width: "100%",
+        }}>
         <Outlet />
       </Box>
     </Stack>

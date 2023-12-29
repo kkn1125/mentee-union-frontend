@@ -18,6 +18,8 @@ import {
   Paper,
   Stack,
   TextField,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import { useFormik } from "formik";
 import { useContext, useState } from "react";
@@ -45,6 +47,8 @@ function Signin() {
   const tokenDispatch = useContext(TokenDispatchContext);
   const navigate = useNavigate();
   const locate = useLocation();
+  const theme = useTheme();
+  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
 
   const formik = useFormik({
     initialValues: {
@@ -131,15 +135,14 @@ function Signin() {
 
   return (
     <Container
-      maxWidth='xs'
+      maxWidth={"xs"}
       sx={{
         flex: 1,
       }}>
       <Paper
         component={Stack}
         sx={{
-          py: 5,
-          px: 7,
+          p: 5,
         }}>
         <Stack component='form' gap={1} onSubmit={formik.handleSubmit}>
           <TextField
