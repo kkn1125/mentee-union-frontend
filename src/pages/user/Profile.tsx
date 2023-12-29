@@ -1,6 +1,7 @@
 import GuageBar from "@/components/atoms/GaugeBar";
 import Loading from "@/components/atoms/Loading";
 import ModalWithButton from "@/components/atoms/ModalWithButton";
+import VisuallyHiddenInput from "@/components/atoms/common/VisuallyHiddenInput";
 import Placeholder from "@/components/moleculars/common/Placeholder";
 import {
   TOKEN_ACTION,
@@ -15,7 +16,11 @@ import {
   SUCCESS_MESSAGE,
 } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
-import { convertDateStringPropertyToDate, timeFormat } from "@/util/tool";
+import {
+  checkImageSize,
+  convertDateStringPropertyToDate,
+  timeFormat,
+} from "@/util/tool";
 import {
   Alert,
   AlertTitle,
@@ -39,18 +44,6 @@ type UpdateData = {
   phone_number?: string | undefined;
   username?: string | undefined;
 };
-
-const VisuallyHiddenInput = styled("input")({
-  clip: "rect(0 0 0 0)",
-  clipPath: "inset(50%)",
-  height: 1,
-  overflow: "hidden",
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  whiteSpace: "nowrap",
-  width: 1,
-});
 
 const validationSchema = yup.object({
   username: yup
@@ -240,14 +233,6 @@ function Profile() {
     const upload = document.getElementById("profile-image") as HTMLInputElement;
     upload.files = null;
     setProfilePreview("");
-  }
-
-  function checkImageSize(file: File | null, limit: number = 10) {
-    if (file) {
-      return parseFloat((file.size / 1024).toFixed(2)) > limit;
-    } else {
-      return false;
-    }
   }
 
   function handleSubmitProfile(updatedData: UpdateData) {
