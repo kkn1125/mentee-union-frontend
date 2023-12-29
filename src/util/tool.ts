@@ -53,3 +53,17 @@ export const timeFormat = (
     }
   });
 };
+
+/**
+ *
+ * @param {File | null} file file or null
+ * @param {number} limit limite byte
+ * @returns {number | boolean}
+ */
+export function checkImageSize(file: File | null, limit: number = 10) {
+  if (file) {
+    return parseFloat((file.size / 1024).toFixed(2)) > limit;
+  } else {
+    return false;
+  }
+}
