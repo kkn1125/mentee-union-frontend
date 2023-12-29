@@ -1,7 +1,24 @@
 import { PaletteColor } from "@mui/material";
+import "@mui/x-date-pickers/DateTimeField";
+
+declare module "@mui/x-date-pickers/DateTimeField" {
+  interface DateTimeFieldProps {
+    // 여기에 추가하고 싶은 새로운 프로퍼티를 정의하세요.
+    error?: boolean;
+  }
+}
 
 export declare global {
   declare interface Window {}
+  // declare module "@mui/x-date-pickers/DateTimeField" {
+  //   interface CustomError {
+  //     error: boolean;
+  //   }
+
+  //   interface DateTimeFieldComponent extends CustomError {
+  //     // 여기에 추가하고 싶은 새로운 프로퍼티를 정의하세요.
+  //   }
+  // }
 
   export declare interface Token {
     sub: number;
@@ -66,6 +83,15 @@ export declare global {
     user: User;
     seminarParticipants: SeminarParticipant[];
     category: Category;
+  }
+  export declare interface Cover {
+    id: number;
+    seminar_id: number;
+    origin_name: string;
+    new_name: string;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
   }
   export declare interface Channel {
     id: number;

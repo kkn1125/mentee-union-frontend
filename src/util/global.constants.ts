@@ -1,14 +1,35 @@
 declare global {
   interface Window {
-    custom_env: {
-      BRAND_NAME: string;
+    // custom_env: {
+    //   BRAND_NAME: string;
+    // };
+    process: {
+      env: {
+        BRAND_NAME: string;
+        API_HOST: string;
+        API_PORT: number;
+        API_BASE: string;
+        API_PATH: string;
+      };
     };
   }
 }
 
+// declare namespace NodeJS {
+//   export interface ProcessEnv {
+//     // 환경 변수 타입 정의
+//     REACT_APP_API_URL: string;
+//     // 기타 환경 변수들...
+//   }
+// }
+
 export const PRIVKEY = import.meta.env.VITE_PRIVKEY;
 
-export const BRAND_NAME = window.custom_env.BRAND_NAME;
+export const BRAND_NAME = window.process.env.BRAND_NAME;
+export const API_HOST = window.process.env.API_HOST;
+export const API_PORT = window.process.env.API_PORT;
+export const API_BASE = window.process.env.API_BASE;
+export const API_PATH = window.process.env.API_PATH;
 
 export const SUCCESS_MESSAGE = {
   ALREADY_PASS_AUTH: "이미 본인인증이 완료 되었습니다.",
@@ -37,6 +58,7 @@ export const ERROR_MESSAGE = {
   REQUIRED: "필수 항목입니다.",
   MIN: (value: number) => `최소 ${value}자 이상 입력 해야합니다.`,
   MAX: (value: number) => `최대 ${value}자 까지 입력 가능합니다.`,
+  ONLY_DATE: "날짜 형식만 가능합니다.",
   ONLY_BOOLEAN: "참, 거짓만 가능합니다.",
   ONLY_STRING: "문자만 입력 가능합니다.",
   ONLY_NUMBER: "숫자만 입력 가능합니다.",
@@ -46,13 +68,16 @@ export const ERROR_MESSAGE = {
       `유저네임은 영문자로 시작하는 ${min} ~ ${max}자의 영문, 숫자, 밑줄(_), 대시(-)로 구성해야 합니다.`,
     NOT_ALLOWED_START_WITH: "숫자나 특수 문자로 시작할 수 없습니다.",
   },
+  NUMBER: {
+    MIN: (value: number) => `최소 ${value} 이상이어야 해야합니다.`,
+    MAX: (value: number) => `최대 ${value} 이하여야 합니다.`,
+  },
   PASSWORD: {
     NO_MATCHED_WITH_ORIGIN: "입력한 비밀번호와 동일하지 않습니다.",
     DEFAULT: (min: number, max: number) =>
       `비밀번호는 숫자, 영문 대소문자, 특수문자가 최소 1개 씩 포함되어야 하며, ${min} ~ ${max}자 이내로 작성해야 합니다.`,
     MIN: (value: number) => `비밀번호는 최소 ${value}자 이상 입력 해야합니다.`,
-    MAX: (value: number) =>
-      `"비밀번호는 최대 ${value}자 이하 입력 해야합니다."`,
+    MAX: (value: number) => `비밀번호는 최대 ${value}자 이하 입력 해야합니다.`,
   },
   PHONE_NUMBER: "폰 번호 형식이 아닙니다. 010-0000-1111 로 작성해야 합니다.",
 };
