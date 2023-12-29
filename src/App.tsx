@@ -24,6 +24,8 @@ import Loading from "./components/atoms/Loading";
 import MyMentee from "./pages/user/MyMentee";
 import WriteForum from "./pages/community/forums/WriteForum";
 import UpdateForum from "./pages/community/forums/UpdateForum";
+import WriteSeminar from "./pages/community/seminars/WriteSeminar";
+import UpdateSeminar from "./pages/community/seminars/UpdateSeminar";
 
 interface ProtectedRouteProps {
   isSigned: boolean;
@@ -120,6 +122,8 @@ function App() {
             <Route path='' element={<Community />} />
             <Route path='seminars'>
               <Route path='' element={<Seminars />} />
+              <Route path='edit' element={<WriteSeminar />} />
+              <Route path='edit/:id' element={<UpdateSeminar />} />
               <Route path=':id' element={<SeminarDetail />} />
             </Route>
             <Route path='forums'>
