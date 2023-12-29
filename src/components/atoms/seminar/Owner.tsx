@@ -1,5 +1,6 @@
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
 import { Tooltip, Typography } from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 type OwnerProps = {
   username: string;
@@ -12,7 +13,7 @@ function Owner({ username }: OwnerProps) {
       color='text.secondary'
       sx={{ display: "flex", alignItems: "center" }}>
       <Tooltip title={"작성자"} placement='left'>
-        <EmojiPeopleIcon fontSize='small' />
+        <AccountCircleIcon />
       </Tooltip>
       {username}
     </Typography>

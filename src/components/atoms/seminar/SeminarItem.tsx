@@ -15,6 +15,7 @@ import Duration from "./Duration";
 import Owner from "./Owner";
 import NoticeBadge from "../common/NoticeBadge";
 import Participants from "./Participants";
+import { API_PATH } from "@/util/global.constants";
 
 type SeminarItemProps = {
   seminar: Seminar;
@@ -141,8 +142,9 @@ const SeminarItem = ({ seminar }: SeminarItemProps) => {
           objectFit: "cover",
         }}
         image={
-          cover?.new_name ||
-          "https://www.industrialempathy.com/img/remote/ZiClJf-1920w.jpg"
+          cover
+            ? API_PATH + "/seminars/cover/" + cover.new_name
+            : "https://www.industrialempathy.com/img/remote/ZiClJf-1920w.jpg"
         }
         alt='Seminar cover'
       />
