@@ -1,9 +1,8 @@
-import SeminarItem from "@/components/atoms/seminar/SeminarItem";
 import PaperContent from "@/components/atoms/home/PaperContent";
 import Step from "@/components/atoms/home/Step";
-import FlowIssues from "@/components/moleculars/home/FlowIssues";
 import Placeholder from "@/components/moleculars/common/Placeholder";
 import Section from "@/components/moleculars/common/Section";
+import FlowIssues from "@/components/moleculars/home/FlowIssues";
 import BackgroundSection from "@/components/organisms/home/BackgroundSection";
 import MainSections from "@/components/organisms/home/MainSections";
 import { TokenContext } from "@/context/TokenProvider";
@@ -13,7 +12,6 @@ import {
   Box,
   Button,
   Container,
-  List,
   Paper,
   Stack,
   Typography,
@@ -453,7 +451,11 @@ function Home() {
             클릭하여 최신 이벤트 정보를 확인하세요.
           </Typography>
           <Box>
-            <Button variant='contained'>이벤트 정보 확인하기</Button>
+            <Button
+              variant='contained'
+              onClick={() => handleRedirect("/board/notice")}>
+              이벤트 정보 확인하기
+            </Button>
           </Box>
         </Section>
 

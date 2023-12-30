@@ -1,5 +1,5 @@
-import Loading from "@/components/atoms/Loading";
-import SeminarItem from "@/components/atoms/seminar/SeminarItem";
+import Loading from "@/components/atoms/common/Loading";
+import SeminarCard from "@/components/atoms/seminar/SeminarCard";
 import ForumCardList from "@/components/moleculars/forum/ForumCardList";
 import { axiosInstance } from "@/util/instances";
 import {
@@ -98,7 +98,7 @@ function Community() {
           {/* 더 많은 세미나 항목들 */}
           {seminars.length === 0 && "등록된 세미나가 없습니다."}
           {seminars.slice(0, SHOW_LIMIT).map((seminar: Seminar) => (
-            <SeminarItem key={seminar.id} seminar={seminar} />
+            <SeminarCard key={seminar.id} seminar={seminar} />
           ))}
         </List>
       </Stack>

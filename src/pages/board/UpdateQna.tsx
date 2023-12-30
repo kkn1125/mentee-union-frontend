@@ -1,26 +1,26 @@
 import Loading from "@/components/atoms/common/Loading";
-import ForumEditor from "@/components/moleculars/forum/ForumEditor";
+import QnaEditor from "@/components/moleculars/board/QnaEditor";
 import { axiosInstance } from "@/util/instances";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-function UpdateForum() {
+function UpdateQna() {
   const params = useParams();
-  const [forum, setForum] = useState<Forum | null>(null);
+  const [qna, setQna] = useState<Board | null>(null);
 
   useEffect(() => {
     axiosInstance
-      .get("/forums/" + params.id)
+      .get("/boards/qna/" + params.id)
       .then(({ data }) => data.data)
       .then((data) => {
-        setForum(data);
+        setQna(data);
       })
       .catch((error) => {
         console.log("error", error);
       });
   }, []);
 
-  return forum ? <ForumEditor forum={forum} /> : <Loading />;
+  return qna ? <QnaEditor qna={qna} /> : <Loading />;
 }
 
-export default UpdateForum;
+export default UpdateQna;

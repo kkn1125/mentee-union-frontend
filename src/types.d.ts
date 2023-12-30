@@ -67,6 +67,7 @@ export declare global {
     category_id: number;
     title: string;
     content: string;
+    view_count: number;
     meeting_place: string;
     limit_participant_amount: number;
     recruit_start_date: Date;
@@ -83,6 +84,21 @@ export declare global {
     user: User;
     seminarParticipants: SeminarParticipant[];
     category: Category;
+  }
+  export declare interface Board {
+    id: number;
+    user_id: number;
+    type: string;
+    title: string;
+    content: string;
+    view_count: number;
+    visible: boolean;
+    sequence: number;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
+
+    user: User;
   }
   export declare interface Cover {
     id: number;
@@ -126,6 +142,7 @@ export declare global {
     givers: User[];
     seminarParticipants: SeminarParticipant[];
     forumLikes: ForumLike[];
+    boards: Board[];
   }
   export declare interface Grade {
     id: number;
@@ -290,4 +307,6 @@ export declare global {
     | DataChannelType
     | DataMessageType
     | DataStringType;
+
+  export declare type BOARD_TYPE = "notice" | "qna" | "event";
 }

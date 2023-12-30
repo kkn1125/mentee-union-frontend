@@ -82,6 +82,30 @@ export default function Header() {
       },
       isShow: true,
     },
+    {
+      name: "Notice",
+      onClick: () => {
+        handleMainClose();
+        handleRedirect("/boards/notice");
+      },
+      isShow: true,
+    },
+    {
+      name: "Event",
+      onClick: () => {
+        handleMainClose();
+        handleRedirect("/boards/event");
+      },
+      isShow: true,
+    },
+    {
+      name: "QNA",
+      onClick: () => {
+        handleMainClose();
+        handleRedirect("/boards/qna");
+      },
+      isShow: true,
+    },
   ];
 
   const menuListInfo = [

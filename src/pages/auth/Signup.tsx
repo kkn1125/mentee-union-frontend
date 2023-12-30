@@ -1,4 +1,4 @@
-import Loading from "@/components/atoms/Loading";
+import Loading from "@/components/atoms/common/Loading";
 import {
   ERROR_MESSAGE,
   FAIL_MESSAGE,

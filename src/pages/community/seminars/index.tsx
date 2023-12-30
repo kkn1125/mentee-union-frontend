@@ -1,19 +1,11 @@
-import Loading from "@/components/atoms/Loading";
-import SeminarItem from "@/components/atoms/seminar/SeminarItem";
+import Loading from "@/components/atoms/common/Loading";
+import SeminarCard from "@/components/atoms/seminar/SeminarCard";
 import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
 import { FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
-import {
-  Stack,
-  Typography,
-  List,
-  ListItem,
-  ListItemButton,
-  Button,
-  Box,
-} from "@mui/material";
+import { Button, List, Stack } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 function Seminars() {
   const navigate = useNavigate();
@@ -42,10 +34,6 @@ function Seminars() {
         }
       });
   }, []);
-
-  // const handleRedirectSeminar = (path: number) => {
-  //   navigate(`${path}`);
-  // };
 
   function handleRedirect(path: string | number) {
     if (typeof path === "string") {
@@ -99,7 +87,7 @@ function Seminars() {
         {/* 더 많은 세미나 항목들 */}
         {seminars.length === 0 && "등록된 세미나가 없습니다."}
         {seminars.map((seminar: Seminar) => (
-          <SeminarItem key={seminar.id} seminar={seminar} />
+          <SeminarCard key={seminar.id} seminar={seminar} />
         ))}
       </List>
     </Stack>

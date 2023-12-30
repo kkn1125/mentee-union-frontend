@@ -1,6 +1,7 @@
-import Loading from "@/components/atoms/Loading";
+import Loading from "@/components/atoms/common/Loading";
 import NoticeBadge from "@/components/atoms/common/NoticeBadge";
 import SunEditorViewer from "@/components/atoms/common/SunEditorViewer";
+import ViewCount from "@/components/atoms/common/ViewCount";
 import Duration from "@/components/atoms/seminar/Duration";
 import MeetingPlace from "@/components/atoms/seminar/MeetingPlace";
 import Owner from "@/components/atoms/seminar/Owner";
@@ -12,6 +13,7 @@ import {
 } from "@/context/TokenProvider";
 import { API_PATH, FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
+import { isAfter, isBefore, isDoing } from "@/util/tool";
 import {
   Box,
   Button,
@@ -63,6 +65,7 @@ function SeminarDetail() {
     category_id,
     title,
     content,
+    view_count,
     meeting_place,
     limit_participant_amount,
     recruit_start_date,
@@ -177,6 +180,40 @@ function SeminarDetail() {
     profileData &&
     seminarParticipants.some((part) => part.user_id === profileData.userId);
 
+  const isBeforeRecruit = !is_recruit_finished && isBefore(recruit_start_date);
+  const isDoingRecruit =
+    !is_recruit_finished && isDoing(recruit_start_date, recruit_end_date);
+  const isDoneRecruit = is_recruit_finished || isAfter(recruit_end_date);
+
+  const isBeforeSeminar = !is_seminar_finished && isBefore(seminar_start_date);
+  const isDoingSeminar =
+    !is_seminar_finished && isDoing(seminar_start_date, seminar_end_date);
+  const isDoneSeminar = is_seminar_finished || isAfter(seminar_end_date);
+
+  const recruitState: [string, number] = (() => {
+    if (isBeforeRecruit) {
+      return ["모집 전", 0];
+    } else if (isDoingRecruit) {
+      return ["모집 중", 1];
+    } else if (isDoneRecruit) {
+      return ["모집 완료", 2];
+    } else {
+      return ["모집 완료", 2];
+    }
+  })();
+
+  const seminarState: [string, number] = (() => {
+    if (isBeforeSeminar) {
+      return ["세미나 진행 전", 0];
+    } else if (isDoingSeminar) {
+      return ["세미나 진행 중", 1];
+    } else if (isDoneSeminar) {
+      return ["세미나 진행 완료", 2];
+    } else {
+      return ["세미나 진행 완료", 2];
+    }
+  })();
+
   return (
     <Container maxWidth='md'>
       <Stack direction='row' gap={1}>
@@ -201,12 +238,7 @@ function SeminarDetail() {
           sx={{ mb: 1 }}>
           <Stack direction='row' gap={1} alignItems='center'>
             <Typography variant='h4'>{title}</Typography>
-            {/* <Stack direction='row' gap={0} alignItems='center'>
-            <IconButton>
-              <VisibilityIcon />
-            </IconButton>
-            <Typography>{view_count || 0}</Typography>
-          </Stack> */}
+            <ViewCount viewCount={view_count} />
           </Stack>
           {seminar.host_id === profileData?.userId && (
             <Button
@@ -266,44 +298,18 @@ function SeminarDetail() {
         <Divider sx={{ my: 2, borderColor: "#565656" }} />
 
         <Stack direction='row' gap={1}>
-          <NoticeBadge
-            title={
-              is_recruit_finished || new Date(recruit_end_date) < new Date()
-                ? "모집 완료"
-                : "모집 중"
-            }
-            level={
-              is_recruit_finished || new Date(recruit_end_date) < new Date()
-                ? 2
-                : 0
-            }
-          />
-          <NoticeBadge
-            title={
-              !is_recruit_finished && seminar_start_date > new Date()
-                ? "세미나 진행 전"
-                : (is_recruit_finished && !is_seminar_finished) ||
-                  (new Date(seminar_start_date) <= new Date() &&
-                    new Date(seminar_end_date) >= new Date())
-                ? "세미나 진행 중"
-                : "세미나 마감"
-            }
-            level={
-              !is_recruit_finished && new Date(seminar_start_date) > new Date()
-                ? 0
-                : (is_recruit_finished && !is_seminar_finished) ||
-                  (new Date(seminar_start_date) <= new Date() &&
-                    new Date(seminar_end_date) >= new Date())
-                ? 1
-                : 2
-            }
-          />
+          <NoticeBadge title={recruitState[0]} level={recruitState[1]} />
+          <NoticeBadge title={seminarState[0]} level={seminarState[1]} />
         </Stack>
 
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
           <Tooltip
             title={
-              alreadyJoined
+              !isDoingRecruit && isBeforeRecruit
+                ? "모집 전 입니다."
+                : !isDoingRecruit && isDoneRecruit
+                ? "이미 모집이 완료된 세미나 입니다."
+                : alreadyJoined
                 ? "이미 신청한 세미나입니다."
                 : profileData
                 ? ""
@@ -315,6 +321,7 @@ function SeminarDetail() {
                 variant='contained'
                 color='secondary'
                 disabled={
+                  !isDoingRecruit ||
                   !profileData ||
                   seminarParticipants.length >= limit_participant_amount ||
                   alreadyJoined ||

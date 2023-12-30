@@ -67,3 +67,20 @@ export function checkImageSize(file: File | null, limit: number = 10) {
     return false;
   }
 }
+
+export function isBefore(compare: Date) {
+  const now = new Date();
+  const compareDate = new Date(compare);
+  return now < compareDate;
+}
+export function isAfter(compare: Date) {
+  const now = new Date();
+  const compareDate = new Date(compare);
+  return now > compareDate;
+}
+export function isDoing(start: Date, end: Date) {
+  const now = new Date();
+  const compareStart = new Date(start);
+  const compareEnd = new Date(end);
+  return compareStart <= now && now <= compareEnd;
+}

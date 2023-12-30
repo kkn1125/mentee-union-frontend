@@ -1,4 +1,4 @@
-import Loading from "@/components/atoms/Loading";
+import Loading from "@/components/atoms/common/Loading";
 import ForumCard from "@/components/atoms/forum/ForumCard";
 import ForumCardList from "@/components/moleculars/forum/ForumCardList";
 import LevelSystem from "@/components/moleculars/home/LevelSystem";

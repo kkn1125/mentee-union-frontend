@@ -1,17 +1,11 @@
 import Loading from "@/components/atoms/common/Loading";
 import SunEditorViewer from "@/components/atoms/common/SunEditorViewer";
 import ViewCount from "@/components/atoms/common/ViewCount";
-import ForumLikeButton from "@/components/atoms/forum/ForumLikeButton";
-import {
-  TOKEN_ACTION,
-  TokenContext,
-  TokenDispatchContext,
-} from "@/context/TokenProvider";
-import { FAIL_MESSAGE } from "@/util/global.constants";
+import Owner from "@/components/atoms/seminar/Owner";
+import { TokenContext } from "@/context/TokenProvider";
+import { boardType } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import { timeFormat } from "@/util/tool";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import VisibilityIcon from "@mui/icons-material/Visibility";
 import {
   Box,
   Button,
@@ -25,65 +19,53 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import LockIcon from "@mui/icons-material/Lock";
 
-// TODO: 포럼 조회 시 조회수 카운트 추가
-
-function ForumDetail() {
-  // const detailRef = useRef<HTMLDivElement | null>(null);
+function BoardDetail() {
   const navigate = useNavigate();
-  const [profileData, setProfileData] = useState<JwtDto | null>(null);
-  const [forum, setForum] = useState<Forum | null>(null);
-  const params = useParams();
   const token = useContext(TokenContext);
-  const tokenDispatch = useContext(TokenDispatchContext);
+  const params = useParams();
+  const [profileData, setProfileData] = useState<JwtDto | null>(null);
+  const [board, setBoard] = useState<Board | null>(null);
 
   useEffect(() => {
-    if (token.token) {
-      axiosInstance
-        .get("/auth/profile", {
-          headers: {
-            Authorization: "Bearer " + token.token,
-          },
-        })
-        .then(({ data }) => data.data)
-        .then((data) => setProfileData(data));
-    }
     axiosInstance
-      .get(`/forums/${params.id}`)
+      .get(`/boards/${params.type}/${params.id}`)
       .then(({ data }) => data.data)
       .then((data) => {
-        setForum(data);
+        setBoard(data);
+      });
+
+    axiosInstance
+      .get("/auth/profile", {
+        headers: {
+          Authorization: "Bearer " + token.token,
+        },
       })
-      .catch((error) => {
-        if (error.message === "Network Error") {
-          alert(
-            FAIL_MESSAGE.PROBLEM_WITH_SERVER_ASK_ADMIN +
-              "\n보안을 위해 로그인 정보는 삭제됩니다."
-          );
-          tokenDispatch({
-            type: TOKEN_ACTION.SIGNOUT,
-          });
-          navigate("/");
-        }
+      .then(({ data }) => data.data)
+      .then((data) => {
+        setProfileData(data);
       });
   }, []);
 
-  if (forum === null) {
+  if (board === null) {
     return <Loading />;
   }
 
   const {
     id,
     user_id,
+    type,
     title,
     content,
     view_count,
+    visible,
+    sequence,
     deleted_at,
     created_at,
     updated_at,
     user,
-    forumLikes,
-  } = forum;
+  } = board;
 
   function handleRedirect(path: string | number) {
     if (typeof path === "string") {
@@ -91,10 +73,6 @@ function ForumDetail() {
     } else {
       navigate(path);
     }
-  }
-
-  function handleUpdateForum(forum_id: number) {
-    navigate("/community/forums/edit/" + forum_id);
   }
 
   return (
@@ -109,8 +87,8 @@ function ForumDetail() {
         <Button
           variant='contained'
           color='info'
-          onClick={() => handleRedirect("/community/forums")}>
-          포럼 둘러보기
+          onClick={() => handleRedirect("/boards/" + type)}>
+          {boardType[type as BOARD_TYPE]} 둘러보기
         </Button>
       </Stack>
       <Paper elevation={3} sx={{ p: 3, marginTop: 2 }}>
@@ -122,27 +100,15 @@ function ForumDetail() {
           <Stack direction='row' gap={1} alignItems='center'>
             <Typography variant='h4'>{title}</Typography>
             <ViewCount viewCount={view_count} />
-            <ForumLikeButton
-              forum_id={id}
-              likeCount={forumLikes.length}
-              token={token.token}
-            />
+            <Tooltip title='비공개 게시글' placement='top' color='success'>
+              <IconButton>
+                <LockIcon />
+              </IconButton>
+            </Tooltip>
           </Stack>
-
-          {forum.user_id === profileData?.userId && (
-            <Button
-              variant='contained'
-              color='info'
-              onClick={() => handleUpdateForum(forum.id)}>
-              수정
-            </Button>
-          )}
         </Stack>
         <Stack gap={1}>
-          <Stack direction='row' alignItems='center'>
-            <AccountCircleIcon />
-            <Typography>{user.username}</Typography>
-          </Stack>
+          <Owner username={user.username} />
         </Stack>
         <Divider sx={{ my: 2, borderColor: "#565656" }} />
         <SunEditorViewer
@@ -174,4 +140,4 @@ function ForumDetail() {
   );
 }
 
-export default ForumDetail;
+export default BoardDetail;

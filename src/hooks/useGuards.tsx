@@ -38,7 +38,7 @@ function useGuards(initGuard?: Guard) {
             guard.signed?.();
             setValidated(true);
           } catch (error: any) {
-            console.log(error);
+            // console.log(error);
             if (error.message === "Network Error") {
               alert(
                 FAIL_MESSAGE.PROBLEM_WITH_SERVER_ASK_ADMIN +

@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from "react";
+import SeminarCard from "@/components/atoms/seminar/SeminarCard";
+import LevelSystem from "@/components/moleculars/home/LevelSystem";
+import { axiosInstance } from "@/util/instances";
 import {
-  Container,
-  Box,
-  Typography,
-  Button,
   AppBar,
-  Toolbar,
-  Paper,
+  Box,
+  Button,
+  Container,
   Grid,
   List,
-  ListItem,
+  Paper,
+  Toolbar,
+  Typography,
   styled,
 } from "@mui/material";
-import { axiosInstance } from "@/util/instances";
-import SeminarItem from "@/components/atoms/seminar/SeminarItem";
-import LevelSystem from "@/components/moleculars/home/LevelSystem";
+import { useEffect, useState } from "react";
 
 const StickySidebar = styled(Box)(({ theme }) => ({
   position: "sticky",
@@ -98,7 +97,7 @@ function Test() {
                 </ListItem> */}
                 {/* 더 많은 세미나 항목들 */}
                 {seminars.map((seminar) => (
-                  <SeminarItem key={seminar.id} seminar={seminar} />
+                  <SeminarCard key={seminar.id} seminar={seminar} />
                 ))}
               </List>
             </Paper>

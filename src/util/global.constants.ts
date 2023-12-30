@@ -125,3 +125,9 @@ export const FAIL_MESSAGE = {
   CHECK_DUPLICATE_USERNAME: "유저네임 중복확인은 필수 입니다.",
   CHECK_WRONG_VALUE: "입력 값 중 잘못된 값이 있습니다. 확인해주세요.",
 };
+
+export const boardType = {
+  notice: "공지사항",
+  qna: "자주하는 질문",
+  event: "이벤트",
+};

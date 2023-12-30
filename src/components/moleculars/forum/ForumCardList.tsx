@@ -1,4 +1,4 @@
-import Loading from "@/components/atoms/Loading";
+import Loading from "@/components/atoms/common/Loading";
 import ForumCard from "@/components/atoms/forum/ForumCard";
 import { Box, Stack, useMediaQuery, useTheme } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";

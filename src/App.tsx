@@ -1,6 +1,14 @@
 import { ReactElement, useEffect } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import {
+  Navigate,
+  Route,
+  Routes,
+  generatePath,
+  useParams,
+} from "react-router-dom";
+import Loading from "./components/atoms/common/Loading";
 import AuthLayout from "./components/templates/AuthLayout";
+import BoardLayout from "./components/templates/BoardLayout";
 import CommunityLayout from "./components/templates/CommunityLayout";
 import Layout from "./components/templates/Layout";
 import MentoringLayout from "./components/templates/MentoringLayout";
@@ -12,20 +20,23 @@ import RequestResetPassword from "./pages/auth/RequestResetPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Signin from "./pages/auth/Signin";
 import Signup from "./pages/auth/Signup";
+import Board from "./pages/board/Index";
 import Community from "./pages/community/Index";
-import Forums from "./pages/community/forums/Index";
 import ForumDetail from "./pages/community/forums/ForumDetail";
+import Forums from "./pages/community/forums/Index";
+import UpdateForum from "./pages/community/forums/UpdateForum";
+import WriteForum from "./pages/community/forums/WriteForum";
 import Mentoring from "./pages/community/mentoring/Index";
 import Seminars from "./pages/community/seminars/Index";
 import SeminarDetail from "./pages/community/seminars/SeminarDetail";
+import UpdateSeminar from "./pages/community/seminars/UpdateSeminar";
+import WriteSeminar from "./pages/community/seminars/WriteSeminar";
+import MyMentee from "./pages/user/MyMentee";
 import Profile from "./pages/user/Profile";
 import { FAIL_MESSAGE } from "./util/global.constants";
-import Loading from "./components/atoms/Loading";
-import MyMentee from "./pages/user/MyMentee";
-import WriteForum from "./pages/community/forums/WriteForum";
-import UpdateForum from "./pages/community/forums/UpdateForum";
-import WriteSeminar from "./pages/community/seminars/WriteSeminar";
-import UpdateSeminar from "./pages/community/seminars/UpdateSeminar";
+import BoardDetail from "./pages/board/BoardDetail";
+import WriteQna from "./pages/board/WriteQna";
+import UpdateQna from "./pages/board/UpdateQna";
 
 interface ProtectedRouteProps {
   isSigned: boolean;
@@ -66,6 +77,22 @@ function BlockedRoute({
   return children;
 }
 
+const boardTypes = ["notice", "qna", "event"];
+
+type SelectedRouteProps = {
+  children: ReactElement;
+  selected: string[];
+};
+
+function SelectedRoute({ children, selected }: SelectedRouteProps) {
+  const params = useParams();
+  if (selected.includes(params.type as string)) {
+    return children;
+  } else {
+    return <Notfound />;
+  }
+}
+
 function App() {
   const [validated, token, guard, setGuard] = useGuards({
     signed: () => {},
@@ -84,9 +111,30 @@ function App() {
     <Loading />
   ) : (
     <Routes>
-      {/* <Route path='test' element={<Test />} /> */}
       <Route path='' element={<Layout />}>
         <Route path='' element={<Home />} />
+        <Route path='boards' element={<BoardLayout />}>
+          <Route path=':type'>
+            <Route
+              path=''
+              element={
+                <SelectedRoute selected={boardTypes}>
+                  <Board />
+                </SelectedRoute>
+              }
+            />
+            <Route
+              path=':id'
+              element={
+                <SelectedRoute selected={boardTypes}>
+                  <BoardDetail />
+                </SelectedRoute>
+              }
+            />
+            <Route path='edit' element={<WriteQna />} />
+            <Route path='edit/:id' element={<UpdateQna />} />
+          </Route>
+        </Route>
         <Route path='auth' element={<AuthLayout />}>
           <Route
             path='signin'
@@ -122,9 +170,9 @@ function App() {
             <Route path='' element={<Community />} />
             <Route path='seminars'>
               <Route path='' element={<Seminars />} />
+              <Route path=':id' element={<SeminarDetail />} />
               <Route path='edit' element={<WriteSeminar />} />
               <Route path='edit/:id' element={<UpdateSeminar />} />
-              <Route path=':id' element={<SeminarDetail />} />
             </Route>
             <Route path='forums'>
               <Route path='' element={<Forums />} />

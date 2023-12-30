@@ -18,7 +18,7 @@ import io, { Socket } from "socket.io-client";
 import ChattingPage from "./ChattingPage";
 import CreateMentoringSessionPage from "./CreateMentoringSessionPage";
 
-import Loading from "@/components/atoms/Loading";
+import Loading from "@/components/atoms/common/Loading";
 import ChatIcon from "@mui/icons-material/Chat";
 import MarkUnreadChatAltIcon from "@mui/icons-material/MarkUnreadChatAlt";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";

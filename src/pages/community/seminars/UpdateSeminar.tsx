@@ -1,4 +1,4 @@
-import Loading from "@/components/atoms/Loading";
+import Loading from "@/components/atoms/common/Loading";
 import SeminarEditor from "@/components/moleculars/seminar/SeminarEditor";
 import { axiosInstance } from "@/util/instances";
 import { useEffect, useState } from "react";

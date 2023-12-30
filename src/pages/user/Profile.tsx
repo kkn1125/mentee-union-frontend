@@ -1,5 +1,5 @@
-import GuageBar from "@/components/atoms/GaugeBar";
-import Loading from "@/components/atoms/Loading";
+import GuageBar from "@/components/atoms/common/GaugeBar";
+import Loading from "@/components/atoms/common/Loading";
 import ModalWithButton from "@/components/atoms/ModalWithButton";
 import VisuallyHiddenInput from "@/components/atoms/common/VisuallyHiddenInput";
 import Placeholder from "@/components/moleculars/common/Placeholder";

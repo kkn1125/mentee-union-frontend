@@ -7,7 +7,7 @@
     "skipLibCheck": true,
 
     /* Bundler mode */
-    "moduleResolution": "Node",
+    "moduleResolution": "Bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
@@ -26,12 +26,11 @@
       "src/types.d.ts",
       "src/vite-env.d.ts"
     ],
-    // "types": ["node"],
     "paths": {
       "@/*": ["./src/*"],
-      "@components/*": ["./src/components/*"]
+      // "@components/*": ["./src/components/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "test"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
