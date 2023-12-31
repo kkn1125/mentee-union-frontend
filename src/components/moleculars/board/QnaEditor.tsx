@@ -79,14 +79,13 @@ function QnaEditor({ qna }: QnaEditorProps) {
           });
       } else {
         axiosInstance
-          .put("/boards/qna" + qna.id, values, {
+          .put("/boards/qna/" + qna.id, values, {
             headers: {
               Authorization: "Bearer " + token.token,
             },
           })
           .then(({ data }) => data.data)
           .then((data) => {
-            console.log(data);
             if (data.message.match(/success/)) {
               alert("글 수정에 성공했습니다.");
               navigate("/boards/qna/" + qna.id);

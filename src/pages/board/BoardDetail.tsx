@@ -106,6 +106,14 @@ function BoardDetail() {
               </IconButton>
             </Tooltip>
           </Stack>
+          {user_id === profileData?.userId && (
+            <Button
+              variant='contained'
+              color='info'
+              onClick={() => handleRedirect("/boards/qna/edit/" + id)}>
+              수정
+            </Button>
+          )}
         </Stack>
         <Stack gap={1}>
           <Owner username={user.username} />
