@@ -1,5 +1,7 @@
 import Loading from "@/components/atoms/common/Loading";
 import ForumCard from "@/components/atoms/forum/ForumCard";
+import SeminarCard from "@/components/atoms/seminar/SeminarCard";
+import PointSystemList from "@/components/atoms/user/PointSystemList";
 import ForumCardList from "@/components/moleculars/forum/ForumCardList";
 import LevelSystem from "@/components/moleculars/home/LevelSystem";
 import {
@@ -7,7 +9,11 @@ import {
   TokenContext,
   TokenDispatchContext,
 } from "@/context/TokenProvider";
-import { CHECK_MESSAGE, FAIL_MESSAGE } from "@/util/global.constants";
+import {
+  CHECK_MESSAGE,
+  ERROR_MESSAGE,
+  FAIL_MESSAGE,
+} from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import {
   Box,
@@ -49,16 +55,29 @@ function MyMentee() {
   }, []);
 
   function getProfileDatas() {
-    axiosInstance
-      .get("/users/profile", {
-        headers: {
-          Authorization: "Bearer " + token.token,
-        },
-      })
-      .then(({ data }) => data.data)
-      .then((data) => {
+    Promise.all(
+      ["", "/seminars", "/forums", "/points", "/mentorings"].map((path) =>
+        axiosInstance.get(`/users/profile${path}`, {
+          headers: {
+            Authorization: "Bearer " + token.token,
+          },
+        })
+      )
+    )
+      .then((data: any) =>
+        data.reduce((acc: User, cur: any) => {
+          Object.assign(acc, cur.data.data);
+          return acc;
+        }, {})
+      )
+      .then((data: User) => {
+        // console.log(data);
         setProfileData(data);
         setLoading(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        alert(FAIL_MESSAGE.PROBLEM_WITH_SERVER);
       });
   }
 
@@ -134,6 +153,17 @@ function MyMentee() {
       : [];
   }, [profileData]);
 
+  // const removeDuplicatedReceivers = useMemo(() => {
+  //   return profileData
+  //     ? profileData.receivers.reduce((acc: User[], cur) => {
+  //         if (!acc.some((item) => item.id === cur.receiver.id)) {
+  //           acc.push(cur.receiver);
+  //         }
+  //         return acc;
+  //       }, [])
+  //     : [];
+  // }, [profileData]);
+
   return !profileData || loading ? (
     <Loading />
   ) : (
@@ -188,36 +218,45 @@ function MyMentee() {
         /> */}
 
       <Box>
-        {/* 참여 중인 세미나 리스트 */}
+        {/* 추천 시스템 */}
         <Typography variant='h5' gutterBottom>
           추천한 멘티
         </Typography>
-        <List>
-          {profileData.receivers.length === 0 && (
+        {/* <List>
+          {removeDuplicatedReceivers.length === 0 && (
             <Typography variant='body2'>추천한 멘티가 없습니다.</Typography>
           )}
-          {profileData.receivers.map((receiver) => (
+          {removeDuplicatedReceivers.map((receiver) => (
             <Typography key={receiver.id}>{receiver.username}</Typography>
           ))}
-        </List>
+        </List> */}
+        <PointSystemList
+          emptyText='추천한 멘티가 없습니다.'
+          senderList={profileData.receivers}
+        />
       </Box>
 
       <Box>
         <Typography variant='h5' gutterBottom>
           추천 해준 멘티
         </Typography>
-        <List>
-          {profileData.givers.length === 0 && (
+        <PointSystemList
+          emptyText='나를 추천한 멘티가 없습니다.'
+          senderList={profileData.givers}
+        />
+        {/* <List>
+          {removeDuplicatedGivers.length === 0 && (
             <Typography variant='body2'>
               나를 추천한 멘티가 없습니다.
             </Typography>
           )}
-          {profileData.givers.map((giver) => (
+          {removeDuplicatedGivers.map((giver) => (
             <Typography key={giver.id}>{giver.username}</Typography>
           ))}
-        </List>
+        </List> */}
       </Box>
 
+      {/* 추천한 포럼 기사 */}
       <Box>
         <Typography variant='h5' gutterBottom>
           내가 추천한 포럼 기사
@@ -241,39 +280,7 @@ function MyMentee() {
             </Typography>
           )}
           {profileData.seminarParticipants.map(({ seminar, is_confirm }) => (
-            <Paper key={seminar.id}>
-              <Box
-                sx={{
-                  p: 2,
-                }}>
-                <Typography variant='h6'>{seminar.title}</Typography>
-              </Box>
-              <Divider sx={{ borderColor: "#565656" }} />
-              <Box sx={{ p: 2 }}>
-                <Typography variant='body2'>{seminar.content}</Typography>
-              </Box>
-              <Divider sx={{ borderColor: "#565656" }} />
-              <Stack
-                direction='row'
-                gap={2}
-                sx={{
-                  p: 2,
-                }}>
-                <Button
-                  disabled={is_confirm}
-                  variant='contained'
-                  color='info'
-                  onClick={() => handleConfirmJoinSeminar(seminar.id)}>
-                  참여 확정
-                </Button>
-                <Button
-                  variant='contained'
-                  color='error'
-                  onClick={() => handleCancelJoinSeminar(seminar.id)}>
-                  참여 취소
-                </Button>
-              </Stack>
-            </Paper>
+            <SeminarCard key={seminar.id} seminar={seminar} />
           ))}
         </List>
       </Box>
