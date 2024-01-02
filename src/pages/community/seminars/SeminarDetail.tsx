@@ -95,13 +95,13 @@ function SeminarDetail() {
       )
       .then(({ data }) => data.data)
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         if (data.message.match(/success/)) {
           alert("세미나 참여 신청이 정상처리 되었습니다.");
         }
       })
       .catch((error) => {
-        console.log(error);
+        // console.log(error);
         if (error.message === "Network Error") {
           alert(
             FAIL_MESSAGE.PROBLEM_WITH_SERVER_ASK_ADMIN +
