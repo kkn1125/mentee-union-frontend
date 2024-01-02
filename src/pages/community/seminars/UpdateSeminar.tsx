@@ -13,6 +13,7 @@ function UpdateSeminar() {
       .get("/seminars/" + params.id)
       .then(({ data }) => data.data)
       .then((data) => {
+        // console.log(data);
         setSeminar(data);
       })
       .catch((error) => {

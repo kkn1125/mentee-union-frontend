@@ -1,4 +1,5 @@
 import Loading from "@/components/atoms/common/Loading";
+import SendPointButton from "@/components/atoms/common/SendPointButton";
 import SunEditorViewer from "@/components/atoms/common/SunEditorViewer";
 import ViewCount from "@/components/atoms/common/ViewCount";
 import ForumLikeButton from "@/components/atoms/forum/ForumLikeButton";
@@ -136,6 +137,9 @@ function ForumDetail() {
               onClick={() => handleUpdateForum(forum.id)}>
               수정
             </Button>
+          )}
+          {forum.user_id !== profileData?.userId && (
+            <SendPointButton receiverId={forum.user_id} points={5} />
           )}
         </Stack>
         <Stack gap={1}>
