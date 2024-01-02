@@ -138,11 +138,23 @@ export declare global {
     profiles: Profile[];
     mentorings: Mentoring[];
     grade: Grade;
-    receivers: User[];
-    givers: User[];
+    receivers: UserRecommend[];
+    givers: UserRecommend[];
     seminarParticipants: SeminarParticipant[];
     forumLikes: ForumLike[];
     boards: Board[];
+  }
+  export declare interface UserRecommend {
+    id: number;
+    giver_id: number;
+    receiver_id: number;
+    points: number;
+    reason: string;
+    deleted_at: Date;
+    created_at: Date;
+    updated_at: Date;
+    giver: User;
+    receiver: User;
   }
   export declare interface Grade {
     id: number;
