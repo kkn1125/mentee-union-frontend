@@ -94,7 +94,9 @@ function SeminarEditor({ seminar }: SeminarEditorProps) {
     error: "",
   });
   const [coverPreview, setCoverPreview] = useState(
-    seminar ? API_PATH + "/seminars/cover/" + seminar.cover.new_name : ""
+    seminar && seminar.cover
+      ? API_PATH + "/seminars/cover/" + seminar.cover.new_name
+      : ""
   );
   const [currentTime, setCurrentTime] = useState<
     CurrentTime & CurrentTimeWithProps
@@ -149,16 +151,18 @@ function SeminarEditor({ seminar }: SeminarEditorProps) {
       );
       startDayMoreThanTomorrow.setDate(startDayMoreThanTomorrow.getDate() + 1);
 
-      if (values.recruit_start_date < startDayMoreThanTomorrow) {
-        errors.recruit_start_date =
-          "모집 시작은 최소 하루 이후 시간으로 설정 가능합니다.";
-      }
+      if (!seminar) {
+        if (values.recruit_start_date < startDayMoreThanTomorrow) {
+          errors.recruit_start_date =
+            "모집 시작은 최소 하루 이후 시간으로 설정 가능합니다.";
+        }
 
-      if (errors.recruit_start_date) {
-        errors.recruit_end_date = "모집 시작 시간 조건을 충족해주세요.";
-      } else if (values.recruit_end_date < values.recruit_start_date) {
-        errors.recruit_end_date =
-          "모집 종료가 모집 시작시간보다 과거일 수 없습니다.";
+        if (errors.recruit_start_date) {
+          errors.recruit_end_date = "모집 시작 시간 조건을 충족해주세요.";
+        } else if (values.recruit_end_date < values.recruit_start_date) {
+          errors.recruit_end_date =
+            "모집 종료가 모집 시작시간보다 과거일 수 없습니다.";
+        }
       }
 
       const seminarMoreThanRecruitOneDay = new Date(values.recruit_end_date);
