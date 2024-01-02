@@ -124,7 +124,7 @@ const SeminarCard = ({ seminar }: SeminarCardProps) => {
           <Owner username={user.username} />
           <MeetingPlace place={meeting_place} />
           <Participants
-            participants={seminarParticipants.length}
+            participants={seminarParticipants?.length || 0}
             limitParticipants={limit_participant_amount}
           />
           <Duration
