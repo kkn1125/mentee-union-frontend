@@ -302,7 +302,7 @@ function ChattingPage({
                     alt={chat.user.username}
                     src={
                       chat.user.profiles[0]
-                        ? "http://localhost:8080/api/users/profile/" +
+                        ? "http://localhost:8080/api/users/profile/resource/" +
                           chat.user.profiles[0].new_name
                         : ""
                     }

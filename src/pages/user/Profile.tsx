@@ -169,7 +169,7 @@ function Profile() {
         setProfileData(convertedProfileData);
         if (data.profiles[0]) {
           setProfilePreview(
-            "http://localhost:8080/api/users/profile/" +
+            "http://localhost:8080/api/users/profile/resource/" +
               data.profiles[0].new_name
           );
         }
