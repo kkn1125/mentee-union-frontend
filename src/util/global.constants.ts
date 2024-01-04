@@ -1,8 +1,5 @@
 declare global {
   interface Window {
-    // custom_env: {
-    //   BRAND_NAME: string;
-    // };
     process: {
       env: {
         BRAND_NAME: string;
@@ -10,6 +7,7 @@ declare global {
         API_PORT: number;
         API_BASE: string;
         API_PATH: string;
+        API_PROTOCOL: string;
       };
     };
   }
@@ -25,12 +23,13 @@ declare global {
 
 export const MODE = import.meta.env.MODE;
 export const PRIVKEY = import.meta.env.VITE_PRIVKEY;
-
 export const BRAND_NAME = window.process.env.BRAND_NAME;
+export const API_PROTOCOL = window.process.env.API_PROTOCOL;
 export const API_HOST = window.process.env.API_HOST;
 export const API_PORT = window.process.env.API_PORT;
 export const API_BASE = window.process.env.API_BASE;
-export const API_PATH = window.process.env.API_PATH;
+export const API_PATH = `http://${API_HOST}:${API_PORT}/${API_BASE}`;
+export const SOCKET_URL = `http://${API_HOST}:${API_PORT}`;
 
 export const SUCCESS_MESSAGE = {
   ALREADY_PASS_AUTH: "이미 본인인증이 완료 되었습니다.",
