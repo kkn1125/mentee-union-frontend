@@ -1,8 +1,4 @@
-import {
-  TOKEN_ACTION,
-  TokenContext,
-  TokenDispatchContext,
-} from "@/context/TokenProvider";
+import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
 import { ERROR_MESSAGE, FAIL_MESSAGE, REGEX } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import {
@@ -11,15 +7,11 @@ import {
   Checkbox,
   CircularProgress,
   Container,
-  Divider,
   FormControlLabel,
   FormGroup,
-  Input,
   Paper,
   Stack,
   TextField,
-  useMediaQuery,
-  useTheme,
 } from "@mui/material";
 import { useFormik } from "formik";
 import { useContext, useState } from "react";
@@ -43,12 +35,9 @@ const validationSchema = yup.object({
 
 function Signin() {
   const [signing, setSigning] = useState(false);
-  const token = useContext(TokenContext);
   const tokenDispatch = useContext(TokenDispatchContext);
   const navigate = useNavigate();
   const locate = useLocation();
-  const theme = useTheme();
-  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
 
   const formik = useFormik({
     initialValues: {
@@ -58,7 +47,6 @@ function Signin() {
     },
     validationSchema: validationSchema,
     validate(values) {
-      // console.log(values);
       const errors: { email?: string } = {};
       const matched = values.email.match(REGEX.EMAIL);
       if (!values.email) {
