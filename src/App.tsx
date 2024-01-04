@@ -1,11 +1,5 @@
 import { ReactElement, useEffect } from "react";
-import {
-  Navigate,
-  Route,
-  Routes,
-  generatePath,
-  useParams,
-} from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import Loading from "./components/atoms/common/Loading";
 import AuthLayout from "./components/templates/AuthLayout";
 import BoardLayout from "./components/templates/BoardLayout";
@@ -20,7 +14,10 @@ import RequestResetPassword from "./pages/auth/RequestResetPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import Signin from "./pages/auth/Signin";
 import Signup from "./pages/auth/Signup";
+import BoardDetail from "./pages/board/BoardDetail";
 import Board from "./pages/board/Index";
+import UpdateQna from "./pages/board/UpdateQna";
+import WriteQna from "./pages/board/WriteQna";
 import Community from "./pages/community/Index";
 import ForumDetail from "./pages/community/forums/ForumDetail";
 import Forums from "./pages/community/forums/Index";
@@ -34,9 +31,6 @@ import WriteSeminar from "./pages/community/seminars/WriteSeminar";
 import MyMentee from "./pages/user/MyMentee";
 import Profile from "./pages/user/Profile";
 import { FAIL_MESSAGE } from "./util/global.constants";
-import BoardDetail from "./pages/board/BoardDetail";
-import WriteQna from "./pages/board/WriteQna";
-import UpdateQna from "./pages/board/UpdateQna";
 
 interface ProtectedRouteProps {
   isSigned: boolean;
