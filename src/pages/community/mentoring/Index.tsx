@@ -1,6 +1,11 @@
-// import { socket } from "@/libs/socket";
+import Loading from "@/components/atoms/common/Loading";
 import { TokenContext } from "@/context/TokenProvider";
+import Logger from "@/libs/logger";
+import ChatIcon from "@mui/icons-material/Chat";
+import MarkUnreadChatAltIcon from "@mui/icons-material/MarkUnreadChatAlt";
+import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import {
+  Badge,
   Box,
   Divider,
   Drawer,
@@ -13,27 +18,14 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import io, { Socket } from "socket.io-client";
 import ChattingPage from "./ChattingPage";
 import CreateMentoringSessionPage from "./CreateMentoringSessionPage";
-
-import Loading from "@/components/atoms/common/Loading";
-import ChatIcon from "@mui/icons-material/Chat";
-import MarkUnreadChatAltIcon from "@mui/icons-material/MarkUnreadChatAlt";
-import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-
-const URL = "http://localhost:8080";
-
-let socket: Socket;
-
-const drawerWidth = 240;
+import { SOCKET_URL } from "@/util/global.constants";
+import LockIcon from "@mui/icons-material/Lock";
 
 interface Props {
-  /**
-   * Injected by the documentation to work in an iframe.
-   * Remove this when copying and pasting into your project.
-   */
   window?: () => Window;
 }
 
@@ -43,6 +35,10 @@ type DrawerListProps = {
   sessionList: MentoringSession[];
 };
 
+const drawerWidth = 240;
+
+const drLogger = new Logger("mentoring drawer list");
+
 const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
   async function enterNew(session_id: number) {
     if (confirm("새로운 모임에 참여하시겠습니까?")) {
@@ -51,7 +47,7 @@ const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
           session_id,
         });
       } catch (error) {
-        console.log(error);
+        drLogger.log(error);
       }
     }
   }
@@ -89,7 +85,7 @@ const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
           </ListItemButton>
         </ListItem>
       )}
-      {publicSessionList.map(({ id, topic, mentorings, messages }, index) => (
+      {publicSessionList.map(({ id, topic, mentorings, messages }) => (
         <ListItem key={id} disablePadding>
           <ListItemButton
             onClick={() =>
@@ -115,8 +111,17 @@ const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
           </ListItemButton>
         </ListItem>
       ))}
-      {privateSessionList.length > 0 && <Divider />}
-      {privateSessionList.map(({ id, topic, mentorings, messages }, index) => (
+      {privateSessionList.length > 0 && (
+        <Divider
+          sx={{
+            border: "none",
+            borderTopWidth: 3,
+            borderTopStyle: "double",
+            borderTopColor: "#565656",
+          }}
+        />
+      )}
+      {privateSessionList.map(({ id, topic, mentorings, messages }) => (
         <ListItem key={id} disablePadding>
           <ListItemButton
             onClick={() =>
@@ -130,9 +135,11 @@ const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
                 messages.some((msg) =>
                   msg.readedUsers.every((usr) => usr.user_id !== user.userId)
                 ) ? (
-                  <MarkUnreadChatAltIcon />
+                  <Badge color='default' variant='dot'>
+                    <LockIcon />
+                  </Badge>
                 ) : (
-                  <ChatIcon />
+                  <LockIcon />
                 )
               ) : (
                 <QuestionMarkIcon />
@@ -146,15 +153,18 @@ const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
   );
 };
 
+let socket: Socket;
+
+const logger = new Logger("mentoring index");
+
 function Index(props: Props) {
-  const { window } = props;
+  const { window: _window } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  const drawerRef = useRef(null);
   const token = useContext(TokenContext);
   const [isConnected, setIsConnected] = useState(socket?.connected);
   const [sessionList, setSessionList] = useState<MentoringSession[]>([]);
@@ -165,7 +175,7 @@ function Index(props: Props) {
 
   useEffect(() => {
     if (token.token) {
-      socket = io(URL, {
+      socket = io(SOCKET_URL, {
         path: "/channel",
         auth: {
           token: token.token,
@@ -174,17 +184,17 @@ function Index(props: Props) {
     }
 
     async function onConnect() {
-      console.log("connected");
+      logger.log("connected");
       setIsConnected(true);
       try {
         socket.emit("initialize");
       } catch (error) {
-        console.log(error);
+        logger.log(error);
       }
     }
 
     function onDisconnect() {
-      console.log("disconnect");
+      logger.log("disconnect");
       setIsConnected(false);
     }
 
@@ -224,7 +234,6 @@ function Index(props: Props) {
     }
 
     function onReject(rejected: any) {
-      // console.log(rejected);
       if (rejected.message === "Session limit exceeded") {
         alert("멘토링 제한 인원에 도달하여 입장 불가합니다.");
       }
@@ -308,6 +317,7 @@ function Index(props: Props) {
           }
         </Drawer>
       </Box>
+
       {/* mentoring info */}
       {currentSession ? (
         <ChattingPage
@@ -315,40 +325,12 @@ function Index(props: Props) {
           user={userData as JwtDto}
           session={currentSession}
           handleDrawerToggle={handleDrawerToggle}
-          // sidebar={
-          //   <Sidebar
-          //     socket={socket}
-          //     user={userData as JwtDto}
-          //     menuList={sessionList}
-          //     button={
-          //       <Tooltip placement='right' title={"open"}>
-          //         <IconButton size='small'>
-          //           <DoubleArrowIcon />
-          //         </IconButton>
-          //       </Tooltip>
-          //     }
-          //   />
-          // }
         />
       ) : (
         <CreateMentoringSessionPage
           socket={socket}
           isConnected={isConnected}
           handleDrawerToggle={handleDrawerToggle}
-          // sidebar={
-          //   <Sidebar
-          //     socket={socket}
-          //     user={userData as JwtDto}
-          //     menuList={sessionList}
-          //     button={
-          //       <Tooltip placement='right' title={"open"}>
-          //         <IconButton size='small'>
-          //           <DoubleArrowIcon />
-          //         </IconButton>
-          //       </Tooltip>
-          //     }
-          //   />
-          // }
         />
       )}
     </Stack>
