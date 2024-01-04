@@ -1,12 +1,11 @@
 import { TokenContext } from "@/context/TokenProvider";
+import Logger from "@/libs/logger";
 import { ERROR_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import {
   Box,
   Button,
-  FormControl,
   FormControlLabel,
-  FormLabel,
   Paper,
   Stack,
   Switch,
@@ -14,10 +13,10 @@ import {
   Typography,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import SunEditor from "suneditor-react";
-import "suneditor/dist/css/suneditor.min.css"; // Import Sun Editor's CSS File
+import "suneditor/dist/css/suneditor.min.css";
 import Ko from "suneditor/src/lang/ko";
 import * as yup from "yup";
 
@@ -41,6 +40,8 @@ const validationSchema = yup.object({
     .typeError(ERROR_MESSAGE.ONLY_STRING),
 });
 
+const logger = new Logger(QnaEditor.name);
+
 function QnaEditor({ qna }: QnaEditorProps) {
   const navigate = useNavigate();
   const token = useContext(TokenContext);
@@ -51,7 +52,7 @@ function QnaEditor({ qna }: QnaEditorProps) {
       content: qna ? qna.content : "",
     },
     validationSchema: validationSchema,
-    validate(values) {
+    validate(_values) {
       const errors: object = {};
       return errors;
     },
@@ -74,7 +75,7 @@ function QnaEditor({ qna }: QnaEditorProps) {
             }
           })
           .catch((error) => {
-            console.log(error);
+            logger.log(error);
             alert("글 작성에 실패했습니다.");
           });
       } else {
@@ -92,7 +93,7 @@ function QnaEditor({ qna }: QnaEditorProps) {
             }
           })
           .catch((error) => {
-            console.log(error);
+            logger.log(error);
             alert("글 수정에 실패했습니다.");
           });
       }

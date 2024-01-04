@@ -1,20 +1,21 @@
+import Logger from "@/libs/logger";
+import ChatIcon from "@mui/icons-material/Chat";
+import MailIcon from "@mui/icons-material/Mail";
+import MarkUnreadChatAltIcon from "@mui/icons-material/MarkUnreadChatAlt";
+import InboxIcon from "@mui/icons-material/MoveToInbox";
+import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
+import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
-import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import Button from "@mui/material/Button";
-import List from "@mui/material/List";
 import Divider from "@mui/material/Divider";
+import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
-import MailIcon from "@mui/icons-material/Mail";
+import SwipeableDrawer from "@mui/material/SwipeableDrawer";
 import { KeyboardEvent, MouseEvent, ReactElement, useState } from "react";
-import { Typography } from "@mui/material";
 import { Socket } from "socket.io-client";
-import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-import ChatIcon from "@mui/icons-material/Chat";
-import MarkUnreadChatAltIcon from "@mui/icons-material/MarkUnreadChatAlt";
 
 type Anchor = "top" | "bottom" | "left" | "right";
 interface SidebarProps {
@@ -24,6 +25,8 @@ interface SidebarProps {
   button?: ReactElement;
   buttonText?: string | ReactElement;
 }
+
+const logger = new Logger(Sidebar.name);
 
 export default function Sidebar({
   socket,
@@ -60,7 +63,7 @@ export default function Sidebar({
           session_id,
         });
       } catch (error) {
-        console.log(error);
+        logger.log(error);
       }
     }
   }

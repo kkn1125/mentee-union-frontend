@@ -1,5 +1,5 @@
 import { List, Typography } from "@mui/material";
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 
 type pointSystemListProps = {
   senderList: UserRecommend[];

@@ -62,7 +62,6 @@ function SendPointButton({ receiverId, points, reason }: SendPointButtonProps) {
       .catch((error) => {
         if (error.response.data.code === 400) {
           alert("점수 부여 대상은 중복 될 수 없습니다.");
-          // console.log(error.response.data.message);
         }
       });
   }

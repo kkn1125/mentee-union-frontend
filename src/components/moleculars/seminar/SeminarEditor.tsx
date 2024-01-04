@@ -1,6 +1,7 @@
 import VisuallyHiddenInput from "@/components/atoms/common/VisuallyHiddenInput";
 import DateField from "@/components/atoms/seminar/DateField";
 import { TokenContext } from "@/context/TokenProvider";
+import Logger from "@/libs/logger";
 import { API_PATH, ERROR_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import { checkImageSize } from "@/util/tool";
@@ -16,14 +17,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useFormik } from "formik";
-import {
-  ChangeEvent,
-  FocusEvent,
-  ReactNode,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { ChangeEvent, ReactNode, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SunEditor from "suneditor-react";
 import Ko from "suneditor/src/lang/ko";
@@ -88,6 +82,8 @@ interface CurrentTime {
   now: Date;
 }
 
+const logger = new Logger(SeminarEditor.name);
+
 function SeminarEditor({ seminar }: SeminarEditorProps) {
   const [cover, setCover] = useState<{ file: File | null; error: string }>({
     file: null,
@@ -98,7 +94,7 @@ function SeminarEditor({ seminar }: SeminarEditorProps) {
       ? API_PATH + "/seminars/cover/" + seminar.cover.new_name
       : ""
   );
-  const [currentTime, setCurrentTime] = useState<
+  const [currentTime /* setCurrentTime */] = useState<
     CurrentTime & CurrentTimeWithProps
   >({
     now: new Date(),
@@ -196,13 +192,9 @@ function SeminarEditor({ seminar }: SeminarEditorProps) {
         errors.seminar_end_date = "모집 기간 조건을 충족해야합니다.";
       }
 
-      if (cover.file === null) {
-        // cover.error = "파일이 없습니다.";
-        // errors.cover = "파일이 없습니다.";
-      } else if (checkImageSize(cover.file, 10)) {
+      if (checkImageSize(cover.file, 10)) {
         errors.cover = "커버 이미지 사이즈는 10kb 이하여야 합니다.";
       }
-      // console.log(errors);
       return errors;
     },
     onSubmit: (values) => {
@@ -212,7 +204,7 @@ function SeminarEditor({ seminar }: SeminarEditorProps) {
         category_id: category,
         cover: cover.file,
       };
-      console.log(convertValues);
+      logger.log(convertValues);
 
       if (!seminar) {
         axiosInstance
@@ -233,7 +225,7 @@ function SeminarEditor({ seminar }: SeminarEditorProps) {
             }
           })
           .catch((error) => {
-            console.log(error);
+            logger.log(error);
             alert("글 작성에 실패했습니다.");
           });
       } else {
@@ -246,14 +238,14 @@ function SeminarEditor({ seminar }: SeminarEditorProps) {
           })
           .then(({ data }) => data)
           .then((data) => {
-            console.log(data);
+            logger.log(data);
             if (data.code === 200 && data.message.match(/success/)) {
               alert("글 수정에 성공했습니다.");
               navigate("/community/seminars/" + seminar.id);
             }
           })
           .catch((error) => {
-            console.log(error);
+            logger.log(error);
             alert("글 수정에 실패했습니다.");
           });
       }
@@ -329,7 +321,6 @@ function SeminarEditor({ seminar }: SeminarEditorProps) {
               color='inherit'
               component={"label"}
               htmlFor='cover-image'
-              // onClick={handleUpdateUserInfo}
               sx={{
                 position: "absolute",
                 top: 0,
@@ -475,8 +466,6 @@ function SeminarEditor({ seminar }: SeminarEditorProps) {
             min: 2,
             max: 50,
           }}
-          // min={'5'}
-          // max={'50'}
         />
 
         {/* durations */}
@@ -613,7 +602,6 @@ function SeminarEditor({ seminar }: SeminarEditorProps) {
             },
           }}>
           <SunEditor
-            // getSunEditorInstance={getSunEditorInstance}
             lang={Ko}
             name='content'
             height={"300px"}

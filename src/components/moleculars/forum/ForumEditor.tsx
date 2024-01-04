@@ -1,4 +1,5 @@
 import { TokenContext } from "@/context/TokenProvider";
+import Logger from "@/libs/logger";
 import { ERROR_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import {
@@ -10,10 +11,10 @@ import {
   Typography,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import SunEditor from "suneditor-react";
-import "suneditor/dist/css/suneditor.min.css"; // Import Sun Editor's CSS File
+import "suneditor/dist/css/suneditor.min.css";
 import Ko from "suneditor/src/lang/ko";
 import * as yup from "yup";
 
@@ -33,8 +34,9 @@ const validationSchema = yup.object({
     .typeError(ERROR_MESSAGE.ONLY_STRING),
 });
 
+const logger = new Logger(ForumEditor.name);
+
 function ForumEditor({ forum }: ForumEditorProps) {
-  // const editor = useRef<SunEditorType | null>(null);
   const navigate = useNavigate();
   const token = useContext(TokenContext);
   const formik = useFormik({
@@ -43,13 +45,12 @@ function ForumEditor({ forum }: ForumEditorProps) {
       content: forum ? forum.content : "",
     },
     validationSchema: validationSchema,
-    validate(values) {
+    validate(_values) {
       const errors: object = {};
-      // console.log(values);
       return errors;
     },
     onSubmit: (values) => {
-      console.log(values);
+      logger.log(values);
       if (!forum) {
         axiosInstance
           .post("/forums", values, {
@@ -68,7 +69,7 @@ function ForumEditor({ forum }: ForumEditorProps) {
             }
           })
           .catch((error) => {
-            console.log(error);
+            logger.log(error);
             alert("글 작성에 실패했습니다.");
           });
       } else {
@@ -80,31 +81,19 @@ function ForumEditor({ forum }: ForumEditorProps) {
           })
           .then(({ data }) => data.data)
           .then((data) => {
-            console.log(data);
+            logger.log(data);
             if (data.message.match(/success/)) {
               alert("글 수정에 성공했습니다.");
               navigate("/community/forums/" + forum.id);
             }
           })
           .catch((error) => {
-            console.log(error);
+            logger.log(error);
             alert("글 수정에 실패했습니다.");
           });
       }
     },
   });
-
-  useEffect(() => {
-    // if (editor.current) {
-    //   editor.current.onload = (e) => {
-    //     console.log("loaded", e.getSelectionNode());
-    //   };
-    // }
-  }, []);
-
-  // const getSunEditorInstance = (sunEditor: SunEditorType) => {
-  //   Object.assign(editor, { current: sunEditor });
-  // };
 
   function handleRedirect(path: string | number) {
     if (typeof path === "string") {
@@ -142,7 +131,6 @@ function ForumEditor({ forum }: ForumEditorProps) {
             },
           }}>
           <SunEditor
-            // getSunEditorInstance={getSunEditorInstance}
             lang={Ko}
             name='content'
             height={"300px"}
