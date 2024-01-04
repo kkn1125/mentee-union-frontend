@@ -23,6 +23,7 @@ declare global {
 //   }
 // }
 
+export const MODE = import.meta.env.MODE;
 export const PRIVKEY = import.meta.env.VITE_PRIVKEY;
 
 export const BRAND_NAME = window.process.env.BRAND_NAME;
