@@ -8,6 +8,7 @@ export default defineConfig(({ command, mode }) => {
   // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
   const env = loadEnv(mode, process.cwd(), "");
   const MODE = process.env.NODE_ENV || "production";
+
   dotenv.config({
     path: path.join(path.resolve(), ".env"),
   });
@@ -22,13 +23,6 @@ export default defineConfig(({ command, mode }) => {
     // vite config
     define: {
       __APP_ENV__: JSON.stringify(env.APP_ENV),
-      "process.env": JSON.stringify({
-        BRAND_NAME: process.env.BRAND_NAME,
-        API_HOST: process.env.API_HOST,
-        API_PORT: process.env.API_PORT,
-        API_BASE: process.env.API_BASE,
-        API_PATH: process.env.API_PATH,
-      }),
     },
     server: {
       host: host,

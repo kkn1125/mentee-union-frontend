@@ -23,11 +23,11 @@ declare global {
 
 export const MODE = import.meta.env.MODE;
 export const PRIVKEY = import.meta.env.VITE_PRIVKEY;
-export const BRAND_NAME = window.process.env.BRAND_NAME;
-export const API_PROTOCOL = window.process.env.API_PROTOCOL;
-export const API_HOST = window.process.env.API_HOST;
-export const API_PORT = window.process.env.API_PORT;
-export const API_BASE = window.process.env.API_BASE;
+export const BRAND_NAME = import.meta.env.VITE_BRAND_NAME;
+export const API_PROTOCOL = import.meta.env.VITE_API_PROTOCOL;
+export const API_HOST = import.meta.env.VITE_API_HOST;
+export const API_PORT = import.meta.env.VITE_API_PORT;
+export const API_BASE = import.meta.env.VITE_API_BASE;
 export const API_PATH = `http://${API_HOST}:${API_PORT}/${API_BASE}`;
 export const SOCKET_URL = `http://${API_HOST}:${API_PORT}`;
 
