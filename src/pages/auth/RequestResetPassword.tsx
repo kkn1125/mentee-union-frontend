@@ -1,3 +1,4 @@
+import Logger from "@/libs/logger";
 import {
   ERROR_MESSAGE,
   FAIL_MESSAGE,
@@ -24,6 +25,8 @@ const validationSchema = yup.object({
     .required(ERROR_MESSAGE.REQUIRED)
     .typeError(ERROR_MESSAGE.ONLY_STRING),
 });
+
+const logger = new Logger(RequestResetPassword.name);
 
 function RequestResetPassword() {
   const locate = useLocation();
@@ -53,8 +56,7 @@ function RequestResetPassword() {
           email: values.email,
         })
         .then(({ data }) => {
-          console.log(data);
-          // navigate("/");
+          logger.log(data);
           alert(SUCCESS_MESSAGE.SEND_RESET_PASSWORD_MAIL_CHECK);
         })
         .catch((err) => {
