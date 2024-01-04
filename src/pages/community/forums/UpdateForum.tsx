@@ -1,8 +1,11 @@
 import Loading from "@/components/atoms/common/Loading";
 import ForumEditor from "@/components/moleculars/forum/ForumEditor";
+import Logger from "@/libs/logger";
 import { axiosInstance } from "@/util/instances";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+
+const logger = new Logger(UpdateForum.name);
 
 function UpdateForum() {
   const params = useParams();
@@ -16,7 +19,7 @@ function UpdateForum() {
         setForum(data);
       })
       .catch((error) => {
-        console.log("error", error);
+        logger.log("error", error);
       });
   }, []);
 

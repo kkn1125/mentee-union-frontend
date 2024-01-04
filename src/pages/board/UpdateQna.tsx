@@ -1,8 +1,11 @@
 import Loading from "@/components/atoms/common/Loading";
 import QnaEditor from "@/components/moleculars/board/QnaEditor";
+import Logger from "@/libs/logger";
 import { axiosInstance } from "@/util/instances";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+
+const logger = new Logger(UpdateQna.name);
 
 function UpdateQna() {
   const params = useParams();
@@ -16,7 +19,7 @@ function UpdateQna() {
         setQna(data);
       })
       .catch((error) => {
-        console.log("error", error);
+        logger.log("error", error);
       });
   }, []);
 

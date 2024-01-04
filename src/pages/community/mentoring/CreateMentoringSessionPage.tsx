@@ -1,3 +1,4 @@
+import Logger from "@/libs/logger";
 import { ERROR_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -70,6 +71,8 @@ type CreateMentoringSessionPageProps = {
   socket: Socket;
 };
 
+const logger = new Logger(CreateMentoringSessionPage.name);
+
 function CreateMentoringSessionPage({
   isConnected,
   handleDrawerToggle,
@@ -89,10 +92,8 @@ function CreateMentoringSessionPage({
       is_private: false,
     },
     validationSchema: validationSchema,
-    validate(values) {
-      // console.log(values);
+    validate(_values) {
       const errors: { email?: string } = {};
-      // console.log(errors, values);
       return errors;
     },
     onSubmit: async (values) => {
@@ -104,7 +105,7 @@ function CreateMentoringSessionPage({
         };
         socket.emit("createSession", copy);
       } catch (error) {
-        console.log("error", error);
+        logger.log("error", error);
       }
     },
   });
@@ -112,7 +113,6 @@ function CreateMentoringSessionPage({
   useEffect(() => {
     axiosInstance.get("/categories").then((res) => {
       const { data } = res.data;
-      // console.log(data);
       setCategories(data);
     });
   }, []);
@@ -256,7 +256,6 @@ function CreateMentoringSessionPage({
                       </FormHelperText>
                     )}
                 </Box>
-                {/* <TextField label='분야' size='small' fullWidth /> */}
                 <TextField
                   name='format'
                   label='멘토링 형식'
