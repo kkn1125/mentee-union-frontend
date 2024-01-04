@@ -1,19 +1,11 @@
 import Loading from "@/components/atoms/common/Loading";
-import ForumCard from "@/components/atoms/forum/ForumCard";
-import ForumCardList from "@/components/moleculars/forum/ForumCardList";
+import ForumCardList from "@/components/atoms/forum/ForumCardList";
 import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
 import { FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
-import {
-  Box,
-  Button,
-  Stack,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-import { useContext, useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Button, Stack } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function Index() {
   const navigate = useNavigate();
@@ -71,7 +63,10 @@ function Index() {
         </Button>
       </Stack>
       <Stack gap={2} sx={{ minHeight: "90%" }}>
-        <ForumCardList forums={forums} />
+        <ForumCardList
+          emptyText='등록된 포럼 기사가 없습니다.'
+          forums={forums}
+        />
       </Stack>
     </Stack>
   );

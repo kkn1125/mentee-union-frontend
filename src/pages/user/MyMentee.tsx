@@ -1,32 +1,19 @@
 import Loading from "@/components/atoms/common/Loading";
-import ForumCard from "@/components/atoms/forum/ForumCard";
-import SeminarCard from "@/components/atoms/seminar/SeminarCard";
+import ForumCardList from "@/components/atoms/forum/ForumCardList";
 import PointSystemList from "@/components/atoms/user/PointSystemList";
-import ForumCardList from "@/components/moleculars/forum/ForumCardList";
+import SeminarJoinedList from "@/components/atoms/user/SeminarJoinedList";
 import LevelSystem from "@/components/moleculars/home/LevelSystem";
 import {
   TOKEN_ACTION,
   TokenContext,
   TokenDispatchContext,
 } from "@/context/TokenProvider";
-import {
-  CHECK_MESSAGE,
-  ERROR_MESSAGE,
-  FAIL_MESSAGE,
-} from "@/util/global.constants";
+import { CHECK_MESSAGE, FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
-import {
-  Box,
-  Button,
-  Chip,
-  Divider,
-  List,
-  Paper,
-  Stack,
-  Typography,
-} from "@mui/material";
+import { Box, Chip, List, Paper, Stack, Typography } from "@mui/material";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Logger from "@/libs/logger";
 
 enum GRADE_COLOR {
   mentee0 = "#56ad6c",
@@ -42,6 +29,8 @@ type GRADE_COLOR_TYPE =
   | "mentor0"
   | "mentor1"
   | "mentor2";
+
+const logger = new Logger(MyMentee.name);
 
 function MyMentee() {
   const navigate = useNavigate();
@@ -71,12 +60,11 @@ function MyMentee() {
         }, {})
       )
       .then((data: User) => {
-        // console.log(data);
         setProfileData(data);
         setLoading(false);
       })
       .catch((error) => {
-        console.log(error);
+        logger.log(error);
         alert(FAIL_MESSAGE.PROBLEM_WITH_SERVER);
       });
   }
@@ -97,7 +85,7 @@ function MyMentee() {
       )
       .then(({ data }) => {
         if (data.message.match(/success/)) {
-          console.log("success");
+          logger.log("success");
           setLoading(true);
         }
       })
@@ -117,9 +105,9 @@ function MyMentee() {
       })
       .then(({ data }) => data.data)
       .then((data) => {
-        console.log(data);
+        logger.log(data);
         if (data.data.message?.match(/success/)) {
-          console.log("success");
+          logger.log("success");
           setLoading(true);
         }
       })
@@ -152,17 +140,6 @@ function MyMentee() {
         }, [])
       : [];
   }, [profileData]);
-
-  // const removeDuplicatedReceivers = useMemo(() => {
-  //   return profileData
-  //     ? profileData.receivers.reduce((acc: User[], cur) => {
-  //         if (!acc.some((item) => item.id === cur.receiver.id)) {
-  //           acc.push(cur.receiver);
-  //         }
-  //         return acc;
-  //       }, [])
-  //     : [];
-  // }, [profileData]);
 
   return !profileData || loading ? (
     <Loading />
@@ -210,26 +187,11 @@ function MyMentee() {
         </Paper>
       </Box>
 
-      {/* <Divider
-          sx={{
-            my: 2,
-            borderColor: "#565656",
-          }}
-        /> */}
-
       <Box>
         {/* 추천 시스템 */}
         <Typography variant='h5' gutterBottom>
           추천한 멘티
         </Typography>
-        {/* <List>
-          {removeDuplicatedReceivers.length === 0 && (
-            <Typography variant='body2'>추천한 멘티가 없습니다.</Typography>
-          )}
-          {removeDuplicatedReceivers.map((receiver) => (
-            <Typography key={receiver.id}>{receiver.username}</Typography>
-          ))}
-        </List> */}
         <PointSystemList
           emptyText='추천한 멘티가 없습니다.'
           senderList={profileData.receivers}
@@ -244,16 +206,6 @@ function MyMentee() {
           emptyText='나를 추천한 멘티가 없습니다.'
           senderList={profileData.givers}
         />
-        {/* <List>
-          {removeDuplicatedGivers.length === 0 && (
-            <Typography variant='body2'>
-              나를 추천한 멘티가 없습니다.
-            </Typography>
-          )}
-          {removeDuplicatedGivers.map((giver) => (
-            <Typography key={giver.id}>{giver.username}</Typography>
-          ))}
-        </List> */}
       </Box>
 
       {/* 추천한 포럼 기사 */}
@@ -263,7 +215,10 @@ function MyMentee() {
         </Typography>
         <List>
           <Stack gap={2} sx={{ minHeight: "90%" }}>
-            <ForumCardList forums={removeDuplicatedForumLikes} />
+            <ForumCardList
+              emptyText='추천한 포럼이 없습니다.'
+              forums={removeDuplicatedForumLikes}
+            />
           </Stack>
         </List>
       </Box>
@@ -273,16 +228,10 @@ function MyMentee() {
         <Typography variant='h5' gutterBottom>
           참여 중인 세미나
         </Typography>
-        <List>
-          {profileData.seminarParticipants.length === 0 && (
-            <Typography variant='body2'>
-              참여 중인 세미나가 없습니다.
-            </Typography>
-          )}
-          {profileData.seminarParticipants.map(({ seminar, is_confirm }) => (
-            <SeminarCard key={seminar.id} seminar={seminar} />
-          ))}
-        </List>
+        <SeminarJoinedList
+          emptyText='참여 중인 세미나가 없습니다.'
+          participants={profileData.seminarParticipants}
+        />
       </Box>
 
       <Box>
@@ -292,7 +241,10 @@ function MyMentee() {
         {/* 작성한 포럼 리스트 */}
         <List>
           <Stack gap={2} sx={{ minHeight: "90%" }}>
-            <ForumCardList forums={profileData.forums} />
+            <ForumCardList
+              emptyText='등록된 포럼이 없습니다.'
+              forums={profileData.forums}
+            />
           </Stack>
         </List>
       </Box>

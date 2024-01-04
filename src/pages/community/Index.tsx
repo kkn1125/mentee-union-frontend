@@ -1,16 +1,8 @@
 import Loading from "@/components/atoms/common/Loading";
+import ForumCardList from "@/components/atoms/forum/ForumCardList";
 import SeminarCard from "@/components/atoms/seminar/SeminarCard";
-import ForumCardList from "@/components/moleculars/forum/ForumCardList";
 import { axiosInstance } from "@/util/instances";
-import {
-  Box,
-  Button,
-  List,
-  Stack,
-  Typography,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
+import { Box, Button, List, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -21,13 +13,6 @@ function Community() {
   const [forums, setForums] = useState<Forum[]>([]);
   const [seminars, setSeminars] = useState<Seminar[]>([]);
   const [loading, setLoading] = useState(true);
-  const theme = useTheme();
-  const isXsUp = useMediaQuery(theme.breakpoints.up("xs"));
-  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const isLgUp = useMediaQuery(theme.breakpoints.up("lg"));
-  const isXlUp = useMediaQuery(theme.breakpoints.up("xl"));
-
-  const forumCardAmount = isXlUp ? 4 : isLgUp ? 3 : isMdUp ? 2 : isXsUp ? 1 : 1;
 
   useEffect(() => {
     Promise.all([
@@ -126,7 +111,10 @@ function Community() {
           </Typography>
         </Typography>
         <Stack gap={2} sx={{ minHeight: "90%" }}>
-          <ForumCardList forums={forums.slice(0, SHOW_LIMIT)} />
+          <ForumCardList
+            emptyText='등록된 포럼 기사가 없습니다.'
+            forums={forums.slice(0, SHOW_LIMIT)}
+          />
         </Stack>
       </Stack>
     </Stack>
