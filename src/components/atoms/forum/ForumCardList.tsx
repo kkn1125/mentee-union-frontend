@@ -1,13 +1,14 @@
 import Loading from "@/components/atoms/common/Loading";
 import ForumCard from "@/components/atoms/forum/ForumCard";
-import { Box, Stack, useMediaQuery, useTheme } from "@mui/material";
+import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 
 type ForumCardListProps = {
   forums: Forum[];
+  emptyText: string;
 };
 
-function ForumCardList({ forums }: ForumCardListProps) {
+function ForumCardList({ forums, emptyText }: ForumCardListProps) {
   const [loading, setLoading] = useState(true);
   const theme = useTheme();
   const isXsUp = useMediaQuery(theme.breakpoints.up("xs"));
@@ -50,32 +51,34 @@ function ForumCardList({ forums }: ForumCardListProps) {
     return <Loading />;
   }
 
-  return forums.length === 0
-    ? "등록된 포럼이 없습니다."
-    : forumsList.map((forums, i) => (
-        <Stack
-          direction='row'
-          flexWrap={"wrap"}
-          gap={2}
-          key={i + "|" + forums.length}>
-          {forums.map((forum, idx) =>
-            forum ? (
-              <ForumCard
-                key={forum.id}
-                forum={forum}
-                forumCardAmount={forumCardAmount}
-              />
-            ) : (
-              <Box
-                key={"empty|" + idx}
-                sx={{
-                  flex: 1,
-                }}
-              />
-            )
-          )}
-        </Stack>
-      ));
+  return forums.length === 0 ? (
+    <Typography variant='body2'>{emptyText}</Typography>
+  ) : (
+    forumsList.map((forums, i) => (
+      <Stack
+        direction='row'
+        flexWrap={"wrap"}
+        gap={2}
+        key={i + "|" + forums.length}>
+        {forums.map((forum, idx) =>
+          forum ? (
+            <ForumCard
+              key={forum.id}
+              forum={forum}
+              forumCardAmount={forumCardAmount}
+            />
+          ) : (
+            <Box
+              key={"empty|" + idx}
+              sx={{
+                flex: 1,
+              }}
+            />
+          )
+        )}
+      </Stack>
+    ))
+  );
 }
 
 export default ForumCardList;
