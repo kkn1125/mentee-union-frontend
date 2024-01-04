@@ -1,8 +1,11 @@
 import Loading from "@/components/atoms/common/Loading";
 import SeminarEditor from "@/components/moleculars/seminar/SeminarEditor";
+import Logger from "@/libs/logger";
 import { axiosInstance } from "@/util/instances";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+
+const logger = new Logger(UpdateSeminar.name);
 
 function UpdateSeminar() {
   const params = useParams();
@@ -13,11 +16,10 @@ function UpdateSeminar() {
       .get("/seminars/" + params.id)
       .then(({ data }) => data.data)
       .then((data) => {
-        // console.log(data);
         setSeminar(data);
       })
       .catch((error) => {
-        console.log("error", error);
+        logger.error("error", error);
       });
   }, []);
 

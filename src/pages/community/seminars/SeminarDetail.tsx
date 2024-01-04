@@ -11,6 +11,7 @@ import {
   TokenContext,
   TokenDispatchContext,
 } from "@/context/TokenProvider";
+import Logger from "@/libs/logger";
 import { API_PATH, FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import { isAfter, isBefore, isDoing } from "@/util/tool";
@@ -27,6 +28,8 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
+const logger = new Logger(SeminarDetail.name);
 
 function SeminarDetail() {
   const navigate = useNavigate();
@@ -61,8 +64,6 @@ function SeminarDetail() {
 
   const {
     id,
-    host_id,
-    category_id,
     title,
     content,
     view_count,
@@ -95,13 +96,11 @@ function SeminarDetail() {
       )
       .then(({ data }) => data.data)
       .then((data) => {
-        // console.log(data);
         if (data.message.match(/success/)) {
           alert("세미나 참여 신청이 정상처리 되었습니다.");
         }
       })
       .catch((error) => {
-        // console.log(error);
         if (error.message === "Network Error") {
           alert(
             FAIL_MESSAGE.PROBLEM_WITH_SERVER_ASK_ADMIN +
@@ -137,13 +136,13 @@ function SeminarDetail() {
       })
       .then(({ data }) => data.data)
       .then((data) => {
-        console.log(data);
+        logger.log(data);
         if (data.message.match(/success/)) {
           alert("세미나 참여 취소가 정상처리 되었습니다.");
         }
       })
       .catch((error) => {
-        console.log(error);
+        logger.log(error);
         if (error.message === "Network Error") {
           alert(
             FAIL_MESSAGE.PROBLEM_WITH_SERVER_ASK_ADMIN +

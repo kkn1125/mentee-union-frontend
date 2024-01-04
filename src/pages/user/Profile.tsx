@@ -1,6 +1,5 @@
-import GuageBar from "@/components/atoms/common/GaugeBar";
-import Loading from "@/components/atoms/common/Loading";
 import ModalWithButton from "@/components/atoms/ModalWithButton";
+import Loading from "@/components/atoms/common/Loading";
 import VisuallyHiddenInput from "@/components/atoms/common/VisuallyHiddenInput";
 import Placeholder from "@/components/moleculars/common/Placeholder";
 import {
@@ -8,6 +7,7 @@ import {
   TokenContext,
   TokenDispatchContext,
 } from "@/context/TokenProvider";
+import Logger from "@/libs/logger";
 import {
   CHECK_MESSAGE,
   ERROR_MESSAGE,
@@ -31,7 +31,6 @@ import {
   Stack,
   TextField,
   Typography,
-  styled,
 } from "@mui/material";
 import { useFormik } from "formik";
 import { ChangeEvent, useContext, useEffect, useState } from "react";
@@ -65,6 +64,8 @@ const validationSchema = yup.object({
     .required(ERROR_MESSAGE.REQUIRED)
     .typeError(ERROR_MESSAGE.ONLY_STRING),
 });
+
+const logger = new Logger(Profile.name);
 
 function Profile() {
   const navigate = useNavigate();
@@ -181,7 +182,6 @@ function Profile() {
         });
       })
       .catch((err) => {
-        // console.log(err.response);
         if (err.response.data.code === 401) {
           if (err.response.data.detail === "jwt expired") {
             alert(FAIL_MESSAGE.EXPIRED_TOKEN);
@@ -255,7 +255,7 @@ function Profile() {
         error: "이미지 사이즈를 맞춰주세요. ",
       }));
     } else {
-      console.log(profile.file);
+      logger.log(profile.file);
       axiosInstance
         .put(
           "/users/profile",
@@ -303,7 +303,7 @@ function Profile() {
           },
         })
         .then(({ data }) => {
-          console.log(data);
+          logger.log(data);
           alert(SUCCESS_MESSAGE.REMOVE_ACCOUNT);
           tokenDispatch({
             type: TOKEN_ACTION.SIGNOUT,
@@ -311,7 +311,7 @@ function Profile() {
           navigate("/");
         })
         .catch((err) => {
-          console.log(err);
+          logger.error(err);
         });
     } else {
       alert("탈퇴를 취소합니다.");
