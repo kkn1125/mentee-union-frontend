@@ -1,4 +1,5 @@
 import { MODE } from "@/util/global.constants";
+import { timeFormat } from "@/util/tool";
 
 export default class Logger implements Console {
   private context: string = "system";
@@ -49,36 +50,125 @@ export default class Logger implements Console {
     if (context) {
       this.context = context;
     }
-    if (MODE === "development") {
+    if (MODE !== "production") {
       this.initialize();
     }
   }
 
+  now() {
+    const timestamp = timeFormat(new Date(), "HH:mm:ss.SSS");
+    return "[ " + timestamp + " ]";
+  }
+
   private initialize() {
-    this.assert = console.assert.bind(this);
-    this.clear = console.clear.bind(this);
-    this.count = console.count.bind(this, this.context);
-    this.countReset = console.countReset.bind(this, this.context);
-    this.debug = console.debug.bind(this, this.context);
-    this.dir = console.dir.bind(this, this.context);
-    this.dirxml = console.dirxml.bind(this, this.context);
-    this.error = console.error.bind(this, this.context);
-    this.group = console.group.bind(this, this.context);
-    this.groupCollapsed = console.groupCollapsed.bind(this, this.context);
-    this.groupEnd = console.groupEnd.bind(this);
-    this.info = console.info.bind(this, this.context);
-    this.log = console.log.bind(this, this.context);
-    this.table = console.table.bind(this, this.context);
-    this.time = console.time.bind(this, this.context);
-    this.timeEnd = console.timeEnd.bind(this, this.context);
-    this.timeLog = console.timeLog.bind(this, this.context);
-    this.timeStamp = console.timeStamp.bind(this, this.context);
-    this.trace = console.trace.bind(this, this.context);
-    this.warn = console.warn.bind(this, this.context);
+    Object.defineProperties(this, {
+      log: {
+        get() {
+          return console.log.bind(this, "🌱", this.now(), this.context);
+        },
+      },
+      debug: {
+        get() {
+          return console.debug.bind(this, "🐛", this.now(), this.context);
+        },
+      },
+      assert: {
+        get() {
+          return console.assert.bind(this);
+        },
+      },
+      clear: {
+        get() {
+          return console.clear.bind(this);
+        },
+      },
+      count: {
+        get() {
+          return console.count.bind(this, this.context);
+        },
+      },
+      countReset: {
+        get() {
+          return console.countReset.bind(this, this.context);
+        },
+      },
+      dir: {
+        get() {
+          return console.dir.bind(this, this.context);
+        },
+      },
+      dirxml: {
+        get() {
+          return console.dirxml.bind(this, this.context);
+        },
+      },
+      error: {
+        get() {
+          return console.error.bind(this, "🚨", this.now(), this.context);
+        },
+      },
+      group: {
+        get() {
+          return console.group.bind(this, this.context);
+        },
+      },
+      groupCollapsed: {
+        get() {
+          return console.groupCollapsed.bind(this, this.context);
+        },
+      },
+      groupEnd: {
+        get() {
+          return console.groupEnd.bind(this);
+        },
+      },
+      info: {
+        get() {
+          return console.info.bind(this, "📝", this.now(), this.context);
+        },
+      },
+      table: {
+        get() {
+          return console.table.bind(this, this.context);
+        },
+      },
+      time: {
+        get() {
+          return console.time.bind(this, this.context);
+        },
+      },
+      timeEnd: {
+        get() {
+          return console.timeEnd.bind(this, this.context);
+        },
+      },
+      timeLog: {
+        get() {
+          return console.timeLog.bind(this, this.context);
+        },
+      },
+      timeStamp: {
+        get() {
+          return console.timeStamp.bind(this, this.context);
+        },
+      },
+      trace: {
+        get() {
+          return console.trace.bind(this, this.context);
+        },
+      },
+      warn: {
+        get() {
+          return console.warn.bind(this, "⚠️", this.now(), this.context);
+        },
+      },
+    });
   }
 
   setContext(context: string) {
-    this.context = context;
-    this.initialize();
+    if (MODE !== "production") {
+      this.context = context;
+      this.initialize();
+    }
   }
 }
