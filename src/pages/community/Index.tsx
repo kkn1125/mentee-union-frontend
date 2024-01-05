@@ -1,6 +1,8 @@
+import LinkTitle from "@/components/atoms/common/LinkTitle";
 import Loading from "@/components/atoms/common/Loading";
 import ForumCardList from "@/components/atoms/forum/ForumCardList";
 import SeminarCard from "@/components/atoms/seminar/SeminarCard";
+import SeminarCardList from "@/components/atoms/seminar/SeminarCardList";
 import { axiosInstance } from "@/util/instances";
 import { Box, Button, List, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -58,58 +60,16 @@ function Community() {
 
       {/* seminars */}
       <Stack flex={1} gap={1}>
-        <Typography
-          variant='h4'
-          textTransform={"capitalize"}
-          sx={{
-            textDecoration: "none",
-            color: "inherit",
-          }}>
-          <Typography
-            component={Link}
-            to='/community/seminars'
-            sx={{
-              textDecoration: "inherit",
-              textTransform: "inherit",
-              color: "inherit",
-              fontSize: "inherit",
-              fontWeight: "inherit",
-            }}>
-            seminars
-          </Typography>
-        </Typography>
-        <List>
-          {/* 세미나 항목 */}
-          {/* 더 많은 세미나 항목들 */}
-          {seminars.length === 0 && "등록된 세미나가 없습니다."}
-          {seminars.slice(0, SHOW_LIMIT).map((seminar: Seminar) => (
-            <SeminarCard key={seminar.id} seminar={seminar} />
-          ))}
-        </List>
+        <LinkTitle title='seminars' to='/community/seminars' />
+        <SeminarCardList
+          emptyText='등록된 세미나가 없습니다.'
+          seminars={seminars.slice(0, SHOW_LIMIT)}
+        />
       </Stack>
 
       {/* forums */}
       <Stack flex={1} gap={1}>
-        <Typography
-          variant='h4'
-          textTransform={"capitalize"}
-          sx={{
-            textDecoration: "none",
-            color: "inherit",
-          }}>
-          <Typography
-            component={Link}
-            to='/community/forums'
-            sx={{
-              textDecoration: "inherit",
-              textTransform: "inherit",
-              color: "inherit",
-              fontSize: "inherit",
-              fontWeight: "inherit",
-            }}>
-            forums
-          </Typography>
-        </Typography>
+        <LinkTitle title='forums' to='/community/forums' />
         <Stack gap={2} sx={{ minHeight: "90%" }}>
           <ForumCardList
             emptyText='등록된 포럼 기사가 없습니다.'

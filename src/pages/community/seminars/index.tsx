@@ -1,5 +1,6 @@
 import Loading from "@/components/atoms/common/Loading";
 import SeminarCard from "@/components/atoms/seminar/SeminarCard";
+import SeminarCardList from "@/components/atoms/seminar/SeminarCardList";
 import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
 import { FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
@@ -62,34 +63,10 @@ function Seminars() {
           글 작성
         </Button>
       </Stack>
-      {/* <Typography
-        variant='h4'
-        textTransform={"capitalize"}
-        sx={{
-          textDecoration: "none",
-          color: "inherit",
-        }}>
-        <Typography
-          component={Link}
-          to='/community/seminars'
-          sx={{
-            textDecoration: "inherit",
-            textTransform: "inherit",
-            color: "inherit",
-            fontSize: "inherit",
-            fontWeight: "inherit",
-          }}>
-          seminars
-        </Typography>
-      </Typography> */}
-      <List>
-        {/* 세미나 항목 */}
-        {/* 더 많은 세미나 항목들 */}
-        {seminars.length === 0 && "등록된 세미나가 없습니다."}
-        {seminars.map((seminar: Seminar) => (
-          <SeminarCard key={seminar.id} seminar={seminar} />
-        ))}
-      </List>
+      <SeminarCardList
+        emptyText='등록된 세미나가 없습니다.'
+        seminars={seminars}
+      />
     </Stack>
   );
 }
