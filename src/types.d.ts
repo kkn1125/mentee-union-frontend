@@ -218,7 +218,6 @@ export declare global {
 
   export declare interface FlowIssuesProps {
     issues: Issue[];
-    width: number;
     height: number;
   }
 

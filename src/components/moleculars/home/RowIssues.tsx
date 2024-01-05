@@ -1,46 +1,49 @@
-import { Paper, Stack, keyframes } from "@mui/material";
-import React, { Fragment } from "react";
+import { Paper, Stack, Typography, keyframes } from "@mui/material";
 
 function RowIssues({
   issues,
   dir = "right",
+  limit,
 }: {
   issues: Issue[];
   dir?: "left" | "right";
+  limit: number;
 }) {
+  const cardWidth = 150; // 카드 너비
+  const gap = 24; // gap
+  const totalWidth = (cardWidth + gap) * issues.length; // 전체 너비 계산
+  const animationDuration = limit * 2 * (totalWidth / 1000); // 10배수로 지속시간 조정
+
+  const offset = cardWidth + gap; // offset
+
   const flow =
     dir === "right"
       ? keyframes`
-      0%{ transform: translateX(-${
-        issues.length * 10 + issues.length * 2 * 1
-      }%) }
-      100%{ transform: translateX(-0%)}
+      from { transform: translateX(-${totalWidth + offset}px) }
+      to { transform: translateX(-${offset}px) }
       `
       : keyframes`
-      0%{ transform: translateX(0%) }
-      100%{ transform: translateX(-${
-        issues.length * 10 + issues.length * 2 * 1
-      }%)}
+      from { transform: translateX(-${offset}px) }
+      to { transform: translateX(-${totalWidth + offset}px) }
       `;
+
+  const list = [...issues, ...issues, ...issues];
+
   return (
     <Stack
       direction='row'
       gap={3}
+      flexWrap={"nowrap"}
       sx={{
-        animation: `${flow} ${issues.length * 10}s infinite linear both`,
+        position: "relative",
+        animation: `${flow} ${animationDuration}s infinite linear both`,
       }}>
-      {[...issues]
-        .concat(...issues)
-        .concat(...issues)
-        .map((issue: Issue, i) =>
-          issue.id ? (
-            <Paper key={"issue" + i} sx={{ flex: parseFloat(Math.random().toFixed(1)), p: 5 }}>
-              {issue.title}
-            </Paper>
-          ) : (
-            <Fragment key={"issue" + i}></Fragment>
-          )
-        )}
+      {list.map((issue: Issue, i) => (
+        <Paper key={"issue" + i} sx={{ minWidth: 150, p: 2 }}>
+          <Typography>{issue.title}</Typography>
+          <Typography>{issue.content.slice(0, 10) + "..."}</Typography>
+        </Paper>
+      ))}
     </Stack>
   );
 }

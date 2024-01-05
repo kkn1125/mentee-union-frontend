@@ -6,6 +6,7 @@ import FlowIssues from "@/components/moleculars/home/FlowIssues";
 import BackgroundSection from "@/components/organisms/home/BackgroundSection";
 import MainSections from "@/components/organisms/home/MainSections";
 import { TokenContext } from "@/context/TokenProvider";
+import reviews from "@/dummy/reviews";
 import { CHECK_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import {
@@ -169,7 +170,6 @@ function Home() {
             멘티들이 공유하는 유용한 정보와 지식을 발견하고, 나누세요.
           </Typography>
           {/* 정보 공유 게시물 */}
-          {/* ... */}
           <Button
             size='large'
             variant='contained'
@@ -180,16 +180,14 @@ function Home() {
         </Paper>
 
         {/* Another section */}
-        <Paper elevation={0} sx={{ p: 5, mt: 3 }}>
+        {/* <Paper elevation={0} sx={{ p: 5, mt: 3 }}>
           <Typography variant='h4' gutterBottom>
             커뮤니티 스토리
           </Typography>
           <Typography variant='body1'>
             멘티들의 성장 스토리와 경험을 들려주세요.
           </Typography>
-          {/* 커뮤니티 스토리 게시물 */}
-          {/* ... */}
-        </Paper>
+        </Paper> */}
       </MainSections>
 
       <Container
@@ -224,7 +222,8 @@ function Home() {
               />
               <Typography variant='h5'>워크샵</Typography>
               <Typography variant='body1'>
-                실무 경험을 바탕으로 한 워크샵에서 실전적인 스킬을 배웁니다.
+                개인 또는 실무 경험을 바탕으로 한 워크샵에서 실전적인 스킬을
+                배웁니다.
               </Typography>
             </Stack>
             <Stack flex={1} gap={2}>
@@ -250,8 +249,8 @@ function Home() {
             <Stack gap={1}>
               <Typography variant='h5'>단계 1</Typography>
               <Typography variant='body1'>
-                멘티는 목표를 설정하고 멘토와 상담을 통해 개인화된 계획을
-                수립합니다.
+                멘티는 목표를 설정하고 멘티 또는 멘토와 상담을 통해 개인화된
+                계획을 수립합니다.
               </Typography>
             </Stack>
           </Stack>
@@ -260,7 +259,7 @@ function Home() {
             <Stack gap={1}>
               <Typography variant='h5'>단계 2</Typography>
               <Typography variant='body1'>
-                멘토와 멘티는 주기적으로 만나고 진행 상황을 확인하며 목표 달성을
+                멘티 또는 멘토와 주기적으로 진행 상황을 확인하며 목표 달성을
                 지원합니다.
               </Typography>
             </Stack>
@@ -300,145 +299,7 @@ function Home() {
                 overflow: "hidden",
                 backgroundColor: (theme) => theme.palette.bg.main,
               }}>
-              <FlowIssues
-                width={600}
-                height={450}
-                issues={[
-                  {
-                    id: 1,
-                    title: "test1",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 2,
-                    title: "test2",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 3,
-                    title: "test3",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 4,
-                    title: "test4",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 5,
-                    title: "test5",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 6,
-                    title: "test6",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 7,
-                    title: "test7",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 8,
-                    title: "test8",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 9,
-                    title: "test9",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 10,
-                    title: "test10",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 11,
-                    title: "test11",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 12,
-                    title: "test12",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 13,
-                    title: "test13",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 14,
-                    title: "test14",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 15,
-                    title: "test15",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 16,
-                    title: "test16",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 17,
-                    title: "test17",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 18,
-                    title: "test18",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 19,
-                    title: "test19",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 20,
-                    title: "test20",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 21,
-                    title: "test21",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                  {
-                    id: 22,
-                    title: "test22",
-                    content:
-                      "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illum, ratione?",
-                  },
-                ]}
-              />
-              {/* <Placeholder width={600} height={450} maxWidth /> */}
+              <FlowIssues height={450} issues={reviews} />
             </Stack>
           )}
         </Section>
