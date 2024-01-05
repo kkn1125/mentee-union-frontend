@@ -1,6 +1,7 @@
 import Loading from "@/components/atoms/common/Loading";
 import ForumCard from "@/components/atoms/forum/ForumCard";
-import { Box, Stack, Typography, useMediaQuery, useTheme } from "@mui/material";
+import Logger from "@/libs/logger";
+import { Box, Stack, Typography } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 
 type ForumCardListProps = {
@@ -8,15 +9,45 @@ type ForumCardListProps = {
   emptyText: string;
 };
 
+const sm = 600;
+const md = 900;
+const lg = 1200;
+const xl = 1536;
+
+const logger = new Logger(ForumCardList.name);
+
 function ForumCardList({ forums, emptyText }: ForumCardListProps) {
   const [loading, setLoading] = useState(true);
-  const theme = useTheme();
-  const isXsUp = useMediaQuery(theme.breakpoints.up("xs"));
-  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
-  const isLgUp = useMediaQuery(theme.breakpoints.up("lg"));
-  const isXlUp = useMediaQuery(theme.breakpoints.up("xl"));
+  const [breakpoints, setBreakpoints] = useState(1);
+  // const xs = 0;
 
-  const forumCardAmount = isXlUp ? 4 : isLgUp ? 3 : isMdUp ? 2 : isXsUp ? 1 : 1;
+  function handleResize() {
+    const isXlUp = innerWidth >= xl;
+    const isLgUp = xl > innerWidth && innerWidth >= lg;
+    const isMdUp = lg > innerWidth && innerWidth >= md;
+    const isSmUp = lg > innerWidth && innerWidth >= sm;
+    // const isXsUp = sm > innerWidth && innerWidth >= xs;
+    const forumCardAmount = isXlUp
+      ? 4
+      : isLgUp
+      ? 3
+      : isMdUp
+      ? 2
+      : isSmUp
+      ? 1
+      : 1;
+    setBreakpoints(forumCardAmount);
+  }
+
+  useEffect(() => {
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      logger.info("확인");
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     if (forums) {
@@ -27,25 +58,23 @@ function ForumCardList({ forums, emptyText }: ForumCardListProps) {
   const forumsList = useMemo(() => {
     return forums.reduce(
       (acc: Forum[][], cur, index) => {
-        if (acc[acc.length - 1].length === forumCardAmount) {
+        if (acc[acc.length - 1].length === breakpoints) {
           acc.push([]);
         }
         acc[acc.length - 1].push(cur);
         if (
           index === forums.length - 1 &&
-          acc[acc.length - 1].length !== forumCardAmount
+          acc[acc.length - 1].length !== breakpoints
         ) {
           acc[acc.length - 1] = acc[acc.length - 1].concat(
-            ...new Array(forumCardAmount - acc[acc.length - 1].length).fill(
-              null
-            )
+            ...new Array(breakpoints - acc[acc.length - 1].length).fill(null)
           );
         }
         return acc;
       },
       [[]]
     );
-  }, [loading, forums, forumCardAmount]);
+  }, [loading, forums, breakpoints]);
 
   if (loading) {
     return <Loading />;
@@ -65,7 +94,7 @@ function ForumCardList({ forums, emptyText }: ForumCardListProps) {
             <ForumCard
               key={forum.id}
               forum={forum}
-              forumCardAmount={forumCardAmount}
+              forumCardAmount={breakpoints}
             />
           ) : (
             <Box
