@@ -213,6 +213,27 @@ function SeminarDetail() {
     }
   })();
 
+  const isDisabledJoinButton =
+    !isDoingRecruit ||
+    !profileData ||
+    seminarParticipants.length >= limit_participant_amount ||
+    alreadyJoined ||
+    is_recruit_finished ||
+    is_seminar_finished;
+
+  const joinTooltipTitle =
+    seminarState[1] === 2
+      ? "이미 종료된 세미나입니다."
+      : !isDoingRecruit && isBeforeRecruit
+      ? "모집 전 입니다."
+      : !isDoingRecruit && isDoneRecruit
+      ? "이미 모집이 완료된 세미나 입니다."
+      : alreadyJoined
+      ? "이미 신청한 세미나입니다."
+      : profileData
+      ? ""
+      : "로그인이 필요합니다.";
+
   return (
     <Container maxWidth='md'>
       <Stack direction='row' gap={1}>
@@ -282,7 +303,8 @@ function SeminarDetail() {
           <Box
             component='img'
             width={300}
-            src={API_PATH + "/seminars/cover/" + cover.new_name}></Box>
+            src={API_PATH + "/seminars/cover/" + cover.new_name}
+          />
         )}
         <Divider sx={{ my: 2, borderColor: "#565656" }} />
         <SunEditorViewer
@@ -302,31 +324,12 @@ function SeminarDetail() {
         </Stack>
 
         <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
-          <Tooltip
-            title={
-              !isDoingRecruit && isBeforeRecruit
-                ? "모집 전 입니다."
-                : !isDoingRecruit && isDoneRecruit
-                ? "이미 모집이 완료된 세미나 입니다."
-                : alreadyJoined
-                ? "이미 신청한 세미나입니다."
-                : profileData
-                ? ""
-                : "로그인이 필요합니다."
-            }
-            placement='top'>
+          <Tooltip title={joinTooltipTitle} placement='top'>
             <Box>
               <Button
                 variant='contained'
                 color='secondary'
-                disabled={
-                  !isDoingRecruit ||
-                  !profileData ||
-                  seminarParticipants.length >= limit_participant_amount ||
-                  alreadyJoined ||
-                  is_recruit_finished ||
-                  is_seminar_finished
-                }
+                disabled={isDisabledJoinButton}
                 onClick={profileData ? handleJoinSeminar : () => {}}>
                 {is_recruit_finished ? "Recruitment Finished" : "Join Seminar"}
               </Button>
