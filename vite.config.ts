@@ -2,6 +2,7 @@ import react from "@vitejs/plugin-react-swc";
 import { defineConfig, loadEnv } from "vite";
 import dotenv from "dotenv";
 import path from "path";
+import { chunkSplitPlugin } from "vite-plugin-chunk-split";
 
 export default defineConfig(({ command, mode }) => {
   // Load env file based on `mode` in the current working directory.
@@ -35,10 +36,6 @@ export default defineConfig(({ command, mode }) => {
           find: "@",
           replacement: path.join(path.resolve(), "src"),
         },
-        {
-          find: "@components",
-          replacement: path.join(path.resolve(), "src/components"),
-        },
       ],
     },
     build: {
@@ -49,6 +46,35 @@ export default defineConfig(({ command, mode }) => {
         keep_classnames: true,
       },
     },
-    plugins: [react()],
+    plugins: [
+      chunkSplitPlugin({
+        strategy: "single-vendor",
+        // customChunk: (args) => {
+        //   // eslint-disable-next-line prefer-const
+        //   let { file, id, moduleId, root } = args;
+        //   // console.log("file:", file);
+        //   // if (file.startsWith("src/pages")) {
+        //   //   file = file.substring(4);
+        //   //   file = file.replace(/\.[^.$]+$/, "");
+        //   //   return file;
+        //   // }
+        //   return null;
+        // },
+        customSplitting: {
+          //   "react-vendor": ["react", "react-router-dom", "react-dom"],
+          dummy: [/src\/dummy/],
+          libs: [/src\/libs/],
+          hooks: [/src\/hooks/],
+          context: [/src\/context/],
+          atoms: [/src\/components\/atoms/],
+          moleculars: [/src\/components\/moleculars/],
+          organisms: [/src\/components\/organisms/],
+          templates: [/src\/components\/templates/],
+          util: [/src\/util/],
+          pages: [/src\/pages/],
+        },
+      }),
+      react(),
+    ],
   };
 });
