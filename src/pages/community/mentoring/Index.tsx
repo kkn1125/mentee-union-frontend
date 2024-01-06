@@ -22,7 +22,7 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import io, { Socket } from "socket.io-client";
 import ChattingPage from "./ChattingPage";
 import CreateMentoringSessionPage from "./CreateMentoringSessionPage";
-import { SOCKET_URL } from "@/util/global.constants";
+import { MODE, SOCKET_URL } from "@/util/global.constants";
 import LockIcon from "@mui/icons-material/Lock";
 
 interface Props {
@@ -177,7 +177,7 @@ function Index(props: Props) {
     if (token.token) {
       socket = io(SOCKET_URL, {
         path: "/channel",
-        secure: true,
+        secure: MODE === "production",
         auth: {
           token: token.token,
         },
