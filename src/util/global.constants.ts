@@ -28,8 +28,8 @@ export const API_PROTOCOL = import.meta.env.VITE_API_PROTOCOL;
 export const API_HOST = import.meta.env.VITE_API_HOST;
 export const API_PORT = import.meta.env.VITE_API_PORT;
 export const API_BASE = import.meta.env.VITE_API_BASE;
-export const API_PATH = `http://${API_HOST}:${API_PORT}/${API_BASE}`;
-export const SOCKET_URL = `http://${API_HOST}:${API_PORT}`;
+export const API_PATH = `${API_PROTOCOL}://${API_HOST}:${API_PORT}/${API_BASE}`;
+export const SOCKET_URL = `${API_PROTOCOL}://${API_HOST}:${API_PORT}`;
 
 export const SUCCESS_MESSAGE = {
   ALREADY_PASS_AUTH: "이미 본인인증이 완료 되었습니다.",
