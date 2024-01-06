@@ -177,6 +177,7 @@ function Index(props: Props) {
     if (token.token) {
       socket = io(SOCKET_URL, {
         path: "/channel",
+        secure: true,
         auth: {
           token: token.token,
         },
