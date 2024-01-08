@@ -9,9 +9,11 @@ import {
 } from "@/context/TokenProvider";
 import Logger from "@/libs/logger";
 import {
+  API_PATH,
   CHECK_MESSAGE,
   ERROR_MESSAGE,
   FAIL_MESSAGE,
+  PROFILE_PATH,
   REGEX,
   SUCCESS_MESSAGE,
 } from "@/util/global.constants";
@@ -169,10 +171,11 @@ function Profile() {
         ) as User;
         setProfileData(convertedProfileData);
         if (data.profiles[0]) {
-          setProfilePreview(
-            "http://localhost:8080/api/users/profile/resource/" +
-              data.profiles[0].new_name
-          );
+          setProfilePreview(PROFILE_PATH + data.profiles[0].new_name);
+          tokenDispatch({
+            type: TOKEN_ACTION.PROFILE,
+            profile: PROFILE_PATH + data.profiles[0].new_name,
+          });
         }
         formik.setValues({
           username: convertedProfileData.username,
@@ -225,7 +228,8 @@ function Profile() {
         file,
         error: isOver ? "프로필 이미지 사이즈는 10kb 이하여야 합니다." : "",
       }));
-      setProfilePreview(URL.createObjectURL(file));
+      const profileImg = URL.createObjectURL(file);
+      setProfilePreview(profileImg);
     }
   }
 
@@ -295,27 +299,27 @@ function Profile() {
   }
 
   function hadleRemoveAccount() {
-    if (confirm(CHECK_MESSAGE.REMOVE_ACCOUNT)) {
-      axiosInstance
-        .delete("/users", {
-          headers: {
-            Authorization: "Bearer " + token.token,
-          },
-        })
-        .then(({ data }) => {
-          logger.log(data);
-          alert(SUCCESS_MESSAGE.REMOVE_ACCOUNT);
-          tokenDispatch({
-            type: TOKEN_ACTION.SIGNOUT,
-          });
-          navigate("/");
-        })
-        .catch((err) => {
-          logger.error(err);
+    axiosInstance
+      .delete("/users", {
+        headers: {
+          Authorization: "Bearer " + token.token,
+        },
+      })
+      .then(({ data }) => {
+        logger.log(data);
+        alert(SUCCESS_MESSAGE.REMOVE_ACCOUNT);
+        tokenDispatch({
+          type: TOKEN_ACTION.SIGNOUT,
         });
-    } else {
-      alert("탈퇴를 취소합니다.");
-    }
+        navigate("/");
+      })
+      .catch((err) => {
+        logger.error(err);
+      });
+    // if (confirm(CHECK_MESSAGE.REMOVE_ACCOUNT)) {
+    // } else {
+    //   alert("탈퇴를 취소합니다.");
+    // }
   }
 
   return loading ? (
@@ -356,7 +360,6 @@ function Profile() {
             color='inherit'
             component={"label"}
             htmlFor='profile-image'
-            // onClick={handleUpdateUserInfo}
             sx={{
               position: "absolute",
               top: 0,
@@ -398,46 +401,6 @@ function Profile() {
           </Button>
         </Stack>
       </Stack>
-
-      {/* <Stack
-        flex={1}
-        gap={1}
-        sx={{
-          borderRadius: 2,
-          p: 3,
-          backgroundColor: (theme) => theme.palette.background.paper,
-        }}>
-        <Typography variant='h5' fontWeight={700} gutterBottom>
-          나의 멘티 정보
-        </Typography>
-        <Stack direction='row' alignItems={"center"} gap={1}>
-          <Typography fontWeight={700} variant='body2' sx={{ flex: 0.1 }}>
-            Level
-          </Typography>
-          <Typography
-            variant='body2'
-            sx={{
-              flex: 0.1,
-              fontSize: (theme) => theme.typography.pxToRem(12),
-            }}>
-            {profileData.level}
-          </Typography>
-        </Stack>
-        <Stack direction='row' alignItems={"center"} gap={1}>
-          <Typography fontWeight={700} variant='body2' sx={{ flex: 0.1 }}>
-            Points
-          </Typography>
-          <GuageBar
-            value={profileData.points}
-            maxValue={100 + (profileData.points || 1) * 50}
-            height={15}
-            sx={{
-              flex: 1,
-              fontSize: (theme) => theme.typography.pxToRem(12),
-            }}
-          />
-        </Stack>
-      </Stack> */}
 
       <Stack
         flex={1}
@@ -519,22 +482,24 @@ function Profile() {
 
       <Stack>
         <Alert color='error'>
-          <AlertTitle>경고</AlertTitle>
+          <AlertTitle>설정 안내</AlertTitle>
           아래 옵션은 회원탈퇴하는 설정이 있습니다.
         </Alert>
 
         <Box sx={{ my: 3 }}>
           <ModalWithButton
+            color='error'
             label='회원 탈퇴'
             title='탈퇴 안내'
             content={CHECK_MESSAGE.REMOVE_ACCOUNT}
+            onClick={hadleRemoveAccount}
           />
-          <Button
+          {/* <Button
             color='error'
             variant='contained'
             onClick={hadleRemoveAccount}>
             회원 탈퇴
-          </Button>
+          </Button> */}
         </Box>
       </Stack>
     </Stack>

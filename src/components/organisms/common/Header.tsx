@@ -9,7 +9,7 @@ import AccountCircle from "@mui/icons-material/AccountCircle";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Box } from "@mui/material";
+import { Avatar, Box } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import IconButton from "@mui/material/IconButton";
 import Menu from "@mui/material/Menu";
@@ -220,7 +220,22 @@ export default function Header() {
             aria-haspopup='true'
             onClick={handleMenu}
             color='inherit'>
-            <AccountCircle />
+            {token.profile ? (
+              <Avatar
+                src={token.profile}
+                sx={{
+                  width: 30,
+                  height: 30,
+                }}
+              />
+            ) : (
+              <Avatar
+                sx={{
+                  width: 30,
+                  height: 30,
+                }}
+              />
+            )}
           </IconButton>
           <Menu
             id='menu-appbar'

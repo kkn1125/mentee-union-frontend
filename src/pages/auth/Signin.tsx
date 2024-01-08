@@ -78,7 +78,26 @@ function Signin() {
             refresh: refresh_token,
             keep_sign: values.keep_sign,
           });
-          navigate("/");
+
+          axiosInstance
+            .get("/users/profile", {
+              headers: {
+                Authorization: "Bearer " + access_token,
+              },
+            })
+            .then(({ data }) => data.data)
+            .then((data) => {
+              const { profiles } = data;
+              if (profiles.length > 0) {
+                tokenDispatch({
+                  type: TOKEN_ACTION.PROFILE,
+                  profile: profiles[0].new_name,
+                });
+              }
+            })
+            .finally(() => {
+              navigate("/");
+            });
         })
         .catch((error) => {
           if (error.message === "Network Error") {

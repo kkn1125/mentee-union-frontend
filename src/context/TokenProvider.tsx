@@ -6,12 +6,14 @@ export type IntialState = {
   expired?: number;
   status?: "exists" | "no-exists";
   keep_sign: boolean;
+  profile?: string;
 };
 
 export enum TOKEN_ACTION {
   LOAD = "token/load",
   SAVE = "token/save",
   SIGNOUT = "token/signout",
+  PROFILE = "token/profile",
 }
 
 type ActionType = {
@@ -19,6 +21,7 @@ type ActionType = {
   token?: string;
   refresh?: string;
   keep_sign?: boolean;
+  profile?: string;
   // expired?: number;
 };
 
@@ -50,6 +53,13 @@ const reducer = (state: IntialState, action: ActionType) => {
       status: "exists",
       refresh: action.refresh,
       keep_sign: action.keep_sign,
+    };
+    localStorage.setItem("user", JSON.stringify(data));
+    return data;
+  } else if (action.type === TOKEN_ACTION.PROFILE) {
+    const data = {
+      ...state,
+      profile: action.profile,
     };
     localStorage.setItem("user", JSON.stringify(data));
     return data;
