@@ -52,30 +52,53 @@ function Board() {
     }
   }
 
+  const boardName = (() => {
+    switch (params.type) {
+      case "event":
+        return "이벤트가";
+      case "qna":
+        return "질의응답이";
+      case "notice":
+        return "공지사항이";
+      default:
+        return "게시글이";
+    }
+  })();
+
   return (
-    <List>
-      <Stack gap={2}>
-        <Typography variant='h5'>
-          {boardType[params.type as BOARD_TYPE]}
-        </Typography>
-        {boardList.length === 0 && (
-          <Typography>등록된 게시글이 없습니다.</Typography>
-        )}
-        {boardList.map((board) => (
-          <BoardCard key={board.id} board={board} />
-        ))}
+    <Stack flex={1} gap={1} alignSelf='stretch'>
+      <Stack direction='row' justifyContent='space-between' gap={1}>
+        <Button
+          variant='contained'
+          color='info'
+          onClick={() => handleRedirect("/")}>
+          메인페이지로 돌아가기
+        </Button>
         {params.type === "qna" && profileData && (
           <Box>
             <Button
               variant='contained'
               color='info'
-              onClick={() => handleRedirect("/boards/qnd/edit")}>
+              onClick={() => handleRedirect(`/boards/${params.type}/edit`)}>
               등록
             </Button>
           </Box>
         )}
       </Stack>
-    </List>
+      <List>
+        <Stack gap={2}>
+          <Typography variant='h5'>
+            {boardType[params.type as BOARD_TYPE]}
+          </Typography>
+          {boardList.length === 0 && (
+            <Typography>등록된 {boardName} 없습니다.</Typography>
+          )}
+          {boardList.map((board) => (
+            <BoardCard key={board.id} board={board} />
+          ))}
+        </Stack>
+      </List>
+    </Stack>
   );
 }
 
