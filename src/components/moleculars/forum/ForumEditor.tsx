@@ -1,3 +1,4 @@
+import CtmSunEditor from "@/components/atoms/common/CtmSunEditor";
 import { TokenContext } from "@/context/TokenProvider";
 import Logger from "@/libs/logger";
 import { ERROR_MESSAGE } from "@/util/global.constants";
@@ -130,7 +131,7 @@ function ForumEditor({ forum }: ForumEditorProps) {
               height: "300px",
             },
           }}>
-          <SunEditor
+          <CtmSunEditor
             lang={Ko}
             name='content'
             height={"300px"}
