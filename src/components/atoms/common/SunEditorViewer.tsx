@@ -14,6 +14,8 @@ function SunEditorViewer({ content, wrapSx, sx }: SunEditorViewerProps) {
       sx={{
         border: "none",
         ...wrapSx,
+        color: "inherit",
+        backgroundColor: "transparent",
       }}>
       <Typography
         className='se-container sun-editor-editable'
@@ -23,6 +25,8 @@ function SunEditorViewer({ content, wrapSx, sx }: SunEditorViewerProps) {
         }}
         sx={{
           p: 0,
+          color: "inherit",
+          backgroundColor: "transparent",
           ...sx,
         }}
       />
