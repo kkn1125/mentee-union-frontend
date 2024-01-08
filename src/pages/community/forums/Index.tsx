@@ -62,7 +62,7 @@ function Index() {
           글 작성
         </Button>
       </Stack>
-      <Stack gap={2} sx={{ minHeight: "90%" }}>
+      <Stack gap={2} sx={{ mt: 3, minHeight: "90%" }}>
         <ForumCardList
           emptyText='등록된 포럼 기사가 없습니다.'
           forums={forums}

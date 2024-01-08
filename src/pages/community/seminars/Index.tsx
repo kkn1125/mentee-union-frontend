@@ -4,7 +4,7 @@ import SeminarCardList from "@/components/atoms/seminar/SeminarCardList";
 import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
 import { FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
-import { Button, List, Stack } from "@mui/material";
+import { Box, Button, List, Stack } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -63,10 +63,12 @@ function Seminars() {
           글 작성
         </Button>
       </Stack>
-      <SeminarCardList
-        emptyText='등록된 세미나가 없습니다.'
-        seminars={seminars}
-      />
+      <Stack gap={2} sx={{ mt: 2, minHeight: "90%" }}>
+        <SeminarCardList
+          emptyText='등록된 세미나가 없습니다.'
+          seminars={seminars}
+        />
+      </Stack>
     </Stack>
   );
 }
