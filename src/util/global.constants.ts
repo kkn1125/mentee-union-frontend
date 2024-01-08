@@ -29,6 +29,7 @@ export const API_HOST = import.meta.env.VITE_API_HOST;
 export const API_PORT = import.meta.env.VITE_API_PORT;
 export const API_BASE = import.meta.env.VITE_API_BASE;
 export const API_PATH = `${API_PROTOCOL}://${API_HOST}:${API_PORT}/${API_BASE}`;
+export const PROFILE_PATH = API_PATH + "/users/profile/resource/";
 export const SOCKET_URL = `${API_PROTOCOL}://${API_HOST}:${API_PORT}`;
 
 export const SUCCESS_MESSAGE = {
@@ -46,7 +47,8 @@ export const SUCCESS_MESSAGE = {
 
 export const CHECK_MESSAGE = {
   REMOVE_ACCOUNT:
-    "서비스 정책에 따라 회원 가입 기간 동안 발생한 결제에 대한 환불은 제공되지 않습니다. 탈퇴 시 모든 서비스 이용이 종료되며, 이에 대한 추가적인 정보는 [이용 약관 링크]에서 확인하실 수 있습니다. 탈퇴를 진행하시겠습니까?",
+    //서비스 정책에 따라 회원 가입 기간 동안 발생한 결제에 대한 환불은 제공되지 않습니다.
+    "탈퇴 시 모든 서비스 이용이 종료되며, 이에 대한 추가적인 정보는 [이용 약관 링크]에서 확인하실 수 있습니다. 7일간 데이터 삭제는 보류되며 이후 데이터는 완전 삭제됩니다.\n탈퇴를 진행하시겠습니까?",
   REQUIRED_SIGN_IN:
     "개인회원 로그인 후 이용해 주세요.\n로그인 페이지로 이동하시겠습니까?",
   CONFIRM_JOIN_SEMINAR:
