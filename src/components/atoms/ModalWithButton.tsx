@@ -3,10 +3,12 @@ import {
   BoxProps,
   Button,
   ButtonProps,
+  ButtonPropsColorOverrides,
   Modal,
+  Stack,
   Typography,
 } from "@mui/material";
-import { ReactNode, useState } from "react";
+import { MouseEventHandler, ReactNode, useState } from "react";
 
 function ModalWithButton({
   label,
@@ -14,12 +16,23 @@ function ModalWithButton({
   content,
   buttonProps,
   boxProps,
+  color = "info",
+  onClick,
 }: {
   label: string | ReactNode | ReactNode[];
   title: string | ReactNode | ReactNode[];
   content: string | ReactNode | ReactNode[];
   buttonProps?: Partial<ButtonProps>;
   boxProps?: Partial<BoxProps>;
+  color?:
+    | "inherit"
+    | "primary"
+    | "secondary"
+    | "success"
+    | "error"
+    | "info"
+    | "warning";
+  onClick?: MouseEventHandler<HTMLButtonElement>;
 }) {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -27,7 +40,11 @@ function ModalWithButton({
 
   return (
     <div>
-      <Button onClick={handleOpen} {...buttonProps}>
+      <Button
+        variant='contained'
+        color={color}
+        onClick={handleOpen}
+        {...buttonProps}>
         {label}
       </Button>
       <Modal
@@ -51,9 +68,34 @@ function ModalWithButton({
           <Typography id='modal-modal-title' variant='h6' component='h2'>
             {title}
           </Typography>
-          <Typography id='modal-modal-description' sx={{ mt: 2 }}>
-            {content}
-          </Typography>
+          {typeof content === "string" ? (
+            <Typography
+              id='modal-modal-description'
+              sx={{ mt: 2 }}
+              dangerouslySetInnerHTML={{
+                __html: content?.replace?.(/\n/, "<br />") || "",
+              }}
+            />
+          ) : (
+            <Typography id='modal-modal-description' sx={{ mt: 2 }}>
+              {content}
+            </Typography>
+          )}
+
+          <Stack direction='row' gap={2} sx={{ mt: 2 }}>
+            <Button
+              variant='contained'
+              color='success'
+              onClick={(e) => {
+                onClick?.(e);
+                handleClose();
+              }}>
+              확인
+            </Button>
+            <Button variant='contained' color='inherit' onClick={handleClose}>
+              취소
+            </Button>
+          </Stack>
         </Box>
       </Modal>
     </div>
