@@ -14,21 +14,7 @@ import { Box, Chip, List, Paper, Stack, Typography } from "@mui/material";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Logger from "@/libs/logger";
-
-enum GRADE_COLOR {
-  mentee0 = "#56ad6c",
-  mentee1 = "#89ad56",
-  mentor0 = "#6841bf",
-  mentor1 = "#dc7031",
-  mentor2 = "#cf2398",
-}
-
-type GRADE_COLOR_TYPE =
-  | "mentee0"
-  | "mentee1"
-  | "mentor0"
-  | "mentor1"
-  | "mentor2";
+import Grade from "@/components/atoms/common/Grade";
 
 const logger = new Logger(MyMentee.name);
 
@@ -126,10 +112,6 @@ function MyMentee() {
       });
   }
 
-  const gradeColor = profileData
-    ? GRADE_COLOR[profileData.grade.name as GRADE_COLOR_TYPE]
-    : "mentee0";
-
   const removeDuplicatedForumLikes = useMemo(() => {
     return profileData
       ? profileData.forumLikes.reduce((acc: Forum[], cur) => {
@@ -164,18 +146,11 @@ function MyMentee() {
           <Typography variant='h6' gutterBottom>
             레벨 시스템
           </Typography>
-          <Stack direction='row' alignItems='center' gap={1}>
-            <Chip
-              label={profileData.grade.name}
-              size='small'
-              sx={{
-                color: "#ffffff",
-                backgroundColor: gradeColor + " !important",
-              }}
-            />
-            <Box>{profileData.grade.description}</Box>
-          </Stack>
-
+          <Grade
+            dir='row'
+            name={profileData.grade.name}
+            description={profileData.grade.description}
+          />
           <LevelSystem
             level={profileData.level}
             points={
