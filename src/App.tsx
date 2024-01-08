@@ -8,6 +8,7 @@ import Layout from "./components/templates/Layout";
 import MentoringLayout from "./components/templates/MentoringLayout";
 import UserLayout from "./components/templates/UserLayout";
 import useGuards from "./hooks/useGuards";
+import Logger from "./libs/logger";
 import Home from "./pages/Home";
 import Notfound from "./pages/Notfound";
 import RequestResetPassword from "./pages/auth/RequestResetPassword";
@@ -16,8 +17,8 @@ import Signin from "./pages/auth/Signin";
 import Signup from "./pages/auth/Signup";
 import BoardDetail from "./pages/board/BoardDetail";
 import Board from "./pages/board/Index";
-import UpdateQna from "./pages/board/UpdateQna";
-import WriteQna from "./pages/board/WriteQna";
+import UpdateBoard from "./pages/board/UpdateBoard";
+import WriteBoard from "./pages/board/WriteBoard";
 import Community from "./pages/community/Index";
 import ForumDetail from "./pages/community/forums/ForumDetail";
 import Forums from "./pages/community/forums/Index";
@@ -78,8 +79,10 @@ type SelectedRouteProps = {
   selected: string[];
 };
 
+const selectedRouteLogger = new Logger(SelectedRoute.name);
 function SelectedRoute({ children, selected }: SelectedRouteProps) {
   const params = useParams();
+  selectedRouteLogger.log(params.type, params.id);
   if (selected.includes(params.type as string)) {
     return children;
   } else {
@@ -107,7 +110,13 @@ function App() {
     <Routes>
       <Route path='' element={<Layout />}>
         <Route path='' element={<Home />} />
-        <Route path='boards' element={<BoardLayout />}>
+        <Route
+          path='boards'
+          element={
+            <SelectedRoute selected={boardTypes}>
+              <BoardLayout />
+            </SelectedRoute>
+          }>
           <Route path=':type'>
             <Route
               path=''
@@ -125,8 +134,8 @@ function App() {
                 </SelectedRoute>
               }
             />
-            <Route path='edit' element={<WriteQna />} />
-            <Route path='edit/:id' element={<UpdateQna />} />
+            <Route path='edit' element={<WriteBoard />} />
+            <Route path='edit/:id' element={<UpdateBoard />} />
           </Route>
         </Route>
         <Route path='auth' element={<AuthLayout />}>
