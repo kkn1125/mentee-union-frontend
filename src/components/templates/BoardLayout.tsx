@@ -5,7 +5,7 @@ function BoardLayout() {
   return (
     <Stack
       gap={10}
-      justifyContent={"center"}
+      justifyContent={"flex-start"}
       alignItems={"center"}
       flex={1}
       sx={{

@@ -5,6 +5,7 @@ function CommunityLayout() {
   return (
     <Stack
       gap={10}
+      justifyContent={"flex-start"}
       sx={{
         width: {
           xs: "90%",
