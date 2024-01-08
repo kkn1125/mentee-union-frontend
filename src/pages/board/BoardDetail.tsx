@@ -100,17 +100,21 @@ function BoardDetail() {
           <Stack direction='row' gap={1} alignItems='center'>
             <Typography variant='h4'>{title}</Typography>
             <ViewCount viewCount={view_count} />
-            <Tooltip title='비공개 게시글' placement='top' color='success'>
-              <IconButton>
-                <LockIcon />
-              </IconButton>
-            </Tooltip>
+            {!visible && (
+              <Tooltip title='비공개 게시글' placement='top' color='success'>
+                <IconButton>
+                  <LockIcon />
+                </IconButton>
+              </Tooltip>
+            )}
           </Stack>
           {user_id === profileData?.userId && (
             <Button
               variant='contained'
               color='info'
-              onClick={() => handleRedirect("/boards/qna/edit/" + id)}>
+              onClick={() =>
+                handleRedirect(`/boards/${params.type}/edit/` + id)
+              }>
               수정
             </Button>
           )}
