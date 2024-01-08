@@ -151,6 +151,7 @@ function Home() {
           <Typography variant='body1'>
             다가오는 세미나 일정과 과거 세미나 요약을 확인하고 참여해 보세요.
           </Typography>
+
           {/* 세미나 목록 */}
           <Button
             size='large'
