@@ -57,6 +57,8 @@ function BoardCard({ board }: BoardCardProps) {
       <SunEditorViewer
         wrapSx={{
           mt: 3,
+          maxHeight: 50,
+          overflow: "hidden",
         }}
         content={content}
       />
