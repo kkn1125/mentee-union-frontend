@@ -1,21 +1,51 @@
 import BoardCard from "@/components/atoms/board/BoardCard";
 import Loading from "@/components/atoms/common/Loading";
 import { TokenContext } from "@/context/TokenProvider";
+import Logger from "@/libs/logger";
 import { boardType } from "@/util/global.constants";
-import { axiosInstance } from "@/util/instances";
+import { axiosInstance, store } from "@/util/instances";
+import { overwrite, overwriteWith } from "@/util/tool";
 import { Box, Button, List, Stack, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+
+const logger = new Logger(Board.name);
 
 function Board() {
   const navigate = useNavigate();
   const token = useContext(TokenContext);
   const params = useParams();
-  const [profileData, setProfileData] = useState<JwtDto | null>(null);
+  const [profileData, setProfileData] = useState<JwtDto | null>(
+    store.profile || null
+  );
   const [loading, setLoading] = useState(true);
-  const [boardList, setBoardList] = useState<Board[]>([]);
+  const [boardList, setBoardList] = useState<Board[]>(store.boards || []);
 
   useEffect(() => {
+    logger.debug("check already loaded", boardList, profileData);
+    if (token.token) {
+      getProfile();
+    }
+  }, []);
+
+  useEffect(() => {
+    getBoardItems();
+  }, [params.type]);
+
+  function getProfile() {
+    axiosInstance
+      .get("/auth/profile", {
+        headers: { Authorization: "Bearer " + token.token },
+      })
+      .then(({ data }) => data.data)
+      .then((data) => {
+        const profiles = overwrite(store.profile, data);
+        store.profile = profiles;
+        setProfileData(profiles);
+      });
+  }
+
+  function getBoardItems() {
     axiosInstance
       .get("/boards/" + params.type, {
         headers: {
@@ -24,24 +54,11 @@ function Board() {
       })
       .then(({ data }) => data.data)
       .then((data) => {
-        setBoardList(data);
         setLoading(false);
+        const boardOverwrites = overwriteWith(store.boards, data);
+        setBoardList(boardOverwrites);
+        store.boards = boardOverwrites;
       });
-
-    if (token.token) {
-      axiosInstance
-        .get("/auth/profile", {
-          headers: { Authorization: "Bearer " + token.token },
-        })
-        .then(({ data }) => data.data)
-        .then((data) => {
-          setProfileData(data);
-        });
-    }
-  }, []);
-
-  if (loading) {
-    return <Loading />;
   }
 
   function handleRedirect(path: string | number) {
@@ -64,6 +81,10 @@ function Board() {
         return "게시글이";
     }
   })();
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <Stack flex={1} gap={1} alignSelf='stretch'>
