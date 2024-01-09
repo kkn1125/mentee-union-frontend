@@ -84,3 +84,39 @@ export function isDoing(start: Date, end: Date) {
   const compareEnd = new Date(end);
   return compareStart <= now && now <= compareEnd;
 }
+
+export function overwriteWith<T = any>(origin: null | T[], compare: T[]) {
+  if (origin === null) {
+    origin = [];
+  }
+  return [...origin, ...compare].reduce((acc: any[], cur: any) => {
+    let flag = false;
+
+    for (let i = 0; i < acc.length; i++) {
+      const _ = acc[i];
+
+      if (_.id === cur.id) {
+        flag = true;
+
+        if (_.updated_at < cur.updated_at) {
+          acc.splice(i, 1, cur);
+        }
+      }
+    }
+
+    if (!flag) {
+      acc.push(cur);
+    }
+    return acc;
+  }, [] as T[]);
+}
+
+export function overwrite<T = any>(origin: T, compare: T) {
+  if (origin === null) return compare;
+  if ((origin as any).id === (compare as any).id) {
+    if ((origin as any).updated_at < (compare as any).updated_at) {
+      return compare;
+    }
+  }
+  return origin;
+}
