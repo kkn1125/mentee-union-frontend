@@ -58,6 +58,9 @@ dependencies:
     version: 1.3.2
 
 devDependencies:
+  '@swc/plugin-styled-components':
+    specifier: ^1.5.108
+    version: 1.5.108
   '@types/chai':
     specifier: ^4.3.11
     version: 4.3.11
@@ -1111,6 +1114,10 @@ packages:
 
   /@swc/counter@0.1.2:
     resolution: {integrity: sha512-9F4ys4C74eSTEUNndnER3VJ15oru2NumfQxS8geE+f3eB5xvfxpWyqE5XlVnxb/R14uoXi6SLbBwwiDSkv+XEw==}
+    dev: true
+
+  /@swc/plugin-styled-components@1.5.108:
+    resolution: {integrity: sha512-hTlkcX3lY+FJjrpCjjVv05WuYjyRZB96F1eG12ZT5vq7UCzJnWkx9FRRSfBenPRpP1Y3SPFqWVWbEJdQ7PdzLg==}
     dev: true
 
   /@swc/types@0.1.5:

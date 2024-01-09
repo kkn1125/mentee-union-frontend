@@ -73,7 +73,10 @@ export default defineConfig(({ command, mode }) => {
           pages: [/src\/pages/],
         },
       }),
-      react(),
+      react({
+        devTarget: "esnext",
+        plugins: [["@swc/plugin-styled-components", {}]],
+      }),
     ],
   };
 });
