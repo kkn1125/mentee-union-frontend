@@ -40,12 +40,37 @@ const drawerWidth = 240;
 const drLogger = new Logger("mentoring drawer list");
 
 const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
-  async function enterNew(session_id: number) {
+  async function enterNew(session_id: number, session: MentoringSession) {
     if (confirm("새로운 모임에 참여하시겠습니까?")) {
       try {
-        await socket.emitWithAck("joinSession", {
-          session_id,
-        });
+        if (
+          session.is_private &&
+          session.password &&
+          session.password.length > 0
+        ) {
+          const pw = prompt("비밀번호를 입력해주세요.");
+          drLogger.debug("check password:", pw);
+          const response = await socket.emitWithAck(
+            "compareSessionWithPassword",
+            {
+              session_id,
+              password: pw,
+            }
+          );
+          drLogger.debug(response);
+          if (response.ok && response.hash === session.password) {
+            await socket.emitWithAck("joinSession", {
+              session_id,
+            });
+          } else {
+            alert("비밀번호가 틀립니다.");
+            drLogger.debug("session pass", session.password);
+          }
+        } else {
+          await socket.emitWithAck("joinSession", {
+            session_id,
+          });
+        }
       } catch (error) {
         drLogger.log(error);
       }
@@ -65,11 +90,10 @@ const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
   const privateSessionList = useMemo(
     () =>
       sessionList.filter(
-        (session) =>
-          session.is_private &&
+        (session) => session.is_private /* &&
           session.mentorings.some(
             (mentoring) => mentoring.mentee_id === user.userId
-          )
+          ) */
       ),
     [sessionList]
   );
@@ -85,12 +109,12 @@ const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
           </ListItemButton>
         </ListItem>
       )}
-      {publicSessionList.map(({ id, topic, mentorings, messages }) => (
+      {publicSessionList.map(({ id, topic, mentorings, messages }, i) => (
         <ListItem key={id} disablePadding>
           <ListItemButton
             onClick={() =>
               mentorings.every((mtr) => mtr.mentee_id !== user.userId)
-                ? enterNew(id)
+                ? enterNew(id, publicSessionList[i])
                 : enterRoom(id)
             }>
             <ListItemIcon>
@@ -121,12 +145,12 @@ const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
           }}
         />
       )}
-      {privateSessionList.map(({ id, topic, mentorings, messages }) => (
+      {privateSessionList.map(({ id, topic, mentorings, messages }, i) => (
         <ListItem key={id} disablePadding>
           <ListItemButton
             onClick={() =>
               mentorings.every((mtr) => mtr.mentee_id !== user.userId)
-                ? enterNew(id)
+                ? enterNew(id, privateSessionList[i])
                 : enterRoom(id)
             }>
             <ListItemIcon>
