@@ -4,7 +4,7 @@ import {
   TokenContext,
   TokenDispatchContext,
 } from "@/context/TokenProvider";
-import { BRAND_NAME } from "@/util/global.constants";
+import { BRAND_NAME, PROFILE_PATH } from "@/util/global.constants";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
@@ -222,7 +222,7 @@ export default function Header() {
             color='inherit'>
             {token.profile ? (
               <Avatar
-                src={token.profile}
+                src={PROFILE_PATH + token.profile}
                 sx={{
                   width: 30,
                   height: 30,
@@ -230,6 +230,7 @@ export default function Header() {
               />
             ) : (
               <Avatar
+                children={token.profile}
                 sx={{
                   width: 30,
                   height: 30,

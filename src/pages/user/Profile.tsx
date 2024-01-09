@@ -174,7 +174,7 @@ function Profile() {
           setProfilePreview(PROFILE_PATH + data.profiles[0].new_name);
           tokenDispatch({
             type: TOKEN_ACTION.PROFILE,
-            profile: PROFILE_PATH + data.profiles[0].new_name,
+            profile: data.profiles[0].new_name,
           });
         }
         formik.setValues({

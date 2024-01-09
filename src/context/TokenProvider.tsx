@@ -6,6 +6,7 @@ export type IntialState = {
   expired?: number;
   status?: "exists" | "no-exists";
   keep_sign: boolean;
+  user?: JwtDto;
   profile?: string;
 };
 
@@ -13,6 +14,7 @@ export enum TOKEN_ACTION {
   LOAD = "token/load",
   SAVE = "token/save",
   SIGNOUT = "token/signout",
+  USER = "token/user",
   PROFILE = "token/profile",
 }
 
@@ -21,11 +23,13 @@ type ActionType = {
   token?: string;
   refresh?: string;
   keep_sign?: boolean;
+  user?: JwtDto;
   profile?: string;
   // expired?: number;
 };
 
 export const initialState: IntialState = {
+  profile: "",
   status: undefined,
   keep_sign: false,
 };
@@ -53,6 +57,13 @@ const reducer = (state: IntialState, action: ActionType) => {
       status: "exists",
       refresh: action.refresh,
       keep_sign: action.keep_sign,
+    };
+    localStorage.setItem("user", JSON.stringify(data));
+    return data;
+  } else if (action.type === TOKEN_ACTION.USER) {
+    const data = {
+      ...state,
+      user: action.user,
     };
     localStorage.setItem("user", JSON.stringify(data));
     return data;

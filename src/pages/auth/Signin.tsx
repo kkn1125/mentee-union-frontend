@@ -1,4 +1,5 @@
 import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
+import Logger from "@/libs/logger";
 import { ERROR_MESSAGE, FAIL_MESSAGE, REGEX } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import {
@@ -32,6 +33,8 @@ const validationSchema = yup.object({
     .typeError(ERROR_MESSAGE.ONLY_STRING),
   keep_sign: yup.boolean().typeError(ERROR_MESSAGE.ONLY_BOOLEAN),
 });
+
+const logger = new Logger(Signin.name);
 
 function Signin() {
   const [signing, setSigning] = useState(false);
@@ -71,35 +74,38 @@ function Signin() {
           }
         )
         .then(({ data: { data } }) => {
-          const { access_token, refresh_token } = data;
+          const { user, access_token, refresh_token } = data;
+
+          logger.debug(data);
+          logger.debug(values);
+
+          if (user.profiles.length > 0) {
+            tokenDispatch({
+              type: TOKEN_ACTION.PROFILE,
+              profile: user.profiles[0].new_name,
+            });
+          }
+          tokenDispatch({
+            type: TOKEN_ACTION.USER,
+            user: {
+              userId: user.id,
+              email: user.email,
+              username: user.username,
+              phone_number: user.phone_number,
+              last_sign_in: user.last_sign_in,
+            },
+          });
+
           tokenDispatch({
             type: TOKEN_ACTION.SAVE,
             token: access_token,
             refresh: refresh_token,
             keep_sign: values.keep_sign,
           });
-
-          axiosInstance
-            .get("/users/profile", {
-              headers: {
-                Authorization: "Bearer " + access_token,
-              },
-            })
-            .then(({ data }) => data.data)
-            .then((data) => {
-              const { profiles } = data;
-              if (profiles.length > 0) {
-                tokenDispatch({
-                  type: TOKEN_ACTION.PROFILE,
-                  profile: profiles[0].new_name,
-                });
-              }
-            })
-            .finally(() => {
-              navigate("/");
-            });
+          navigate("/");
         })
         .catch((error) => {
+          console.log(error);
           if (error.message === "Network Error") {
             alert(FAIL_MESSAGE.PROBLEM_WITH_SERVER_ASK_ADMIN);
             return;
