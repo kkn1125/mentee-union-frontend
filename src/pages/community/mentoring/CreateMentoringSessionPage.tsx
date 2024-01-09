@@ -102,6 +102,7 @@ function CreateMentoringSessionPage({
         const copy = {
           ...rest,
           category_id: category,
+          password: rest.is_private ? rest.password : "",
         };
         socket.emit("createSession", copy);
       } catch (error) {
