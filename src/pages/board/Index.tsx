@@ -19,7 +19,9 @@ function Board() {
     store.profile || null
   );
   const [loading, setLoading] = useState(true);
-  const [boardList, setBoardList] = useState<Board[]>([]);
+  const [boardList, setBoardList] = useState<Board[]>(
+    store.boards ? store.boards.filter((_) => _.type === params.type) : []
+  );
 
   useEffect(() => {
     logger.debug("check already loaded", boardList, profileData);
