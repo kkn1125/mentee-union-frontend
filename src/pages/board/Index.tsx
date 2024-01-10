@@ -19,7 +19,7 @@ function Board() {
     store.profile || null
   );
   const [loading, setLoading] = useState(true);
-  const [boardList, setBoardList] = useState<Board[]>(store.boards || []);
+  const [boardList, setBoardList] = useState<Board[]>([]);
 
   useEffect(() => {
     logger.debug("check already loaded", boardList, profileData);
@@ -30,6 +30,9 @@ function Board() {
 
   useEffect(() => {
     getBoardItems();
+    return () => {
+      setBoardList([]);
+    };
   }, [params.type]);
 
   function getProfile() {
@@ -56,7 +59,10 @@ function Board() {
       .then((data) => {
         setLoading(false);
         const boardOverwrites = overwriteWith(store.boards, data);
-        setBoardList(boardOverwrites);
+        const typedBoards = boardOverwrites.filter(
+          (_) => _.type === params.type
+        );
+        setBoardList(typedBoards);
         store.boards = boardOverwrites;
       });
   }
