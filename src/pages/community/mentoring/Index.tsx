@@ -1,29 +1,22 @@
 import Loading from "@/components/atoms/common/Loading";
+import PublicOrPrivateSessionList from "@/components/atoms/mentoring/PublicSessionList";
 import { TokenContext } from "@/context/TokenProvider";
 import Logger from "@/libs/logger";
-import ChatIcon from "@mui/icons-material/Chat";
-import MarkUnreadChatAltIcon from "@mui/icons-material/MarkUnreadChatAlt";
-import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
+import { MODE, SOCKET_URL } from "@/util/global.constants";
+import { Box, Divider, Drawer, List, Stack, Toolbar } from "@mui/material";
 import {
-  Badge,
-  Box,
-  Divider,
-  Drawer,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Stack,
-  Toolbar,
-  Typography,
-} from "@mui/material";
-import { useContext, useEffect, useMemo, useState } from "react";
+  Dispatch,
+  SetStateAction,
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import io, { Socket } from "socket.io-client";
 import ChattingPage from "./ChattingPage";
 import CreateMentoringSessionPage from "./CreateMentoringSessionPage";
-import { MODE, SOCKET_URL } from "@/util/global.constants";
-import LockIcon from "@mui/icons-material/Lock";
 
 interface Props {
   window?: () => Window;
@@ -33,15 +26,46 @@ type DrawerListProps = {
   socket: Socket;
   user: JwtDto;
   sessionList: MentoringSession[];
+  setMobileOpen?: Dispatch<SetStateAction<boolean>>;
 };
 
 const drawerWidth = 240;
 
 const drLogger = new Logger("mentoring drawer list");
 
-const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
-  async function enterNew(session_id: number, session: MentoringSession) {
-    if (confirm("새로운 모임에 참여하시겠습니까?")) {
+const DrawerList = memo(
+  ({ socket, user, sessionList, setMobileOpen }: DrawerListProps) => {
+    const infoRef = useRef<HTMLDivElement>(null);
+    const [sessionInfo, setSessionInfo] = useState<MentoringSession | null>(
+      null
+    );
+
+    useEffect(() => {
+      window.addEventListener("click", closeInfoToClick);
+      window.addEventListener("keyup", closeInfoToKeyboard);
+      return () => {
+        window.removeEventListener("click", closeInfoToClick);
+        window.removeEventListener("keyup", closeInfoToKeyboard);
+      };
+    }, []);
+
+    function closeInfoToClick(e: MouseEvent) {
+      logger.debug("click event");
+      const target = e.target as HTMLDivElement;
+      if (target && infoRef.current !== target.closest("#session-info")) {
+        setSessionInfo(null);
+      }
+    }
+    function closeInfoToKeyboard(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        logger.debug("keyboard event");
+        setSessionInfo(null);
+      }
+    }
+
+    async function enterNew(session_id: number, session: MentoringSession) {
+      if (!confirm("새로운 모임에 참여하시겠습니까?")) return;
+
       try {
         if (
           session.is_private &&
@@ -75,107 +99,61 @@ const DrawerList = ({ socket, user, sessionList }: DrawerListProps) => {
         drLogger.log(error);
       }
     }
-  }
 
-  function enterRoom(session_id: number) {
-    socket.emit("changeSession", {
-      session_id,
-    });
-  }
+    function enterRoom(session_id: number) {
+      socket.emit("changeSession", {
+        session_id,
+      });
+    }
 
-  const publicSessionList = useMemo(
-    () => sessionList.filter((session) => !session.is_private),
-    [sessionList]
-  );
-  const privateSessionList = useMemo(
-    () =>
-      sessionList.filter(
-        (session) => session.is_private /* &&
-          session.mentorings.some(
-            (mentoring) => mentoring.mentee_id === user.userId
-          ) */
-      ),
-    [sessionList]
-  );
+    const publicSessionList = useMemo(
+      () => sessionList.filter((session) => !session.is_private),
+      [sessionList]
+    );
+    const privateSessionList = useMemo(
+      () => sessionList.filter((session) => session.is_private),
+      [sessionList]
+    );
 
-  return (
-    <List>
-      <Toolbar />
-      <Divider sx={{ borderColor: "transparent" }} />
-      {sessionList.length === 0 && (
-        <ListItem disablePadding>
-          <ListItemButton>
-            <Typography>등록된 멘토링이 없습니다.</Typography>
-          </ListItemButton>
-        </ListItem>
-      )}
-      {publicSessionList.map(({ id, topic, mentorings, messages }, i) => (
-        <ListItem key={id} disablePadding>
-          <ListItemButton
-            onClick={() =>
-              mentorings.every((mtr) => mtr.mentee_id !== user.userId)
-                ? enterNew(id, publicSessionList[i])
-                : enterRoom(id)
-            }>
-            <ListItemIcon>
-              {mentorings.some((mtr) => mtr.mentee_id === user.userId) ? (
-                messages.length > 0 &&
-                messages.some((msg) =>
-                  msg.readedUsers.every((usr) => usr.user_id !== user.userId)
-                ) ? (
-                  <MarkUnreadChatAltIcon />
-                ) : (
-                  <ChatIcon />
-                )
-              ) : (
-                <QuestionMarkIcon />
-              )}
-            </ListItemIcon>
-            <ListItemText primary={topic} />
-          </ListItemButton>
-        </ListItem>
-      ))}
-      {privateSessionList.length > 0 && (
-        <Divider
-          sx={{
-            border: "none",
-            borderTopWidth: 3,
-            borderTopStyle: "double",
-            borderTopColor: "#565656",
-          }}
+    return (
+      <List>
+        <Toolbar />
+        <Divider sx={{ borderColor: "transparent" }} />
+        <PublicOrPrivateSessionList
+          infoRef={infoRef}
+          user={user}
+          sessionList={publicSessionList}
+          enterNew={enterNew}
+          enterRoom={enterRoom}
+          setMobileOpen={setMobileOpen}
+          sessionInfo={sessionInfo}
+          setSessionInfo={setSessionInfo}
         />
-      )}
-      {privateSessionList.map(({ id, topic, mentorings, messages }, i) => (
-        <ListItem key={id} disablePadding>
-          <ListItemButton
-            onClick={() =>
-              mentorings.every((mtr) => mtr.mentee_id !== user.userId)
-                ? enterNew(id, privateSessionList[i])
-                : enterRoom(id)
-            }>
-            <ListItemIcon>
-              {mentorings.some((mtr) => mtr.mentee_id === user.userId) ? (
-                messages.length > 0 &&
-                messages.some((msg) =>
-                  msg.readedUsers.every((usr) => usr.user_id !== user.userId)
-                ) ? (
-                  <Badge color='default' variant='dot'>
-                    <LockIcon />
-                  </Badge>
-                ) : (
-                  <LockIcon />
-                )
-              ) : (
-                <QuestionMarkIcon />
-              )}
-            </ListItemIcon>
-            <ListItemText primary={topic} />
-          </ListItemButton>
-        </ListItem>
-      ))}
-    </List>
-  );
-};
+        {privateSessionList.length > 0 && (
+          <Divider
+            sx={{
+              border: "none",
+              borderTopWidth: 3,
+              borderTopStyle: "double",
+              borderTopColor: "#565656",
+            }}
+          />
+        )}
+        <PublicOrPrivateSessionList
+          infoRef={infoRef}
+          privacy
+          user={user}
+          sessionList={privateSessionList}
+          enterNew={enterNew}
+          enterRoom={enterRoom}
+          setMobileOpen={setMobileOpen}
+          sessionInfo={sessionInfo}
+          setSessionInfo={setSessionInfo}
+        />
+      </List>
+    );
+  }
+);
 
 let socket: Socket;
 
@@ -184,6 +162,13 @@ const logger = new Logger("mentoring index");
 function Index(props: Props) {
   const { window: _window } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const currentIsMobile = () => {
+    const result = !!navigator.userAgent.match(/mobile|android|iphone/gi);
+    logger.info(result);
+    return result;
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -234,6 +219,7 @@ function Index(props: Props) {
     }) {
       setSessionList(sessionList);
     }
+
     function onUpdateSession({ session }: { session: MentoringSession }) {
       setSessionList((sessionList) => {
         const temp = [...sessionList];
@@ -272,7 +258,11 @@ function Index(props: Props) {
     socket.on("reject", onReject);
     socket.on("disconnect", onDisconnect);
 
+    handleDetectMobile();
+    window.addEventListener("resize", handleDetectMobile);
     return () => {
+      window.removeEventListener("resize", handleDetectMobile);
+
       socket.disconnect();
       socket.off("connect", onConnect);
       socket.off("sessionList", onUpdateSessionList);
@@ -283,6 +273,12 @@ function Index(props: Props) {
       socket.off("disconnect", onDisconnect);
     };
   }, []);
+
+  function handleDetectMobile() {
+    setTimeout(() => {
+      setIsMobile(currentIsMobile());
+    }, 50);
+  }
 
   return userData === null ? (
     <Loading />
@@ -299,48 +295,52 @@ function Index(props: Props) {
         }}
         aria-label='session list'>
         {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-        <Drawer
-          variant='temporary'
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: "block", sm: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-              borderRightColor: "#565656",
-            },
-          }}>
-          {
-            <DrawerList
-              socket={socket}
-              user={userData}
-              sessionList={sessionList}
-            />
-          }
-        </Drawer>
-        <Drawer
-          variant='permanent'
-          sx={{
-            display: { xs: "none", sm: "block" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: drawerWidth,
-              borderRightColor: "#565656",
-            },
-          }}
-          open>
-          {
-            <DrawerList
-              socket={socket}
-              user={userData}
-              sessionList={sessionList}
-            />
-          }
-        </Drawer>
+        {isMobile ? (
+          <Drawer
+            variant='temporary'
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            ModalProps={{
+              keepMounted: true, // Better open performance on mobile.
+            }}
+            sx={{
+              display: { xs: "block", sm: "none" },
+              "& .MuiDrawer-paper": {
+                boxSizing: "border-box",
+                width: drawerWidth,
+                borderRightColor: "#565656",
+              },
+            }}>
+            {
+              <DrawerList
+                socket={socket}
+                user={userData}
+                sessionList={sessionList}
+                setMobileOpen={setMobileOpen}
+              />
+            }
+          </Drawer>
+        ) : (
+          <Drawer
+            variant='permanent'
+            sx={{
+              display: { xs: "none", sm: "block" },
+              "& .MuiDrawer-paper": {
+                boxSizing: "border-box",
+                width: drawerWidth,
+                borderRightColor: "#565656",
+              },
+            }}
+            open>
+            {
+              <DrawerList
+                socket={socket}
+                user={userData}
+                sessionList={sessionList}
+              />
+            }
+          </Drawer>
+        )}
       </Box>
 
       {/* mentoring info */}
@@ -362,4 +362,4 @@ function Index(props: Props) {
   );
 }
 
-export default Index;
+export default memo(Index);
