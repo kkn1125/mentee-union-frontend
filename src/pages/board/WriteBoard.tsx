@@ -10,7 +10,7 @@ function WriteBoard() {
   } else if (params.type === "notice") {
     return <NoticeEditor />;
   } else {
-    <Notfound />;
+    return <Notfound />;
   }
 }
 
