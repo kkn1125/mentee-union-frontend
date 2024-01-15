@@ -134,8 +134,22 @@ function App() {
                 </SelectedRoute>
               }
             />
-            <Route path='edit' element={<WriteBoard />} />
-            <Route path='edit/:id' element={<UpdateBoard />} />
+            <Route
+              path='edit'
+              element={
+                <ProtectedRoute isSigned={token.status === "exists"}>
+                  <WriteBoard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path='edit/:id'
+              element={
+                <ProtectedRoute isSigned={token.status === "exists"}>
+                  <UpdateBoard />
+                </ProtectedRoute>
+              }
+            />
           </Route>
         </Route>
         <Route path='auth' element={<AuthLayout />}>
@@ -174,13 +188,41 @@ function App() {
             <Route path='seminars'>
               <Route path='' element={<Seminars />} />
               <Route path=':id' element={<SeminarDetail />} />
-              <Route path='edit' element={<WriteSeminar />} />
-              <Route path='edit/:id' element={<UpdateSeminar />} />
+              <Route
+                path='edit'
+                element={
+                  <ProtectedRoute isSigned={token.status === "exists"}>
+                    <WriteSeminar />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='edit/:id'
+                element={
+                  <ProtectedRoute isSigned={token.status === "exists"}>
+                    <UpdateSeminar />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
             <Route path='forums'>
               <Route path='' element={<Forums />} />
-              <Route path='edit' element={<WriteForum />} />
-              <Route path='edit/:id' element={<UpdateForum />} />
+              <Route
+                path='edit'
+                element={
+                  <ProtectedRoute isSigned={token.status === "exists"}>
+                    <WriteForum />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path='edit/:id'
+                element={
+                  <ProtectedRoute isSigned={token.status === "exists"}>
+                    <UpdateForum />
+                  </ProtectedRoute>
+                }
+              />
               <Route path=':id' element={<ForumDetail />} />
             </Route>
           </Route>
