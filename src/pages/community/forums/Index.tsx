@@ -1,6 +1,10 @@
 import Loading from "@/components/atoms/common/Loading";
 import ForumCardList from "@/components/atoms/forum/ForumCardList";
-import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
+import {
+  TOKEN_ACTION,
+  TokenContext,
+  TokenDispatchContext,
+} from "@/context/TokenProvider";
 import { FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import { Button, Stack } from "@mui/material";
@@ -9,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 
 function Index() {
   const navigate = useNavigate();
+  const token = useContext(TokenContext);
   const tokenDispatch = useContext(TokenDispatchContext);
   const [forums, setForums] = useState<Forum[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,6 +49,10 @@ function Index() {
   }
 
   function handleWriteArticle() {
+    if (!token.token) {
+      alert(FAIL_MESSAGE.REQUIRE_SIGN_IN);
+      return;
+    }
     navigate("/community/forums/edit");
   }
 

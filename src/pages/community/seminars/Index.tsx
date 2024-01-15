@@ -1,15 +1,19 @@
 import Loading from "@/components/atoms/common/Loading";
-import SeminarCard from "@/components/atoms/seminar/SeminarCard";
 import SeminarCardList from "@/components/atoms/seminar/SeminarCardList";
-import { TOKEN_ACTION, TokenDispatchContext } from "@/context/TokenProvider";
+import {
+  TOKEN_ACTION,
+  TokenContext,
+  TokenDispatchContext,
+} from "@/context/TokenProvider";
 import { FAIL_MESSAGE } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
-import { Box, Button, List, Stack } from "@mui/material";
+import { Button, Stack } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function Seminars() {
   const navigate = useNavigate();
+  const token = useContext(TokenContext);
   const tokenDispatch = useContext(TokenDispatchContext);
   const [seminars, setSeminars] = useState<Seminar[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,6 +49,10 @@ function Seminars() {
   }
 
   function handleWriteArticle() {
+    if (!token.token) {
+      alert(FAIL_MESSAGE.REQUIRE_SIGN_IN);
+      return;
+    }
     navigate("/community/seminars/edit");
   }
 
