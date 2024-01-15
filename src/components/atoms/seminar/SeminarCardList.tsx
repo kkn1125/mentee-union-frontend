@@ -1,6 +1,6 @@
 import Loading from "@/components/atoms/common/Loading";
 import SeminarCard from "@/components/atoms/seminar/SeminarCard";
-import { List, Stack, Typography } from "@mui/material";
+import { List, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 
 type SeminarCardListProps = {

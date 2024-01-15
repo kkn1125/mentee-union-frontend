@@ -1,7 +1,7 @@
 import { timeFormat } from "@/util/tool";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import { Tooltip, Typography } from "@mui/material";
 import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import { Tooltip, Typography } from "@mui/material";
 
 type DurationProps = {
   title: string;

@@ -1,12 +1,11 @@
-import React from "react";
 import {
-  Box,
-  Typography,
   LinearProgress,
-  linearProgressClasses,
   Stack,
+  Typography,
+  linearProgressClasses,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+import React from "react";
 
 interface CustomLinearProgressProps {
   value: number;

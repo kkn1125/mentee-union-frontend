@@ -6,6 +6,7 @@ import { TokenContext } from "@/context/TokenProvider";
 import { boardType } from "@/util/global.constants";
 import { axiosInstance } from "@/util/instances";
 import { timeFormat } from "@/util/tool";
+import LockIcon from "@mui/icons-material/Lock";
 import {
   Box,
   Button,
@@ -19,7 +20,6 @@ import {
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import LockIcon from "@mui/icons-material/Lock";
 
 function BoardDetail() {
   const navigate = useNavigate();

@@ -1,4 +1,4 @@
-import { Box, Chip, Stack, SxProps, Typography } from "@mui/material";
+import { Chip, Stack, SxProps, Typography } from "@mui/material";
 
 enum GRADE_COLOR {
   mentee0 = "#56ad6c",

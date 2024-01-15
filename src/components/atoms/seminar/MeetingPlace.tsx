@@ -1,5 +1,5 @@
-import { Tooltip, Typography } from "@mui/material";
 import PlaceIcon from "@mui/icons-material/Place";
+import { Tooltip, Typography } from "@mui/material";
 
 type MeetingPlaceProps = {
   place: string;

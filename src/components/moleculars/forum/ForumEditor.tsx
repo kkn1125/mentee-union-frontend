@@ -14,7 +14,6 @@ import {
 import { useFormik } from "formik";
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import SunEditor from "suneditor-react";
 import "suneditor/dist/css/suneditor.min.css";
 import Ko from "suneditor/src/lang/ko";
 import * as yup from "yup";

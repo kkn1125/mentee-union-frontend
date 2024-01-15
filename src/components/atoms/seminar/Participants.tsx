@@ -1,4 +1,3 @@
-import React from "react";
 import GroupIcon from "@mui/icons-material/Group";
 import { Tooltip, Typography } from "@mui/material";
 

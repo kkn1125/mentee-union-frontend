@@ -1,12 +1,11 @@
 import LinkTitle from "@/components/atoms/common/LinkTitle";
 import Loading from "@/components/atoms/common/Loading";
 import ForumCardList from "@/components/atoms/forum/ForumCardList";
-import SeminarCard from "@/components/atoms/seminar/SeminarCard";
 import SeminarCardList from "@/components/atoms/seminar/SeminarCardList";
 import { axiosInstance } from "@/util/instances";
-import { Box, Button, List, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const SHOW_LIMIT = 4;
 

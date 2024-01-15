@@ -1,6 +1,5 @@
-import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople";
-import { Tooltip, Typography } from "@mui/material";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { Tooltip, Typography } from "@mui/material";
 
 type OwnerProps = {
   username: string;
