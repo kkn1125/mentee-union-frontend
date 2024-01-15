@@ -1,5 +1,4 @@
-import React from "react";
-import SunEditor, { buttonList } from "suneditor-react";
+import SunEditor from "suneditor-react";
 import { SunEditorReactProps } from "suneditor-react/dist/types/SunEditorReactProps";
 
 type CtmSunEditorProps = SunEditorReactProps;

@@ -1,4 +1,6 @@
+import Logger from "@/libs/logger";
 import ChatIcon from "@mui/icons-material/Chat";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import LockIcon from "@mui/icons-material/Lock";
 import MarkUnreadChatAltIcon from "@mui/icons-material/MarkUnreadChatAlt";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
@@ -25,12 +27,7 @@ import {
   RefObject,
   SetStateAction,
   memo,
-  useEffect,
-  useRef,
-  useState,
 } from "react";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
-import Logger from "@/libs/logger";
 
 type PublicOrPrivateSessionListProps = {
   infoRef: RefObject<HTMLDivElement>;

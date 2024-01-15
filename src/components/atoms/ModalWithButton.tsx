@@ -3,7 +3,6 @@ import {
   BoxProps,
   Button,
   ButtonProps,
-  ButtonPropsColorOverrides,
   Modal,
   Stack,
   Typography,

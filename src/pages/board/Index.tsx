@@ -15,13 +15,9 @@ function Board() {
   const navigate = useNavigate();
   const token = useContext(TokenContext);
   const params = useParams();
-  const [profileData, setProfileData] = useState<JwtDto | null>(
-    store.profile || null
-  );
+  const [profileData, setProfileData] = useState<JwtDto | null>(null);
   const [loading, setLoading] = useState(true);
-  const [boardList, setBoardList] = useState<Board[]>(
-    store.boards ? store.boards.filter((_) => _.type === params.type) : []
-  );
+  const [boardList, setBoardList] = useState<Board[]>([]);
 
   useEffect(() => {
     logger.debug("check already loaded", boardList, profileData);
@@ -33,7 +29,9 @@ function Board() {
   useEffect(() => {
     getBoardItems();
     return () => {
+      setLoading(true);
       setBoardList([]);
+      setProfileData(null);
     };
   }, [params.type]);
 
@@ -60,12 +58,12 @@ function Board() {
       .then(({ data }) => data.data)
       .then((data) => {
         setLoading(false);
-        const boardOverwrites = overwriteWith(store.boards, data);
-        const typedBoards = boardOverwrites.filter(
-          (_) => _.type === params.type
-        );
-        setBoardList(typedBoards);
-        store.boards = boardOverwrites;
+        // const boardOverwrites = overwriteWith(store.boards, data);
+        // const typedBoards = boardOverwrites.filter(
+        //   (_) => _.type === params.type
+        // );
+        setBoardList(data);
+        // store.boards = boardOverwrites;
       });
   }
 

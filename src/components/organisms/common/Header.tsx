@@ -5,7 +5,6 @@ import {
   TokenDispatchContext,
 } from "@/context/TokenProvider";
 import { BRAND_NAME, PROFILE_PATH } from "@/util/global.constants";
-import AccountCircle from "@mui/icons-material/AccountCircle";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -16,7 +15,7 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { MouseEvent, useContext, useEffect, useState } from "react";
+import { MouseEvent, useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function Header() {
