@@ -315,7 +315,7 @@ function Home() {
           <Box>
             <Button
               variant='contained'
-              onClick={() => handleRedirect("/board/notice")}>
+              onClick={() => handleRedirect("/boards/notice")}>
               이벤트 정보 확인하기
             </Button>
           </Box>
